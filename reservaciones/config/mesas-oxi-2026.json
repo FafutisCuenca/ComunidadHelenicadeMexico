@@ -1,0 +1,14 @@
+
+{
+  "version_configuracion": 1,
+  "evento_id": "OXI-2026",
+  "capacidad_predeterminada": 10,
+  "permitir_capacidad_personalizada": true,
+  "mesas": [],
+  "reglas": {
+    "asignacion_automatica": false,
+    "permitir_sobrecupo": false,
+    "permitir_duplicar_asignacion": false,
+    "requiere_validacion_administrativa": true
+  }
+}
