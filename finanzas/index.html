@@ -5,6 +5,100 @@
 <title>Administración Financiera | Comunidad Helénica</title>
 <style>
 :root{--azul:#102b49;--azul2:#183d63;--dorado:#c5a15a;--fondo:#f3f6fa;--texto:#25364a;--gris:#66768a;--borde:#dce4ed;--verde:#18794e;--rojo:#b42318}*{box-sizing:border-box}body{margin:0;background:var(--fondo);color:var(--texto);font-family:Arial,Helvetica,sans-serif}header{background:linear-gradient(125deg,var(--azul),var(--azul2));color:white;padding:28px 22px;border-bottom:4px solid var(--dorado)}.encabezado{max-width:1250px;margin:auto;display:flex;align-items:center;gap:20px}.logo{width:95px;height:95px;background:white;border:1px solid var(--dorado);border-radius:15px;padding:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 20px #0003,0 0 0 3px #c5a15a22}.logo img{width:100%;height:100%;object-fit:contain}.identidad{min-width:0}.nombre-comunidad,.titulo-modulo{margin:0;color:#fff;font-size:clamp(23px,3vw,34px);font-weight:800;line-height:1.2;letter-spacing:.3px}.fundacion{margin:5px 0 13px;color:#e9d7a9;font-size:12px;font-weight:500;letter-spacing:.4px}.subtitulo{margin:9px 0 0;color:#e1eaf3;font-size:15px}main{max-width:1250px;padding:25px 18px 45px;margin:auto}.barra{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px}.barra h2{color:var(--azul);margin:0;font-size:23px}.acciones,.botones-form{display:flex;flex-wrap:wrap;gap:8px}button,.boton{border:0;border-radius:7px;padding:10px 14px;font-weight:bold;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}.primario{background:var(--azul);color:white}.secundario{background:#e5edf5;color:var(--azul)}.dorado{background:var(--dorado);color:#172b41}.peligro{background:#fde8e7;color:var(--rojo)}button:hover,.boton:hover{filter:brightness(.96)}.nota{padding:13px 15px;background:#fff9e9;border:1px solid #ead9a9;border-radius:8px;font-size:13px;line-height:1.5;margin-bottom:20px}.resumen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:24px}.indicador{background:white;padding:19px;border-radius:11px;border:1px solid var(--borde);box-shadow:0 3px 10px #102b4908;min-width:0}.etiqueta{color:var(--gris);font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px}.valor{display:block;margin-top:11px;color:var(--azul);font-size:clamp(19px,2vw,27px);font-weight:bold;overflow-wrap:anywhere}.indicador small{display:block;margin-top:7px;color:var(--gris);font-size:12px}.panel{background:white;border:1px solid var(--borde);border-radius:11px;margin-bottom:22px;overflow:hidden;box-shadow:0 3px 10px #102b4908}.panel-titulo{padding:17px 20px;background:#fafdff;border-bottom:1px solid var(--borde)}.panel-titulo h3{margin:0;color:var(--azul);font-size:18px}.panel-titulo p{margin:6px 0 0;color:var(--gris);font-size:13px;line-height:1.4}.contenido{padding:20px}.formulario{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.campo{display:flex;flex-direction:column;gap:6px;min-width:0}.campo.completo{grid-column:1/-1}label{font-size:13px;font-weight:bold;color:#34485e}input,select,textarea{width:100%;min-width:0;padding:11px;border:1px solid #cbd5e1;border-radius:7px;background:white;color:var(--texto);font:inherit;font-size:14px}input:focus,select:focus,textarea:focus{outline:2px solid #c5a15a66;border-color:var(--dorado)}.ayuda{color:var(--gris);font-size:12px;line-height:1.4}.botones-form{margin-top:18px}.tabla-contenedor{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:12px 14px;border-bottom:1px solid #e8edf3;vertical-align:top}th{color:#52647a;background:#f8fafc;font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}td{line-height:1.45}td strong{color:var(--azul)}.numerico{text-align:right;white-space:nowrap}.estado{display:inline-block;border-radius:20px;padding:4px 8px;background:#e9f5ee;color:var(--verde);font-size:11px;font-weight:bold}.estado-pendiente{background:#fff4d6;color:#805b00}.vacio{text-align:center;color:var(--gris);padding:22px 15px}.oculto{display:none!important}.aviso-estado{margin:14px 0 0;font-size:13px;line-height:1.5}.dos-columnas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}footer{text-align:center;padding:20px;background:var(--azul);color:#dbe5ef;font-size:12px;line-height:1.6}@media(max-width:850px){.resumen{grid-template-columns:repeat(2,minmax(0,1fr))}.formulario{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:540px){header{padding:20px 15px}.encabezado{align-items:flex-start;gap:13px}.logo{width:68px;height:68px;padding:5px}.nombre-comunidad,.titulo-modulo{font-size:23px}.fundacion{font-size:10px;margin-bottom:11px}.subtitulo{font-size:13px}main{padding:20px 12px 30px}.resumen{gap:9px}.indicador{padding:13px}.etiqueta{font-size:10px}.formulario,.dos-columnas{grid-template-columns:1fr}.campo.completo{grid-column:auto}.contenido{padding:14px}.barra{align-items:flex-start}}
+ /* Estado financiero: ingresos vs. egresos */
+.estado-financiero {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 0 0 24px;
+}
+
+.estado-columna {
+  background: #fff;
+  border: 1px solid #dce4ed;
+  border-radius: 11px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px #102b4908;
+}
+
+.estado-columna h3 {
+  margin: 0;
+  padding: 16px 18px;
+  color: white;
+  font-size: 17px;
+}
+
+.estado-columna.egresos h3 {
+  background: #7b3340;
+}
+
+.estado-columna.ingresos h3 {
+  background: #17664b;
+}
+
+.estado-cuerpo {
+  padding: 16px 18px;
+}
+
+.linea-resumen {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e8edf3;
+  font-size: 13px;
+}
+
+.linea-resumen:last-child {
+  border-bottom: 0;
+}
+
+.linea-resumen span {
+  color: #66768a;
+}
+
+.linea-resumen strong {
+  color: #102b49;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.linea-resumen.total {
+  margin-top: 4px;
+  padding-top: 14px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.subtitulo-resumen {
+  margin: 14px 0 4px;
+  color: #102b49;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .45px;
+  font-weight: bold;
+}
+
+.nota-resumen {
+  font-size: 11px;
+  color: #66768a;
+  line-height: 1.45;
+  margin: 12px 0 0;
+}
+
+.donacion-linea {
+  background: #f0f8f3;
+  margin: 6px -8px;
+  padding: 10px 8px;
+  border-radius: 6px;
+}
+
+@media (max-width: 720px) {
+  .estado-financiero {
+    grid-template-columns: 1fr;
+  }
+} 
 </style>
 </head><body>
 <header><div class="encabezado"><div class="logo"><img src="../images/Logo%20COMHELMEX.jpg" alt="Logotipo oficial de la Comunidad Helénica de México" onerror="this.style.display='none'"></div><div class="identidad"><h1 class="nombre-comunidad">Comunidad Helénica de México, A.C.</h1><p class="fundacion">Fundada el 13 de marzo de 1956</p><h2 class="titulo-modulo">Administración Financiera</h2><p class="subtitulo">Control de proveedores, servicios, presupuesto, gastos e ingresos</p></div></div></header>
