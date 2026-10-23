@@ -372,14 +372,22 @@
     }
   }
 
-  window.addEventListener("oxi:reservacion-calculada", evento => {
-    borradorActual = evento.detail;
-    mostrarEstado(
-      "Reservación calculada. Puedes agregarla a la lista de trabajo.",
-      false
-    );
-  });
+ botonAgregar.disabled = true;
 
+window.addEventListener("oxi:reservacion-calculada", evento => {
+  borradorActual = evento.detail;
+  botonAgregar.disabled = false;
+
+  mostrarEstado(
+    "Reservación calculada. Puedes agregarla a la lista de trabajo.",
+    false
+  );
+});
+
+window.addEventListener("oxi:reservacion-invalidada", () => {
+  borradorActual = null;
+  botonAgregar.disabled = true;
+});
   botonAgregar.addEventListener("click", agregarReservacion);
   botonExportar.addEventListener("click", exportarReservaciones);
   entradaArchivo.addEventListener("change", importarReservaciones);
