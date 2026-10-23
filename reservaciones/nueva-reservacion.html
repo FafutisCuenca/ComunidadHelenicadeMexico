@@ -396,6 +396,48 @@
         <div id="mensaje" aria-live="polite"></div>
       </section>
     </form>
+ 
+<section class="panel" id="panelIntercambioJSON">
+  <h2>4. Archivo de reservaciones</h2>
+
+  <p>
+    Agrega cada reservación calculada a la lista de trabajo.
+    Después podrás descargar el conjunto en formato JSON o
+    importar un archivo anterior.
+  </p>
+
+  <p class="nota">
+    Los registros permanecen en la memoria de esta página hasta
+    que los exportes. Al recargarla, la lista de trabajo se pierde.
+    El archivo descargado puede contener datos personales.
+  </p>
+
+  <div class="botones">
+    <button type="button" class="primario" id="agregarAlArchivo">
+      Agregar reservación calculada
+    </button>
+
+    <button type="button" class="secundario" id="exportarJSON">
+      Descargar JSON
+    </button>
+  </div>
+
+  <div class="campo" style="margin-top:16px">
+    <label for="archivoJSON">Importar archivo JSON existente</label>
+    <input
+      id="archivoJSON"
+      type="file"
+      accept=".json,application/json">
+  </div>
+
+  <div id="estadoJSON" class="mensaje" aria-live="polite">
+    Todavía no hay reservaciones en la lista de trabajo.
+  </div>
+
+  <div id="listaJSON" class="tabla-contenedor"></div>
+</section>
+
+  
   </main>
 
   <footer>
