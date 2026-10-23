@@ -1,0 +1,41 @@
+
+{
+  "version_configuracion": 1,
+  "evento_id": "OXI-2026",
+  "nombre": "Día del OXI",
+  "organizacion": "Comunidad Helénica de México A.C.",
+  "fecha": "2026-10-25",
+  "moneda": "MXN",
+  "estado": "configuracion",
+  "tarifas": {
+    "adulto": {
+      "descripcion": "Adulto",
+      "importe": 700,
+      "edad_minima": 9
+    },
+    "nino_3_a_8": {
+      "descripcion": "Niño de 3 a 8 años",
+      "importe": 350,
+      "edad_minima": 3,
+      "edad_maxima": 8
+    }
+  },
+  "mesas": {
+    "capacidad_predeterminada": 10,
+    "permitir_capacidad_personalizada": true
+  },
+  "reservaciones": {
+    "folio_prefijo": "OXI-2026",
+    "requiere_responsable": true,
+    "requiere_dato_verificacion": true
+  },
+  "pagos": {
+    "requiere_validacion_administrativa": true,
+    "permitir_pagos_parciales": true,
+    "permitir_sob pagos": false
+  },
+  "boletos": {
+    "requiere_pago_validado": true,
+    "requiere_mesa_asignada": true
+  }
+}
