@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Módulo de reservaciones y administración del Día del OXI 2026 de la Comunidad Helénica de México A.C.">
+  <title>Reservaciones OXI 2026 | Comunidad Helénica</title>
+  <style>
+    :root {
+      --azul: #17365d;
+      --azul-oscuro: #102844;
+      --azul-claro: #eaf1f8;
+      --dorado: #b59655;
+      --fondo: #f5f6f8;
+      --texto: #263238;
+      --muted: #5e6872;
+      --blanco: #ffffff;
+      --borde: #dce2e8;
+      --verde: #236548;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, var(--azul-oscuro), var(--azul));
+      color: var(--blanco);
+      padding: 30px 20px;
+      text-align: center;
+      border-bottom: 5px solid var(--dorado);
+    }
+    header h1 { margin: 0; font-size: clamp(1.5rem, 4vw, 2.2rem); }
+    header p { margin: 8px 0 0; }
+    main { width: min(1040px, 92%); margin: 30px auto 38px; }
+    .evento {
+      background: var(--blanco);
+      padding: clamp(20px, 4vw, 30px);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.07);
+      border-top: 4px solid var(--dorado);
+    }
+    .evento h2 { color: var(--azul); margin: 10px 0 6px; }
+    .estado {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      background: #fff2d5;
+      color: #755519;
+      font-size: .85rem;
+      font-weight: bold;
+    }
+    .datos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 22px 0 0;
+    }
+    .dato { background: var(--azul-claro); padding: 14px; border-radius: 8px; }
+    .dato strong { display: block; color: var(--azul); }
+    .seccion-titulo { color: var(--azul); margin: 30px 0 6px; }
+    .subtitulo { margin-top: 0; color: var(--muted); }
+    .opciones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .opcion {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      background: var(--blanco);
+      padding: 22px;
+      border-radius: 10px;
+      border: 1px solid var(--borde);
+      box-shadow: 0 3px 10px rgba(0,0,0,.035);
+    }
+    .icono {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--azul-claro);
+      color: var(--azul);
+      font-size: 1.45rem;
+      font-weight: bold;
+    }
+    .opcion h3 { margin: 12px 0 5px; color: var(--azul); }
+    .opcion p { margin: 0 0 12px; }
+    .opcion ul { margin: 0 0 20px; padding-left: 20px; color: #46525e; }
+    .boton {
+      display: inline-block;
+      margin-top: auto;
+      padding: 11px 15px;
+      border-radius: 7px;
+      background: var(--azul);
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      border: 2px solid var(--azul);
+      transition: background .15s ease, transform .15s ease;
+    }
+    .boton:hover, .boton:focus { background: var(--azul-oscuro); transform: translateY(-1px); }
+    .boton-secundario { background: white; color: var(--azul); }
+    .boton-secundario:hover, .boton-secundario:focus { color: white; }
+    .nota {
+      margin-top: 24px;
+      padding: 16px 18px;
+      background: #fff;
+      border-left: 4px solid var(--dorado);
+      border-radius: 4px;
+      font-size: .94rem;
+    }
+    .pasos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .paso { padding: 15px; background: #fff; border: 1px solid var(--borde); border-radius: 8px; }
+    .paso strong { display: block; color: var(--azul); margin-bottom: 4px; }
+    footer { text-align: center; padding: 22px 15px; color: var(--muted); font-size: .9rem; }
+    @media (max-width: 520px) {
+      header { padding: 25px 15px; }
+      .opcion { padding: 18px; }
+      .boton { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Comunidad Helénica de México A.C.</h1>
+    <p>Sistema de reservaciones y administración de eventos</p>
+  </header>
+
+  <main>
+    <section class="evento" aria-labelledby="titulo-evento">
+      <span class="estado">Módulo OXI 2026</span>
+      <h2 id="titulo-evento">Día del OXI 2026</h2>
+      <p>Bienvenido al módulo de reservaciones del Día del OXI, organizado por la Comunidad Helénica de México A.C. Selecciona la actividad que necesitas realizar.</p>
+      <div class="datos">
+        <div class="dato"><strong>Fecha del evento</strong>25 de octubre de 2026</div>
+        <div class="dato"><strong>Adultos</strong>$700 MXN · Desde los 9 años</div>
+        <div class="dato"><strong>Niños de 3 a 8 años</strong>$350 MXN</div>
+        <div class="dato"><strong>Capacidad de referencia</strong>10 personas por mesa</div>
+      </div>
+    </section>
+
+    <h2 class="seccion-titulo">¿Qué deseas hacer?</h2>
+    <p class="subtitulo">Accede directamente al módulo correspondiente. Ambos trabajan con el archivo de reservaciones JSON v2.</p>
+
+    <section class="opciones" aria-label="Módulos de reservaciones">
+      <article class="opcion">
+        <div class="icono" aria-hidden="true">＋</div>
+        <h3>Registrar nueva reservación</h3>
+        <p>Captura una reservación y los datos de las personas que asistirán.</p>
+        <ul>
+          <li>Datos del responsable y del grupo</li>
+          <li>Registro de asistentes</li>
+          <li>Asignación o captura de mesa</li>
+          <li>Cálculo de importes según las reglas del módulo</li>
+          <li>Importación y exportación de JSON</li>
+        </ul>
+        <a class="boton" href="./nueva-reservacion.html">Abrir nueva reservación →</a>
+      </article>
+
+      <article class="opcion">
+        <div class="icono" aria-hidden="true">⌕</div>
+        <h3>Consultar y actualizar</h3>
+        <p>Administra los registros existentes y prepara una versión actualizada del archivo.</p>
+        <ul>
+          <li>Buscar y consultar reservaciones</li>
+          <li>Editar información registrada</li>
+          <li>Revisar mesas y lugares disponibles</li>
+          <li>Generar padrón y reporte alfabético para recepción</li>
+          <li>Revisar estados de cobro y saldos registrados</li>
+          <li>Exportar JSON actualizado</li>
+        </ul>
+        <a class="boton" href="./consulta.html">Abrir consulta y administración →</a>
+      </article>
+    </section>
+
+    <h2 class="seccion-titulo">Flujo de trabajo recomendado</h2>
+    <section class="pasos" aria-label="Pasos para mantener actualizadas las reservaciones">
+      <div class="paso"><strong>1. Carga la versión vigente</strong>Si el módulo solicita un archivo JSON, selecciona la copia más reciente de las reservaciones.</div>
+      <div class="paso"><strong>2. Registra o edita</strong>Realiza los cambios en uno de los módulos. Evita trabajar al mismo tiempo con copias distintas.</div>
+      <div class="paso"><strong>3. Exporta el JSON</strong>Descarga el archivo actualizado y consérvalo como la versión vigente.</div>
+      <div class="paso"><strong>4. Usa esa misma versión</strong>Cuando abras el otro módulo, carga el JSON actualizado para trabajar con los cambios más recientes.</div>
+    </section>
+
+    <div class="nota">
+      <strong>Importante:</strong> GitHub Pages publica los archivos, pero no guarda automáticamente dentro del repositorio los cambios realizados desde el navegador. Para conservar las altas y modificaciones, exporta el JSON actualizado. Si deseas que la versión publicada del archivo cambie, tendrás que actualizarla manualmente en GitHub. Los cambios que no se exporten pueden perderse al cerrar o recargar la página.
+    </div>
+  </main>
+
+  <footer>Comunidad Helénica de México A.C. · Día del OXI 2026</footer>
+</body>
+</html>
