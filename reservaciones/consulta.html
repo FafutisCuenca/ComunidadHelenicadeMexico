@@ -3,19 +3,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Consulta de reservaciones | OXI 2026</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OXI-2026 | Consulta de reservaciones</title>
 
   <style>
     :root {
       --azul: #17365d;
       --azul-claro: #eaf1f8;
+      --dorado: #b99a55;
       --fondo: #f4f6f9;
-      --borde: #d9e0e8;
       --texto: #263445;
-      --verde: #176b43;
-      --rojo: #a4262c;
+      --borde: #dce2e9;
+      --verde: #18794e;
+      --rojo: #b42318;
+      --gris: #667085;
     }
 
     * {
@@ -24,1225 +25,1520 @@
 
     body {
       margin: 0;
-      padding: 24px;
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--texto);
       background: var(--fondo);
-    }
-
-    main {
-      max-width: 1250px;
-      margin: 0 auto;
+      color: var(--texto);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.45;
     }
 
     header {
       background: var(--azul);
       color: white;
-      padding: 24px;
-      border-radius: 12px;
-      margin-bottom: 22px;
+      padding: 25px 18px;
+      border-bottom: 5px solid var(--dorado);
+    }
+
+    header .contenedor,
+    main {
+      max-width: 1500px;
+      margin: auto;
     }
 
     header h1 {
-      margin: 0 0 8px;
-      font-size: 27px;
+      margin: 0 0 5px;
+      font-size: clamp(22px, 4vw, 32px);
     }
 
     header p {
-      margin: 0;
-      line-height: 1.5;
+      margin: 5px 0;
+      color: #e3eaf3;
+    }
+
+    main {
+      padding: 22px 16px 40px;
     }
 
     .panel {
       background: white;
-      padding: 20px;
-      margin-bottom: 20px;
       border: 1px solid var(--borde);
       border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 7px rgba(16, 24, 40, 0.04);
     }
 
     h2 {
       color: var(--azul);
-      font-size: 20px;
-      margin-top: 0;
+      font-size: 21px;
+      margin: 0 0 14px;
     }
 
-    .nota {
-      color: #586779;
-      font-size: 14px;
-      line-height: 1.6;
+    h3 {
+      color: var(--azul);
+      font-size: 17px;
+      margin: 18px 0 10px;
     }
 
-    .controles {
+    .ayuda {
+      color: var(--gris);
+      font-size: 13px;
+    }
+
+    .barra-controles {
       display: flex;
-      gap: 12px;
       flex-wrap: wrap;
+      gap: 10px;
       align-items: center;
     }
 
-    input[type="file"] {
+    input[type="file"],
+    input[type="search"],
+    select {
+      padding: 10px;
+      border: 1px solid #c7ced8;
+      border-radius: 7px;
+      background: white;
+      color: var(--texto);
       max-width: 100%;
-      padding: 10px 0;
+    }
+
+    input[type="search"] {
+      width: min(100%, 380px);
     }
 
     button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 7px;
+      padding: 10px 14px;
       background: var(--azul);
       color: white;
-      border: none;
-      border-radius: 7px;
-      padding: 11px 16px;
-      cursor: pointer;
-      font-size: 14px;
+      font-weight: 600;
     }
 
     button:hover {
-      opacity: 0.9;
+      filter: brightness(1.12);
+    }
+
+    button.secundario {
+      color: var(--azul);
+      background: var(--azul-claro);
+      border: 1px solid #d4dfed;
     }
 
     button:disabled {
-      opacity: 0.45;
+      opacity: .45;
       cursor: not-allowed;
     }
 
-    .mensaje {
-      margin-top: 14px;
-      padding: 12px;
+    .estado {
+      margin-top: 12px;
+      padding: 11px 13px;
       border-radius: 7px;
-      background: var(--azul-claro);
-      line-height: 1.5;
+      background: #f2f4f7;
+      color: var(--gris);
       overflow-wrap: anywhere;
     }
 
-    .mensaje.ok {
+    .estado.ok {
       color: var(--verde);
-      background: #e8f5ed;
+      background: #eaf7ef;
     }
 
-    .mensaje.error {
+    .estado.error {
       color: var(--rojo);
-      background: #fcebea;
+      background: #fef0ef;
     }
 
     .resumen {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
-    .indicador {
-      padding: 18px;
+    .tarjeta {
+      background: white;
       border: 1px solid var(--borde);
+      border-top: 4px solid var(--dorado);
       border-radius: 10px;
-      background: #fff;
+      padding: 15px;
       min-width: 0;
     }
 
-    .indicador .etiqueta {
+    .tarjeta .etiqueta {
       display: block;
-      font-size: 13px;
-      color: #586779;
-      margin-bottom: 9px;
+      color: var(--gris);
+      font-size: 12px;
+      margin-bottom: 7px;
     }
 
-    .indicador .valor {
+    .tarjeta .valor {
       display: block;
-      font-size: 23px;
-      font-weight: bold;
+      font-size: 25px;
+      font-weight: 700;
       color: var(--azul);
       overflow-wrap: anywhere;
+    }
+
+    .tarjeta .detalle {
+      display: block;
+      color: var(--gris);
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .navegacion {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .navegacion button {
+      background: white;
+      color: var(--azul);
+      border: 1px solid var(--borde);
+    }
+
+    .navegacion button.activo {
+      background: var(--azul);
+      color: white;
+    }
+
+    .vista {
+      display: none;
+    }
+
+    .vista.activa {
+      display: block;
     }
 
     .tabla-contenedor {
       width: 100%;
       overflow-x: auto;
+      border: 1px solid var(--borde);
+      border-radius: 8px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
+      background: white;
+      font-size: 13px;
     }
 
-    th, td {
-      padding: 11px 12px;
-      border-bottom: 1px solid var(--borde);
+    th,
+    td {
+      padding: 10px 11px;
       text-align: left;
       vertical-align: top;
+      border-bottom: 1px solid var(--borde);
     }
 
     th {
       background: var(--azul-claro);
       color: var(--azul);
       white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
 
     tbody tr:hover {
       background: #f8fafc;
     }
 
-    td.numero {
+    tfoot td {
+      font-weight: 700;
+      background: #f0f4f8;
+    }
+
+    .numero {
       text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .etiqueta-estado {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #eef2f6;
+      color: #475467;
+    }
+
+    .etiqueta-estado.pagado {
+      background: #e7f6ec;
+      color: #17663e;
+    }
+
+    .etiqueta-estado.pendiente {
+      background: #fff1d6;
+      color: #8a5200;
+    }
+
+    .etiqueta-estado.cortesia {
+      background: #eee8ff;
+      color: #5636a5;
+    }
+
+    .etiqueta-estado.sin-mesa {
+      background: #fef0ef;
+      color: #b42318;
+    }
+
+    .nombre-provisional {
+      font-weight: 600;
+    }
+
+    .identificador {
+      font-family: Consolas, monospace;
+      color: var(--azul);
       white-space: nowrap;
     }
 
-    tfoot {
-      font-weight: bold;
-      background: #f4f6f9;
+    .nota {
+      border-left: 4px solid var(--dorado);
+      padding: 10px 13px;
+      background: #fbf8f0;
+      font-size: 13px;
+      margin: 12px 0;
     }
 
-    .vacio {
-      color: #68788a;
-      padding: 18px 0;
-    }
-
-    .oculto {
-      display: none;
+    .sin-datos {
+      padding: 24px;
+      text-align: center;
+      color: var(--gris);
     }
 
     .pie {
-      color: #68788a;
+      color: var(--gris);
+      font-size: 12px;
       text-align: center;
-      font-size: 13px;
-      padding: 10px;
-    }
-
-    @media (max-width: 850px) {
-      body {
-        padding: 12px;
-      }
-
-      .resumen {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 420px) {
-      .resumen {
-        grid-template-columns: 1fr;
-      }
-
-      header h1 {
-        font-size: 22px;
-      }
+      padding: 18px 0 5px;
     }
 
     @media print {
       body {
         background: white;
-        padding: 0;
-      }
-
-      .panel-controles,
-      .pie,
-      button {
-        display: none !important;
-      }
-
-      .panel {
-        border: 0;
-        padding: 8px 0;
-        break-inside: avoid;
       }
 
       header {
         background: white;
         color: black;
-        padding: 10px 0;
+        border-bottom: 2px solid black;
+      }
+
+      header p {
+        color: black;
+      }
+
+      .controles,
+      .navegacion,
+      .no-imprimir {
+        display: none !important;
+      }
+
+      main {
+        max-width: none;
+        padding: 5px;
+      }
+
+      .panel,
+      .tarjeta {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      .vista {
+        display: block !important;
       }
 
       .tabla-contenedor {
         overflow: visible;
+        border: 0;
       }
 
       table {
-        font-size: 10px;
+        font-size: 9px;
       }
 
-      th, td {
+      th,
+      td {
         padding: 5px;
+      }
+
+      th {
+        position: static;
       }
     }
   </style>
 </head>
 
 <body>
-<main>
-
   <header>
-    <h1>OXI 2026</h1>
-    <p>Consulta consolidada de reservaciones</p>
-    <p>Comunidad Helénica de México A.C.</p>
+    <div class="contenedor">
+      <h1>OXI-2026 | Consulta de reservaciones</h1>
+      <p>Comunidad Helénica de México A.C.</p>
+      <p>Control de mesas, grupos familiares y padrón provisional de asistentes</p>
+    </div>
   </header>
 
-  <section class="panel panel-controles">
-    <h2>1. Cargar archivo de reservaciones</h2>
+  <main>
+    <section class="panel controles">
+      <h2>1. Cargar información</h2>
 
-    <p class="nota">
-      Selecciona el archivo JSON de reservaciones.
-      La información se procesa en este navegador y no se
-      guarda en una base de datos.
-    </p>
-
-    <div class="controles">
-      <input
-        type="file"
-        id="archivoJSON"
-        accept=".json,application/json"
-      >
-
-      <button type="button" id="limpiarConsulta">
-        Limpiar consulta
-      </button>
-
-      <button type="button" id="imprimirConsulta" disabled>
-        Imprimir / Guardar PDF
-      </button>
-    </div>
-
-    <div
-      id="estadoConsulta"
-      class="mensaje"
-      role="status"
-      aria-live="polite"
-    >
-      Selecciona un archivo JSON para comenzar.
-    </div>
-  </section>
-
-  <div id="resultados" class="oculto">
-
-    <section class="panel">
-      <h2>2. Resumen general</h2>
-
-      <div class="resumen">
-        <div class="indicador">
-          <span class="etiqueta" id="etiquetaReservaciones">
-            Reservaciones familiares
-          </span>
-          <span class="valor" id="totalReservaciones">0</span>
-        </div>
-
-        <div class="indicador">
-          <span class="etiqueta" id="etiquetaAsistentes">
-            Asistentes registrados
-          </span>
-          <span class="valor" id="totalAsistentes">0</span>
-        </div>
-
-        <div class="indicador">
-          <span class="etiqueta" id="etiquetaOriginal">
-            Importe original
-          </span>
-          <span class="valor" id="totalOriginal">$0.00</span>
-        </div>
-
-        <div class="indicador">
-          <span class="etiqueta" id="etiquetaFinal">
-            Importe final
-          </span>
-          <span class="valor" id="totalFinal">$0.00</span>
-        </div>
-      </div>
-
-      <p id="resumenAjustes" class="nota"></p>
-      <p id="fechaExportacion" class="nota"></p>
-    </section>
-
-    <section class="panel">
-      <h2>3. Concentrado por mesa</h2>
-
-      <p class="nota">
-        Las reservaciones se agrupan por mesa. Los registros
-        sin mesa asignada también se incluyen en el concentrado.
+      <p class="ayuda">
+        Selecciona el archivo JSON v2 exportado a partir del listado de Excel.
+        La consulta procesa el archivo localmente en este navegador.
       </p>
 
-      <div class="tabla-contenedor">
-        <table>
-          <thead>
-            <tr>
-              <th>Mesa</th>
-              <th>Reservaciones</th>
-              <th>Asistentes</th>
-              <th>Importe original</th>
-              <th>Ajustes</th>
-              <th>Importe final</th>
-            </tr>
-          </thead>
-          <tbody id="tablaMesas"></tbody>
-          <tfoot id="totalesMesas"></tfoot>
-        </table>
+      <div class="barra-controles">
+        <input
+          type="file"
+          id="archivoJson"
+          accept=".json,application/json"
+        >
+
+        <button id="btnCargar" type="button">
+          Cargar JSON
+        </button>
+
+        <button
+          id="btnExportarPadron"
+          type="button"
+          class="secundario"
+          disabled
+        >
+          Exportar padrón CSV
+        </button>
+
+        <button
+          id="btnImprimir"
+          type="button"
+          class="secundario"
+          disabled
+        >
+          Imprimir / guardar PDF
+        </button>
+      </div>
+
+      <div id="estadoCarga" class="estado" role="status" aria-live="polite">
+        Selecciona el JSON v2 para iniciar la consulta.
       </div>
     </section>
 
-    <section class="panel">
-      <h2>4. Listado de familias y grupos</h2>
+    <section id="contenidoConsulta" hidden>
+      <div class="resumen" id="tarjetasResumen"></div>
 
-      <div class="tabla-contenedor">
-        <table>
-          <thead>
-            <tr>
-              <th>Reservación</th>
-              <th>Familia o grupo</th>
-              <th>Responsable o beneficio</th>
-              <th>Mesa / Estado de pago</th>
-              <th>Asistentes</th>
-              <th>Importe original</th>
-              <th>Ajustes</th>
-              <th>Importe final</th>
-            </tr>
-          </thead>
-          <tbody id="tablaFamilias"></tbody>
-          <tfoot id="totalesFamilias"></tfoot>
-        </table>
+      <div class="panel">
+        <h2>Distribución general</h2>
+        <div id="resumenTexto" class="ayuda"></div>
+        <div class="nota">
+          Los asistentes provisionales se generan desde las cantidades de
+          adultos y niños de cada reservación. No representan nombres reales.
+          Los pagos e importes se conservan a nivel de grupo familiar.
+        </div>
       </div>
+
+      <nav class="navegacion no-imprimir" aria-label="Secciones de consulta">
+        <button type="button" class="activo" data-vista="vistaMesas">
+          Mesas
+        </button>
+
+        <button type="button" data-vista="vistaPadron">
+          Padrón individual
+        </button>
+
+        <button type="button" data-vista="vistaGrupos">
+          Grupos familiares y pagos
+        </button>
+
+        <button type="button" data-vista="vistaSinMesa">
+          Sin mesa asignada
+        </button>
+      </nav>
+
+      <section id="vistaMesas" class="vista activa">
+        <div class="panel">
+          <h2>2. Ocupación por mesa</h2>
+          <p class="ayuda">
+            Se respetan los números de mesa registrados en el JSON.
+            No se reasignan automáticamente los asistentes.
+          </p>
+
+          <div class="tabla-contenedor">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mesa</th>
+                  <th class="numero">Grupos</th>
+                  <th class="numero">Adultos</th>
+                  <th class="numero">Niños</th>
+                  <th class="numero">Asistentes</th>
+                  <th class="numero">Capacidad</th>
+                  <th class="numero">Disponibles</th>
+                  <th>Observación</th>
+                </tr>
+              </thead>
+              <tbody id="tablaMesas">
+                <tr>
+                  <td colspan="8" class="sin-datos">Sin información.</td>
+                </tr>
+              </tbody>
+              <tfoot id="totalesMesas"></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="vistaPadron" class="vista">
+        <div class="panel">
+          <h2>3. Padrón provisional individual</h2>
+
+          <p class="ayuda">
+            Cada asistente tendrá un identificador consecutivo con el formato
+            OXI-2026-A0001. El nombre provisional se relaciona con su grupo
+            familiar y puede actualizarse posteriormente con el nombre real.
+          </p>
+
+          <div class="barra-controles no-imprimir">
+            <input
+              type="search"
+              id="buscarPadron"
+              placeholder="Buscar por ID, grupo familiar o mesa..."
+              aria-label="Buscar en el padrón"
+            >
+
+            <select id="filtroTipo" aria-label="Filtrar por tipo">
+              <option value="">Todos los asistentes</option>
+              <option value="Adulto">Solo adultos</option>
+              <option value="Niño">Solo niños</option>
+            </select>
+
+            <select id="filtroMesa" aria-label="Filtrar por mesa">
+              <option value="">Todas las mesas</option>
+              <option value="sin-mesa">Sin mesa asignada</option>
+            </select>
+
+            <select id="filtroPago" aria-label="Filtrar por estatus de pago">
+              <option value="">Todos los estatus de pago</option>
+            </select>
+          </div>
+
+          <p id="contadorPadron" class="ayuda"></p>
+
+          <div class="tabla-contenedor">
+            <table>
+              <thead>
+                <tr>
+                  <th>Consecutivo</th>
+                  <th>Nombre provisional</th>
+                  <th>Grupo familiar</th>
+                  <th>Tipo</th>
+                  <th>Mesa</th>
+                  <th>Reservación</th>
+                  <th>Estatus de pago</th>
+                  <th>Forma de pago</th>
+                  <th>Tipo de reservación</th>
+                </tr>
+              </thead>
+              <tbody id="tablaPadron">
+                <tr>
+                  <td colspan="9" class="sin-datos">Sin información.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="vistaGrupos" class="vista">
+        <div class="panel">
+          <h2>4. Grupos familiares y situación financiera</h2>
+
+          <p class="ayuda">
+            Esta vista conserva la información financiera a nivel de
+            reservación. No se multiplica el importe por el número de asistentes.
+          </p>
+
+          <div class="barra-controles no-imprimir">
+            <input
+              type="search"
+              id="buscarGrupo"
+              placeholder="Buscar grupo familiar o referencia..."
+              aria-label="Buscar grupo familiar"
+            >
+          </div>
+
+          <div class="tabla-contenedor">
+            <table>
+              <thead>
+                <tr>
+                  <th>Referencia</th>
+                  <th>Grupo familiar</th>
+                  <th>Tipo</th>
+                  <th class="numero">Adultos</th>
+                  <th class="numero">Niños</th>
+                  <th class="numero">Total</th>
+                  <th>Mesa</th>
+                  <th>Beneficio</th>
+                  <th>Estatus de pago</th>
+                  <th>Forma de pago</th>
+                  <th class="numero">Costo Excel</th>
+                  <th class="numero">Cortesía</th>
+                  <th class="numero">Subtotal</th>
+                  <th class="numero">Pagado</th>
+                  <th class="numero">Debe</th>
+                  <th>Notas</th>
+                </tr>
+              </thead>
+              <tbody id="tablaGrupos">
+                <tr>
+                  <td colspan="16" class="sin-datos">Sin información.</td>
+                </tr>
+              </tbody>
+              <tfoot id="totalesGrupos"></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="vistaSinMesa" class="vista">
+        <div class="panel">
+          <h2>5. Asistentes sin mesa asignada</h2>
+
+          <p class="ayuda">
+            Esta lista muestra los asistentes de grupos cuya reservación no
+            tiene mesa registrada en el JSON. No se les asignará una mesa
+            de manera automática.
+          </p>
+
+          <div class="tabla-contenedor">
+            <table>
+              <thead>
+                <tr>
+                  <th>Consecutivo</th>
+                  <th>Nombre provisional</th>
+                  <th>Grupo familiar</th>
+                  <th>Tipo</th>
+                  <th>Referencia de reservación</th>
+                  <th>Estatus de pago</th>
+                </tr>
+              </thead>
+              <tbody id="tablaSinMesa">
+                <tr>
+                  <td colspan="6" class="sin-datos">Sin información.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </section>
 
-    <section class="panel">
-      <h2>5. Detalle de personas por reservación</h2>
+    <footer class="pie">
+      OXI-2026 · Control interno de reservaciones · Padrón provisional
+    </footer>
+  </main>
 
-      <p class="nota" id="notaDetalle">
-        Los datos se presentan conforme a la información disponible
-        en el archivo. No se generan nombres ni edades que no estén
-        registrados en la fuente.
-      </p>
+  <script>
+    "use strict";
 
-      <div class="tabla-contenedor">
-        <table>
-          <thead id="encabezadoAsistentes">
-            <tr>
-              <th>Familia</th>
-              <th>Persona</th>
-              <th>Edad</th>
-              <th>Categoría</th>
-              <th>Beneficio</th>
-              <th>Mesa</th>
-              <th>Importe</th>
-            </tr>
-          </thead>
-          <tbody id="tablaAsistentes"></tbody>
-        </table>
-      </div>
-    </section>
+    const $ = (id) => document.getElementById(id);
 
-  </div>
+    let documentoActual = null;
+    let reservaciones = [];
+    let padron = [];
+    let mesas = [];
+    let capacidadMesa = 10;
 
-  <p class="pie">
-    Comunidad Helénica de México A.C. · OXI 2026
-  </p>
-
-</main>
-
-<script>
-(function () {
-  "use strict";
-
-  const EVENTO_ID = "OXI-2026";
-  const MAX_ARCHIVO_BYTES = 5 * 1024 * 1024;
-
-  const archivoJSON = document.getElementById("archivoJSON");
-  const estado = document.getElementById("estadoConsulta");
-  const resultados = document.getElementById("resultados");
-  const botonLimpiar = document.getElementById("limpiarConsulta");
-  const botonImprimir = document.getElementById("imprimirConsulta");
-
-  let reservacionesActuales = [];
-  let documentoActual = null;
-
-  function pesos(valor) {
-    return new Intl.NumberFormat("es-MX", {
+    const moneda = new Intl.NumberFormat("es-MX", {
       style: "currency",
-      currency: "MXN"
-    }).format(valor);
-  }
-
-  function numero(valor) {
-    return typeof valor === "number" &&
-      Number.isFinite(valor) &&
-      valor >= 0;
-  }
-
-  function importeExcel(valor) {
-    if (typeof valor === "number" && Number.isFinite(valor)) {
-      return Math.max(0, valor);
-    }
-
-    if (typeof valor === "string" && valor.trim() !== "") {
-      const limpio = valor.replace(/[$,\s]/g, "");
-      const convertido = Number(limpio);
-
-      if (Number.isFinite(convertido) && convertido >= 0) {
-        return convertido;
-      }
-    }
-
-    return 0;
-  }
-
-  function mostrarEstado(mensaje, tipo) {
-    estado.className = "mensaje" + (tipo ? " " + tipo : "");
-    estado.textContent = mensaje;
-  }
-
-  function crearCelda(valor, clase) {
-    const celda = document.createElement("td");
-    celda.textContent = valor == null ? "" : String(valor);
-
-    if (clase) {
-      celda.className = clase;
-    }
-
-    return celda;
-  }
-
-  function agregarFila(contenedor, valores) {
-    const fila = document.createElement("tr");
-
-    valores.forEach(item => {
-      if (item && typeof item === "object" && "valor" in item) {
-        fila.appendChild(crearCelda(item.valor, item.clase || ""));
-      } else {
-        fila.appendChild(crearCelda(item));
-      }
+      currency: "MXN",
+      minimumFractionDigits: 2
     });
 
-    contenedor.appendChild(fila);
-    return fila;
-  }
+    const entero = new Intl.NumberFormat("es-MX", {
+      maximumFractionDigits: 0
+    });
 
-  function limpiarTabla(id) {
-    document.getElementById(id).replaceChildren();
-  }
+    function texto(valor, alternativo = "—") {
+      if (valor === null || valor === undefined || valor === "") {
+        return alternativo;
+      }
 
-  function validarDocumento(documento) {
-    if (
-      !documento ||
-      documento.evento_id !== EVENTO_ID ||
-      ![1, 2].includes(documento.formato_version) ||
-      !Array.isArray(documento.reservaciones)
-    ) {
-      throw new Error(
-        "El archivo no corresponde al formato JSON v1 o v2 de OXI-2026."
+      return String(valor);
+    }
+
+    function numero(valor) {
+      if (valor === null || valor === undefined || valor === "") {
+        return 0;
+      }
+
+      if (typeof valor === "number") {
+        return Number.isFinite(valor) ? valor : 0;
+      }
+
+      const limpio = String(valor)
+        .replace(/[$\s]/g, "")
+        .replace(/,/g, "");
+
+      const resultado = Number(limpio);
+      return Number.isFinite(resultado) ? resultado : 0;
+    }
+
+    function dinero(valor) {
+      return moneda.format(numero(valor));
+    }
+
+    function escapar(valor) {
+      return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function mesaNumero(r) {
+      const valor = r.mesa_numero;
+
+      if (
+        valor === null ||
+        valor === undefined ||
+        valor === "" ||
+        !Number.isFinite(Number(valor))
+      ) {
+        return null;
+      }
+
+      return Number(valor);
+    }
+
+    function nombreGrupo(r) {
+      return texto(
+        r.nombre_reservacion,
+        "Grupo sin nombre (" + texto(r.reservacion_id, "sin referencia") + ")"
       );
     }
 
-    const ids = new Set();
+    function adultos(r) {
+      return Math.max(0, Math.floor(numero(r.adultos)));
+    }
 
-    documento.reservaciones.forEach(r => {
+    function ninos(r) {
+      return Math.max(0, Math.floor(numero(r.ninos)));
+    }
+
+    function totalAsientos(r) {
+      /*
+       * En JSON v2 se utiliza el número de adultos + niños para construir
+       * el padrón individual. El total registrado en Excel se conserva como
+       * referencia y se compara para advertir posibles diferencias.
+       */
+      return adultos(r) + ninos(r);
+    }
+
+    function referencia(r) {
+      return texto(r.reservacion_id, "SIN-REFERENCIA");
+    }
+
+    function tipoReservacion(r) {
+      return r.tipo_reservacion === "cortesia_institucional"
+        ? "Cortesía institucional"
+        : "Grupo";
+    }
+
+    function estatusPago(r) {
+      return texto(r.estado_pago_excel, "Sin estatus registrado");
+    }
+
+    function formaPago(r) {
+      return texto(r.forma_pago_excel, "No especificada");
+    }
+
+    function clasePago(estatus, r) {
+      if (r.tipo_reservacion === "cortesia_institucional") {
+        return "cortesia";
+      }
+
+      const s = String(estatus).toLocaleLowerCase("es-MX");
+
       if (
-        !r ||
-        typeof r.reservacion_id !== "string" ||
-        !r.reservacion_id.trim()
+        s.includes("pagado") ||
+        s.includes("liquidado") ||
+        s.includes("completo")
       ) {
+        return "pagado";
+      }
+
+      if (
+        s.includes("pendiente") ||
+        s.includes("debe") ||
+        s.includes("parcial")
+      ) {
+        return "pendiente";
+      }
+
+      return "";
+    }
+
+    function etiquetaPago(r) {
+      const estatus = estatusPago(r);
+      const clase = clasePago(estatus, r);
+
+      return '<span class="etiqueta-estado ' +
+        clase +
+        '">' +
+        escapar(estatus) +
+        "</span>";
+    }
+
+    function validarDocumento(doc) {
+      if (!doc || typeof doc !== "object" || Array.isArray(doc)) {
+        throw new Error("El archivo no contiene un objeto JSON válido.");
+      }
+
+      if (doc.formato_version !== 2) {
         throw new Error(
-          "Se encontró una reservación sin identificador válido."
+          "Se requiere un JSON v2. La propiedad formato_version debe ser 2."
         );
       }
 
-      if (ids.has(r.reservacion_id)) {
+      if (doc.evento_id !== "OXI-2026") {
         throw new Error(
-          "El archivo contiene identificadores de reservación duplicados."
+          "El archivo no corresponde al evento OXI-2026."
         );
       }
 
-      ids.add(r.reservacion_id);
+      if (!Array.isArray(doc.reservaciones)) {
+        throw new Error(
+          "No se encontró el arreglo reservaciones en el JSON."
+        );
+      }
 
-      if (documento.formato_version === 1) {
+      if (doc.resumen_importacion &&
+          typeof doc.resumen_importacion !== "object") {
+        throw new Error(
+          "La propiedad resumen_importacion no tiene el formato esperado."
+        );
+      }
+
+      doc.reservaciones.forEach((r, i) => {
+        if (!r || typeof r !== "object") {
+          throw new Error(
+            "La reservación número " + (i + 1) + " no es válida."
+          );
+        }
+
+        if (!r.reservacion_id) {
+          throw new Error(
+            "Falta reservacion_id en el registro número " + (i + 1) + "."
+          );
+        }
+
+        if (numero(r.adultos) < 0 || numero(r.ninos) < 0) {
+          throw new Error(
+            "Hay cantidades negativas de asistentes en " +
+            r.reservacion_id + "."
+          );
+        }
+      });
+
+      return true;
+    }
+
+    function construirPadron() {
+      const resultado = [];
+      let consecutivo = 1;
+
+      /*
+       * Cada registro del padrón es provisional.
+       * El ID depende del orden de las reservaciones en el JSON y de las
+       * cantidades de adultos/niños. Para conservar los IDs, mantener ese
+       * orden al actualizar los nombres. No se inventan nombres reales.
+       */
+      reservaciones.forEach((r) => {
+        const totalAdultos = adultos(r);
+        const totalNinos = ninos(r);
+        const mesa = mesaNumero(r);
+
+        for (let i = 1; i <= totalAdultos; i++) {
+          resultado.push({
+            id: "OXI-2026-A" + String(consecutivo).padStart(4, "0"),
+            consecutivo: consecutivo,
+            nombre_provisional:
+              nombreGrupo(r) + " — Adulto " + i,
+            grupo_familiar: nombreGrupo(r),
+            tipo: "Adulto",
+            mesa_numero: mesa,
+            reservacion_id: referencia(r),
+            estatus_pago: estatusPago(r),
+            forma_pago: formaPago(r),
+            tipo_reservacion: tipoReservacion(r),
+            reserva: r
+          });
+
+          consecutivo++;
+        }
+
+        for (let i = 1; i <= totalNinos; i++) {
+          resultado.push({
+            id: "OXI-2026-A" + String(consecutivo).padStart(4, "0"),
+            consecutivo: consecutivo,
+            nombre_provisional:
+              nombreGrupo(r) + " — Niño " + i,
+            grupo_familiar: nombreGrupo(r),
+            tipo: "Niño",
+            mesa_numero: mesa,
+            reservacion_id: referencia(r),
+            estatus_pago: estatusPago(r),
+            forma_pago: formaPago(r),
+            tipo_reservacion: tipoReservacion(r),
+            reserva: r
+          });
+
+          consecutivo++;
+        }
+      });
+
+      return resultado;
+    }
+
+    function construirMesas() {
+      const mapa = new Map();
+
+      reservaciones.forEach((r) => {
+        const mesa = mesaNumero(r);
+
+        if (mesa === null) return;
+
+        if (!mapa.has(mesa)) {
+          mapa.set(mesa, {
+            mesa_numero: mesa,
+            grupos: 0,
+            adultos: 0,
+            ninos: 0,
+            asistentes: 0
+          });
+        }
+
+        const m = mapa.get(mesa);
+        m.grupos++;
+        m.adultos += adultos(r);
+        m.ninos += ninos(r);
+        m.asistentes += totalAsientos(r);
+      });
+
+      return Array.from(mapa.values())
+        .sort((a, b) => a.mesa_numero - b.mesa_numero);
+    }
+
+    function crearTarjeta(etiqueta, valor, detalle = "") {
+      return `
+        <div class="tarjeta">
+          <span class="etiqueta">${escapar(etiqueta)}</span>
+          <span class="valor">${escapar(valor)}</span>
+          ${detalle
+            ? `<span class="detalle">${escapar(detalle)}</span>`
+            : ""}
+        </div>
+      `;
+    }
+
+    function renderizarResumen() {
+      const totalGrupos = reservaciones.filter(
+        r => r.tipo_reservacion !== "cortesia_institucional"
+      ).length;
+
+      const totalCortesias = reservaciones.filter(
+        r => r.tipo_reservacion === "cortesia_institucional"
+      ).length;
+
+      const totalAdultos = reservaciones.reduce(
+        (s, r) => s + adultos(r), 0
+      );
+
+      const totalNinos = reservaciones.reduce(
+        (s, r) => s + ninos(r), 0
+      );
+
+      const totalPersonas = totalAdultos + totalNinos;
+
+      const asignados = padron.filter(
+        p => p.mesa_numero !== null
+      ).length;
+
+      const sinMesa = padron.length - asignados;
+
+      /*
+       * Importes financieros calculados a nivel de reservación,
+       * no a nivel de cada asistente.
+       */
+      const subtotal = reservaciones.reduce(
+        (s, r) => s + numero(r.subtotal_excel), 0
+      );
+
+      const pagado = reservaciones.reduce(
+        (s, r) => s + numero(r.pagado_excel), 0
+      );
+
+      const debe = reservaciones.reduce(
+        (s, r) => s + numero(r.debe_excel), 0
+      );
+
+      const costos = reservaciones.reduce(
+        (s, r) => s + numero(r.costo_excel), 0
+      );
+
+      const resumen = [
+        ["Reservaciones", entero.format(reservaciones.length),
+          "Registros en JSON v2"],
+        ["Grupos regulares", entero.format(totalGrupos),
+          "Reservaciones de grupo"],
+        ["Cortesías institucionales", entero.format(totalCortesias),
+          "Reservaciones de cortesía"],
+        ["Adultos", entero.format(totalAdultos),
+          "Según el desglose del JSON"],
+        ["Niños", entero.format(totalNinos),
+          "Según el desglose del JSON"],
+        ["Asistentes", entero.format(totalPersonas),
+          "Adultos + niños"],
+        ["Con mesa asignada", entero.format(asignados),
+          "Según la mesa del grupo"],
+        ["Sin mesa asignada", entero.format(sinMesa),
+          "Requieren revisión de mesa"],
+        ["Subtotal Excel", dinero(subtotal),
+          "Suma por reservación"],
+        ["Pagado Excel", dinero(pagado),
+          "Suma por reservación"],
+        ["Saldo Excel", dinero(debe),
+          "Suma por reservación"],
+        ["Costo Excel", dinero(costos),
+          "Referencia importada"]
+      ];
+
+      $("tarjetasResumen").innerHTML = resumen.map(
+        x => crearTarjeta(x[0], x[1], x[2])
+      ).join("");
+
+      const r = documentoActual.resumen_importacion || {};
+
+      $("resumenTexto").innerHTML = `
+        <p>
+          <strong>Evento:</strong> ${escapar(documentoActual.evento_id)}
+          &nbsp; · &nbsp;
+          <strong>Versión:</strong> ${escapar(documentoActual.formato_version)}
+        </p>
+        <p>
+          <strong>Registros:</strong> ${entero.format(reservaciones.length)}
+          &nbsp; · &nbsp;
+          <strong>Personas generadas:</strong> ${entero.format(padron.length)}
+          &nbsp; · &nbsp;
+          <strong>Capacidad por mesa:</strong> ${entero.format(capacidadMesa)}
+        </p>
+        <p>
+          <strong>Asientos registrados en resumen de importación:</strong>
+          ${escapar(texto(r.asientos_registrados_excel))}
+          &nbsp; · &nbsp;
+          <strong>Asientos con mesa en resumen de importación:</strong>
+          ${escapar(texto(r.asientos_con_mesa))}
+          &nbsp; · &nbsp;
+          <strong>Asientos sin mesa en resumen de importación:</strong>
+          ${escapar(texto(r.asientos_sin_mesa))}
+        </p>
+      `;
+    }
+
+    function renderizarMesas() {
+      const tbody = $("tablaMesas");
+      const tfoot = $("totalesMesas");
+
+      if (!mesas.length) {
+        tbody.innerHTML = `
+          <tr><td colspan="8" class="sin-datos">
+            No hay mesas asignadas en el JSON.
+          </td></tr>`;
+        tfoot.innerHTML = "";
+        return;
+      }
+
+      tbody.innerHTML = mesas.map(m => {
+        const disponibles = capacidadMesa - m.asistentes;
+        let observacion = "Dentro de la capacidad";
+
+        if (disponibles < 0) {
+          observacion = "Excede la capacidad por " +
+            Math.abs(disponibles) + " lugares";
+        } else if (disponibles === 0) {
+          observacion = "Mesa completa";
+        }
+
+        return `
+          <tr>
+            <td><strong>Mesa ${entero.format(m.mesa_numero)}</strong></td>
+            <td class="numero">${entero.format(m.grupos)}</td>
+            <td class="numero">${entero.format(m.adultos)}</td>
+            <td class="numero">${entero.format(m.ninos)}</td>
+            <td class="numero"><strong>${entero.format(m.asistentes)}</strong></td>
+            <td class="numero">${entero.format(capacidadMesa)}</td>
+            <td class="numero">${entero.format(disponibles)}</td>
+            <td>${escapar(observacion)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      const totales = mesas.reduce((a, m) => {
+        a.grupos += m.grupos;
+        a.adultos += m.adultos;
+        a.ninos += m.ninos;
+        a.asistentes += m.asistentes;
+        return a;
+      }, {
+        grupos: 0,
+        adultos: 0,
+        ninos: 0,
+        asistentes: 0
+      });
+
+      tfoot.innerHTML = `
+        <tr>
+          <td>TOTAL CON MESA</td>
+          <td class="numero">${entero.format(totales.grupos)}</td>
+          <td class="numero">${entero.format(totales.adultos)}</td>
+          <td class="numero">${entero.format(totales.ninos)}</td>
+          <td class="numero">${entero.format(totales.asistentes)}</td>
+          <td class="numero">—</td>
+          <td class="numero">—</td>
+          <td>Asignación original del JSON</td>
+        </tr>
+      `;
+    }
+
+    function renderizarPadron() {
+      const buscar = $("buscarPadron").value
+        .trim().toLocaleLowerCase("es-MX");
+
+      const tipo = $("filtroTipo").value;
+      const mesaFiltro = $("filtroMesa").value;
+      const pagoFiltro = $("filtroPago").value;
+
+      const filtrados = padron.filter(p => {
+        const textoBusqueda = [
+          p.id,
+          p.nombre_provisional,
+          p.grupo_familiar,
+          p.reservacion_id,
+          p.mesa_numero === null ? "sin mesa" : "mesa " + p.mesa_numero,
+          p.estatus_pago,
+          p.forma_pago
+        ].join(" ").toLocaleLowerCase("es-MX");
+
+        if (buscar && !textoBusqueda.includes(buscar)) return false;
+        if (tipo && p.tipo !== tipo) return false;
+
+        if (mesaFiltro === "sin-mesa" && p.mesa_numero !== null) {
+          return false;
+        }
+
         if (
-          typeof r.nombre_familia !== "string" ||
-          !r.nombre_familia.trim() ||
-          !Array.isArray(r.asistentes) ||
-          !r.totales
+          mesaFiltro &&
+          mesaFiltro !== "sin-mesa" &&
+          String(p.mesa_numero) !== mesaFiltro
         ) {
-          throw new Error(
-            "Se encontró una reservación v1 incompleta."
-          );
+          return false;
         }
 
-        [
-          "importe_original",
-          "importe_ajuste",
-          "importe_final"
-        ].forEach(campo => {
-          if (!numero(r.totales[campo])) {
-            throw new Error(
-              "Una reservación v1 contiene importes inválidos."
-            );
-          }
-        });
+        if (pagoFiltro && p.estatus_pago !== pagoFiltro) {
+          return false;
+        }
 
-        r.asistentes.forEach(persona => {
-          if (
-            !persona ||
-            typeof persona.nombre !== "string" ||
-            !persona.nombre.trim() ||
-            !numero(persona.importe_final)
-          ) {
-            throw new Error(
-              "Se encontró un asistente v1 con información inválida."
-            );
-          }
-        });
+        return true;
+      });
 
+      $("contadorPadron").textContent =
+        "Mostrando " + entero.format(filtrados.length) +
+        " de " + entero.format(padron.length) +
+        " asistentes provisionales.";
+
+      if (!filtrados.length) {
+        $("tablaPadron").innerHTML = `
+          <tr><td colspan="9" class="sin-datos">
+            No hay asistentes que coincidan con los filtros.
+          </td></tr>`;
         return;
       }
 
-      if (
-        typeof r.nombre_reservacion !== "string" ||
-        !r.nombre_reservacion.trim()
-      ) {
-        throw new Error(
-          "Una reservación v2 no tiene nombre de familia o grupo."
-        );
-      }
+      $("tablaPadron").innerHTML = filtrados.map(p => `
+        <tr>
+          <td class="identificador">${escapar(p.id)}</td>
+          <td class="nombre-provisional">
+            ${escapar(p.nombre_provisional)}
+          </td>
+          <td>${escapar(p.grupo_familiar)}</td>
+          <td>${escapar(p.tipo)}</td>
+          <td>
+            ${
+              p.mesa_numero === null
+                ? '<span class="etiqueta-estado sin-mesa">Sin mesa</span>'
+                : "Mesa " + entero.format(p.mesa_numero)
+            }
+          </td>
+          <td class="identificador">${escapar(p.reservacion_id)}</td>
+          <td>${etiquetaPago(p.reserva)}</td>
+          <td>${escapar(p.forma_pago)}</td>
+          <td>${escapar(p.tipo_reservacion)}</td>
+        </tr>
+      `).join("");
+    }
 
-      [
-        "adultos",
-        "ninos",
-        "total_asientos_excel"
-      ].forEach(campo => {
-        if (!Number.isInteger(r[campo]) || r[campo] < 0) {
-          throw new Error(
-            "La reservación " + r.reservacion_id +
-            " contiene una cantidad inválida en " + campo + "."
-          );
-        }
+    function renderizarGrupos() {
+      const buscar = $("buscarGrupo").value
+        .trim().toLocaleLowerCase("es-MX");
+
+      const filtrados = reservaciones.filter(r => {
+        const contenido = [
+          referencia(r),
+          nombreGrupo(r),
+          r.beneficio_excel,
+          r.estado_pago_excel,
+          r.forma_pago_excel,
+          r.notas_excel,
+          r.estado_excel_columna_J,
+          r.tipo_reservacion
+        ].join(" ").toLocaleLowerCase("es-MX");
+
+        return !buscar || contenido.includes(buscar);
       });
 
-      if (r.adultos + r.ninos !== r.total_asientos_excel) {
-        throw new Error(
-          "La suma de adultos y niños no coincide con el total de asientos en " +
-          r.reservacion_id + ". Revisa el Excel original."
-        );
-      }
-
-      if (
-        r.mesa_numero != null &&
-        (!Number.isInteger(r.mesa_numero) || r.mesa_numero < 1)
-      ) {
-        throw new Error(
-          "La reservación " + r.reservacion_id +
-          " contiene un número de mesa inválido."
-        );
-      }
-    });
-
-    if (documento.formato_version === 2) {
-      if (
-        !documento.resumen_importacion ||
-        !Number.isInteger(
-          documento.resumen_importacion.reservaciones_total
-        )
-      ) {
-        throw new Error(
-          "El JSON v2 no contiene un resumen de importación válido."
-        );
-      }
-
-      if (
-        documento.resumen_importacion.reservaciones_total !==
-        documento.reservaciones.length
-      ) {
-        throw new Error(
-          "El total de reservaciones no coincide con el resumen de importación."
-        );
-      }
-    }
-
-    return documento.reservaciones.map(r => {
-      if (documento.formato_version === 1) {
-        return {
-          ...r,
-          formato_origen: 1,
-          cantidad_asistentes: r.asistentes.length
-        };
-      }
-
-      return {
-        ...r,
-        formato_origen: 2,
-        nombre_familia: r.nombre_reservacion,
-        responsable: r.beneficio_excel || "No indicado",
-        mesa_id: r.mesa_id || null,
-        asistentes: [],
-        cantidad_asistentes: r.total_asientos_excel,
-        totales: {
-          importe_original: importeExcel(r.subtotal_excel),
-          importe_ajuste: importeExcel(r.pagado_excel),
-          importe_final: importeExcel(r.debe_excel)
-        }
-      };
-    });
-  }
-
-  function importe(reservacion, campo) {
-    const valor = reservacion.totales &&
-      reservacion.totales[campo];
-
-    return numero(valor) ? valor : 0;
-  }
-
-  function totalAsistentes(reservacion) {
-    if (Number.isInteger(reservacion.cantidad_asistentes)) {
-      return reservacion.cantidad_asistentes;
-    }
-
-    return Array.isArray(reservacion.asistentes)
-      ? reservacion.asistentes.length
-      : 0;
-  }
-
-  function obtenerNumeroMesa(reservacion) {
-    if (reservacion.mesa_numero != null) {
-      return reservacion.mesa_numero;
-    }
-
-    const mesaId = reservacion.mesa_id;
-
-    if (typeof mesaId === "string") {
-      const coincidencia = mesaId.match(/(\d+)$/);
-
-      if (coincidencia) {
-        return Number(coincidencia[1]);
-      }
-    }
-
-    return null;
-  }
-
-  function obtenerMesa(reservacion) {
-    const numeroMesa = obtenerNumeroMesa(reservacion);
-
-    return numeroMesa == null
-      ? "Sin asignar"
-      : "Mesa " + numeroMesa;
-  }
-
-  function ajustarEtiquetas(documento) {
-    const esExcel = documento.formato_version === 2;
-
-    document.getElementById("etiquetaReservaciones").textContent =
-      esExcel ? "Reservaciones de grupo" : "Reservaciones familiares";
-
-    document.getElementById("etiquetaAsistentes").textContent =
-      esExcel ? "Asientos registrados en Excel" : "Asistentes registrados";
-
-    document.getElementById("etiquetaOriginal").textContent =
-      esExcel ? "Subtotal registrado en Excel" : "Importe original";
-
-    document.getElementById("etiquetaFinal").textContent =
-      esExcel ? "Saldo registrado en Excel" : "Importe final";
-
-    const encabezadosMesas = document
-      .querySelector("#tablaMesas")
-      .closest("table")
-      .querySelectorAll("thead th");
-
-    if (esExcel) {
-      encabezadosMesas[1].textContent = "Reservaciones";
-      encabezadosMesas[2].textContent = "Asientos";
-      encabezadosMesas[3].textContent = "Subtotal Excel";
-      encabezadosMesas[4].textContent = "Pagado según Excel";
-      encabezadosMesas[5].textContent = "Saldo según Excel";
-    } else {
-      encabezadosMesas[1].textContent = "Familias";
-      encabezadosMesas[2].textContent = "Asistentes";
-      encabezadosMesas[3].textContent = "Importe original";
-      encabezadosMesas[4].textContent = "Ajustes";
-      encabezadosMesas[5].textContent = "Importe final";
-    }
-
-    const encabezadosFamilias = document
-      .querySelector("#tablaFamilias")
-      .closest("table")
-      .querySelectorAll("thead th");
-
-    if (esExcel) {
-      encabezadosFamilias[0].textContent = "Reservación";
-      encabezadosFamilias[1].textContent = "Familia o grupo";
-      encabezadosFamilias[2].textContent = "Beneficio";
-      encabezadosFamilias[3].textContent = "Estado de pago";
-      encabezadosFamilias[4].textContent = "Asientos";
-      encabezadosFamilias[5].textContent = "Subtotal Excel";
-      encabezadosFamilias[6].textContent = "Pagado según Excel";
-      encabezadosFamilias[7].textContent = "Saldo según Excel";
-    } else {
-      encabezadosFamilias[0].textContent = "Reservación";
-      encabezadosFamilias[1].textContent = "Familia";
-      encabezadosFamilias[2].textContent = "Responsable";
-      encabezadosFamilias[3].textContent = "Mesa";
-      encabezadosFamilias[4].textContent = "Asistentes";
-      encabezadosFamilias[5].textContent = "Importe original";
-      encabezadosFamilias[6].textContent = "Ajustes";
-      encabezadosFamilias[7].textContent = "Importe final";
-    }
-
-    const encabezadoAsistentes =
-      document.getElementById("encabezadoAsistentes");
-
-    encabezadoAsistentes.replaceChildren();
-
-    const filaEncabezado = document.createElement("tr");
-
-    const titulos = esExcel
-      ? [
-          "Familia o grupo",
-          "Adultos",
-          "Niños",
-          "Total de asientos",
-          "Mesa",
-          "Beneficio o referencia",
-          "Estado de pago original"
-        ]
-      : [
-          "Familia",
-          "Persona",
-          "Edad",
-          "Categoría",
-          "Beneficio",
-          "Mesa",
-          "Importe"
-        ];
-
-    titulos.forEach(titulo => {
-      const th = document.createElement("th");
-      th.textContent = titulo;
-      filaEncabezado.appendChild(th);
-    });
-
-    encabezadoAsistentes.appendChild(filaEncabezado);
-
-    document.getElementById("notaDetalle").textContent = esExcel
-      ? "Las cantidades de adultos y niños se conservan por grupo. No se generan nombres ni edades individuales que no estén registrados en el Excel."
-      : "El detalle individual muestra los datos disponibles en el archivo original. No se generan datos personales que no estén registrados.";
-  }
-
-  function pintarResumen(reservaciones) {
-    const esExcel = documentoActual.formato_version === 2;
-
-    const cantidadReservaciones = reservaciones.length;
-
-    const cantidadPersonas = reservaciones.reduce(
-      (suma, r) => suma + totalAsistentes(r),
-      0
-    );
-
-    const original = reservaciones.reduce(
-      (suma, r) => suma + importe(r, "importe_original"),
-      0
-    );
-
-    const tercerImporte = reservaciones.reduce(
-      (suma, r) => suma + importe(r, "importe_ajuste"),
-      0
-    );
-
-    const final = reservaciones.reduce(
-      (suma, r) => suma + importe(r, "importe_final"),
-      0
-    );
-
-    document.getElementById("totalReservaciones").textContent =
-      String(cantidadReservaciones);
-
-    document.getElementById("totalAsistentes").textContent =
-      String(cantidadPersonas);
-
-    document.getElementById("totalOriginal").textContent =
-      pesos(original);
-
-    document.getElementById("totalFinal").textContent =
-      pesos(final);
-
-    document.getElementById("resumenAjustes").textContent = esExcel
-      ? "Pagado registrado en Excel: " + pesos(tercerImporte) +
-        ". Los importes se presentan tal como aparecen en el archivo; " +
-        "esta consulta no confirma pagos."
-      : "Ajustes registrados: " + pesos(tercerImporte) + ".";
-
-    const mesas = new Set(
-      reservaciones.map(r => {
-        const numeroMesa = obtenerNumeroMesa(r);
-        return numeroMesa == null
-          ? "Sin asignar"
-          : String(numeroMesa);
-      })
-    );
-
-    document.getElementById("fechaExportacion").textContent =
-      "Mesas o grupos de asignación considerados: " + mesas.size + ".";
-  }
-
-  function pintarMesas(reservaciones) {
-    const tbody = document.getElementById("tablaMesas");
-    const tfoot = document.getElementById("totalesMesas");
-
-    limpiarTabla("tablaMesas");
-    limpiarTabla("totalesMesas");
-
-    const esExcel = documentoActual.formato_version === 2;
-    const mesas = new Map();
-
-    reservaciones.forEach(r => {
-      const numeroMesa = obtenerNumeroMesa(r);
-      const clave = numeroMesa == null
-        ? "sin-asignar"
-        : String(numeroMesa);
-
-      if (!mesas.has(clave)) {
-        mesas.set(clave, {
-          clave,
-          mesa: numeroMesa == null
-            ? "Sin asignar"
-            : "Mesa " + numeroMesa,
-          reservaciones: 0,
-          asistentes: 0,
-          original: 0,
-          tercerImporte: 0,
-          final: 0
-        });
-      }
-
-      const resumen = mesas.get(clave);
-
-      resumen.reservaciones++;
-      resumen.asistentes += totalAsistentes(r);
-      resumen.original += importe(r, "importe_original");
-      resumen.tercerImporte += importe(r, "importe_ajuste");
-      resumen.final += importe(r, "importe_final");
-    });
-
-    const filas = [...mesas.values()].sort((a, b) => {
-      if (a.clave === "sin-asignar") return 1;
-      if (b.clave === "sin-asignar") return -1;
-      return Number(a.clave) - Number(b.clave);
-    });
-
-    filas.forEach(m => {
-      agregarFila(tbody, [
-        m.mesa,
-        m.reservaciones,
-        m.asistentes,
-        pesos(m.original),
-        pesos(m.tercerImporte),
-        pesos(m.final)
-      ]);
-    });
-
-    const totales = filas.reduce((acc, m) => {
-      acc.reservaciones += m.reservaciones;
-      acc.asistentes += m.asistentes;
-      acc.original += m.original;
-      acc.tercerImporte += m.tercerImporte;
-      acc.final += m.final;
-      return acc;
-    }, {
-      reservaciones: 0,
-      asistentes: 0,
-      original: 0,
-      tercerImporte: 0,
-      final: 0
-    });
-
-    agregarFila(tfoot, [
-      "TOTAL",
-      totales.reservaciones,
-      totales.asistentes,
-      pesos(totales.original),
-      pesos(totales.tercerImporte),
-      pesos(totales.final)
-    ]);
-  }
-
-  function pintarFamilias(reservaciones) {
-    const tbody = document.getElementById("tablaFamilias");
-    const tfoot = document.getElementById("totalesFamilias");
-
-    limpiarTabla("tablaFamilias");
-    limpiarTabla("totalesFamilias");
-
-    const esExcel = documentoActual.formato_version === 2;
-
-    let totalAsientos = 0;
-    let totalOriginal = 0;
-    let totalTercerImporte = 0;
-    let totalFinal = 0;
-
-    reservaciones.forEach(r => {
-      const asientos = totalAsistentes(r);
-      const original = importe(r, "importe_original");
-      const tercerImporte = importe(r, "importe_ajuste");
-      const final = importe(r, "importe_final");
-
-      totalAsientos += asientos;
-      totalOriginal += original;
-      totalTercerImporte += tercerImporte;
-      totalFinal += final;
-
-      if (esExcel) {
-        agregarFila(tbody, [
-          r.reservacion_id,
-          r.nombre_reservacion,
-          r.beneficio_excel || "No indicado",
-          r.estado_pago_excel || "No indicado",
-          asientos,
-          pesos(importeExcel(r.subtotal_excel)),
-          pesos(importeExcel(r.pagado_excel)),
-          pesos(importeExcel(r.debe_excel))
-        ]);
+      if (!filtrados.length) {
+        $("tablaGrupos").innerHTML = `
+          <tr><td colspan="16" class="sin-datos">
+            No hay grupos que coincidan con la búsqueda.
+          </td></tr>`;
       } else {
-        agregarFila(tbody, [
-          r.reservacion_id,
-          r.nombre_familia,
-          r.responsable || "No indicado",
-          obtenerMesa(r),
-          asientos,
-          pesos(original),
-          pesos(tercerImporte),
-          pesos(final)
-        ]);
+        $("tablaGrupos").innerHTML = filtrados.map(r => `
+          <tr>
+            <td class="identificador">${escapar(referencia(r))}</td>
+            <td><strong>${escapar(nombreGrupo(r))}</strong></td>
+            <td>${escapar(tipoReservacion(r))}</td>
+            <td class="numero">${entero.format(adultos(r))}</td>
+            <td class="numero">${entero.format(ninos(r))}</td>
+            <td class="numero">${entero.format(totalAsientos(r))}</td>
+            <td>
+              ${
+                mesaNumero(r) === null
+                  ? '<span class="etiqueta-estado sin-mesa">Sin mesa</span>'
+                  : "Mesa " + entero.format(mesaNumero(r))
+              }
+            </td>
+            <td>${escapar(texto(r.beneficio_excel))}</td>
+            <td>${etiquetaPago(r)}</td>
+            <td>${escapar(formaPago(r))}</td>
+            <td class="numero">${dinero(r.costo_excel)}</td>
+            <td class="numero">${dinero(r.cortesia_excel)}</td>
+            <td class="numero">${dinero(r.subtotal_excel)}</td>
+            <td class="numero">${dinero(r.pagado_excel)}</td>
+            <td class="numero">${dinero(r.debe_excel)}</td>
+            <td>
+              ${escapar(texto(r.notas_excel))}
+              ${
+                r.estado_excel_columna_J !== null &&
+                r.estado_excel_columna_J !== undefined &&
+                r.estado_excel_columna_J !== ""
+                  ? "<br><span class='ayuda'>Columna J: " +
+                    escapar(r.estado_excel_columna_J) + "</span>"
+                  : ""
+              }
+            </td>
+          </tr>
+        `).join("");
       }
-    });
 
-    agregarFila(tfoot, [
-      "TOTAL",
-      "",
-      "",
-      "",
-      totalAsientos,
-      pesos(totalOriginal),
-      pesos(totalTercerImporte),
-      pesos(totalFinal)
-    ]);
-  }
+      /*
+       * El pie se calcula con todas las reservaciones, no con los resultados
+       * filtrados, para que el resumen financiero no cambie al buscar grupos.
+       */
+      const totales = reservaciones.reduce((a, r) => {
+        a.adultos += adultos(r);
+        a.ninos += ninos(r);
+        a.asientos += totalAsientos(r);
+        a.costo += numero(r.costo_excel);
+        a.cortesia += numero(r.cortesia_excel);
+        a.subtotal += numero(r.subtotal_excel);
+        a.pagado += numero(r.pagado_excel);
+        a.debe += numero(r.debe_excel);
+        return a;
+      }, {
+        adultos: 0,
+        ninos: 0,
+        asientos: 0,
+        costo: 0,
+        cortesia: 0,
+        subtotal: 0,
+        pagado: 0,
+        debe: 0
+      });
 
-  function pintarAsistentes(reservaciones) {
-    const tbody = document.getElementById("tablaAsistentes");
-    limpiarTabla("tablaAsistentes");
+      $("totalesGrupos").innerHTML = `
+        <tr>
+          <td colspan="3">TOTAL GENERAL</td>
+          <td class="numero">${entero.format(totales.adultos)}</td>
+          <td class="numero">${entero.format(totales.ninos)}</td>
+          <td class="numero">${entero.format(totales.asientos)}</td>
+          <td colspan="4">Importes sumados por reservación</td>
+          <td class="numero">${dinero(totales.costo)}</td>
+          <td class="numero">${dinero(totales.cortesia)}</td>
+          <td class="numero">${dinero(totales.subtotal)}</td>
+          <td class="numero">${dinero(totales.pagado)}</td>
+          <td class="numero">${dinero(totales.debe)}</td>
+          <td>Sin duplicar importes por asistente</td>
+        </tr>
+      `;
+    }
 
-    const esExcel = documentoActual.formato_version === 2;
+    function renderizarSinMesa() {
+      const sinMesa = padron.filter(p => p.mesa_numero === null);
 
-    reservaciones.forEach(r => {
-      if (esExcel) {
-        agregarFila(tbody, [
-          r.nombre_reservacion,
-          r.adultos,
-          r.ninos,
-          r.total_asientos_excel,
-          r.mesa_numero == null
-            ? "Sin asignar"
-            : "Mesa " + r.mesa_numero,
-          r.beneficio_excel || "No indicado",
-          r.estado_pago_excel || "No indicado"
-        ]);
-
+      if (!sinMesa.length) {
+        $("tablaSinMesa").innerHTML = `
+          <tr><td colspan="6" class="sin-datos">
+            Todos los asistentes tienen una mesa registrada.
+          </td></tr>`;
         return;
       }
 
-      r.asistentes.forEach(persona => {
-        agregarFila(tbody, [
-          r.nombre_familia,
-          persona.nombre,
-          persona.edad == null ? "No indicada" : persona.edad,
-          persona.categoria || "No indicada",
-          persona.beneficio_nombre || "Ninguno",
-          obtenerMesa(r),
-          pesos(persona.importe_final)
-        ]);
+      $("tablaSinMesa").innerHTML = sinMesa.map(p => `
+        <tr>
+          <td class="identificador">${escapar(p.id)}</td>
+          <td>${escapar(p.nombre_provisional)}</td>
+          <td>${escapar(p.grupo_familiar)}</td>
+          <td>${escapar(p.tipo)}</td>
+          <td class="identificador">${escapar(p.reservacion_id)}</td>
+          <td>${etiquetaPago(p.reserva)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function configurarFiltros() {
+      const filtroMesa = $("filtroMesa");
+      const filtroPago = $("filtroPago");
+
+      const mesasUnicas = [...new Set(
+        padron
+          .filter(p => p.mesa_numero !== null)
+          .map(p => p.mesa_numero)
+      )].sort((a, b) => a - b);
+
+      filtroMesa.innerHTML =
+        '<option value="">Todas las mesas</option>' +
+        '<option value="sin-mesa">Sin mesa asignada</option>' +
+        mesasUnicas.map(m =>
+          `<option value="${escapar(m)}">Mesa ${entero.format(m)}</option>`
+        ).join("");
+
+      const pagosUnicos = [...new Set(
+        padron.map(p => p.estatus_pago)
+      )].sort((a, b) => a.localeCompare(b, "es-MX"));
+
+      filtroPago.innerHTML =
+        '<option value="">Todos los estatus de pago</option>' +
+        pagosUnicos.map(p =>
+          `<option value="${escapar(p)}">${escapar(p)}</option>`
+        ).join("");
+    }
+
+    function renderizarTodo() {
+      padron = construirPadron();
+      mesas = construirMesas();
+
+      renderizarResumen();
+      renderizarMesas();
+      configurarFiltros();
+      renderizarPadron();
+      renderizarGrupos();
+      renderizarSinMesa();
+
+      $("contenidoConsulta").hidden = false;
+      $("btnExportarPadron").disabled = false;
+      $("btnImprimir").disabled = false;
+    }
+
+    async function cargarArchivo() {
+      const archivo = $("archivoJson").files[0];
+
+      if (!archivo) {
+        mostrarEstado(
+          "Primero selecciona el archivo JSON v2.",
+          "error"
+        );
+        return;
+      }
+
+      try {
+        mostrarEstado("Leyendo archivo...", "");
+
+        const contenido = await archivo.text();
+        const doc = JSON.parse(contenido);
+
+        validarDocumento(doc);
+
+        documentoActual = doc;
+        reservaciones = doc.reservaciones;
+
+        capacidadMesa = numero(doc.capacidad_mesa_personas) || 10;
+
+        /*
+         * Limpiar filtros al cargar una nueva versión del JSON.
+         */
+        $("buscarPadron").value = "";
+        $("buscarGrupo").value = "";
+        $("filtroTipo").value = "";
+
+        renderizarTodo();
+
+        mostrarEstado(
+          "JSON v2 cargado correctamente: " +
+          reservaciones.length +
+          " reservaciones y " +
+          padron.length +
+          " registros provisionales individuales.",
+          "ok"
+        );
+
+      } catch (error) {
+        documentoActual = null;
+        reservaciones = [];
+        padron = [];
+        mesas = [];
+
+        $("contenidoConsulta").hidden = true;
+        $("btnExportarPadron").disabled = true;
+        $("btnImprimir").disabled = true;
+
+        mostrarEstado(
+          "No se pudo cargar el archivo. " +
+          (error.message || "Verifica que sea un JSON válido."),
+          "error"
+        );
+      }
+    }
+
+    function mostrarEstado(mensaje, tipo) {
+      const elemento = $("estadoCarga");
+      elemento.className = "estado" + (tipo ? " " + tipo : "");
+      elemento.textContent = mensaje;
+    }
+
+    function activarVista(id) {
+      document.querySelectorAll(".vista").forEach(vista => {
+        vista.classList.toggle("activa", vista.id === id);
+      });
+
+      document.querySelectorAll(".navegacion button").forEach(boton => {
+        boton.classList.toggle(
+          "activo",
+          boton.dataset.vista === id
+        );
+      });
+    }
+
+    function exportarPadronCSV() {
+      if (!padron.length) {
+        mostrarEstado("No hay asistentes para exportar.", "error");
+        return;
+      }
+
+      const encabezados = [
+        "ID asistente",
+        "Nombre provisional",
+        "Nombre real",
+        "Grupo familiar",
+        "Reservacion ID",
+        "Tipo asistente",
+        "Mesa",
+        "Estatus pago",
+        "Forma pago",
+        "Tipo reservacion",
+        "Estado de actualizacion"
+      ];
+
+      const filas = padron.map(p => [
+        p.id,
+        p.nombre_provisional,
+        "",
+        p.grupo_familiar,
+        p.reservacion_id,
+        p.tipo,
+        p.mesa_numero === null ? "" : p.mesa_numero,
+        p.estatus_pago,
+        p.forma_pago,
+        p.tipo_reservacion,
+        "Pendiente de confirmar nombre real"
+      ]);
+
+      function csvCampo(valor) {
+        return '"' + String(valor ?? "").replace(/"/g, '""') + '"';
+      }
+
+      const csv = [
+        encabezados,
+        ...filas
+      ].map(fila => fila.map(csvCampo).join(",")).join("\r\n");
+
+      /*
+       * BOM para que Excel reconozca correctamente los acentos.
+       */
+      const blob = new Blob(
+        ["\uFEFF" + csv],
+        { type: "text/csv;charset=utf-8;" }
+      );
+
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement("a");
+
+      enlace.href = url;
+      enlace.download = "OXI-2026-padron-provisional.csv";
+
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+
+      URL.revokeObjectURL(url);
+    }
+
+    $("btnCargar").addEventListener("click", cargarArchivo);
+
+    $("archivoJson").addEventListener("change", () => {
+      if ($("archivoJson").files.length) {
+        mostrarEstado(
+          "Archivo seleccionado. Presiona «Cargar JSON» para procesarlo.",
+          ""
+        );
+      }
+    });
+
+    $("buscarPadron").addEventListener("input", renderizarPadron);
+    $("filtroTipo").addEventListener("change", renderizarPadron);
+    $("filtroMesa").addEventListener("change", renderizarPadron);
+    $("filtroPago").addEventListener("change", renderizarPadron);
+    $("buscarGrupo").addEventListener("input", renderizarGrupos);
+
+    document.querySelectorAll(".navegacion button").forEach(boton => {
+      boton.addEventListener("click", () => {
+        activarVista(boton.dataset.vista);
       });
     });
 
-    if (tbody.children.length === 0) {
-      const fila = document.createElement("tr");
-      const celda = document.createElement("td");
-      celda.colSpan = 7;
-      celda.className = "vacio";
-      celda.textContent = "No hay registros para mostrar.";
-      fila.appendChild(celda);
-      tbody.appendChild(fila);
-    }
-  }
+    $("btnExportarPadron").addEventListener("click", exportarPadronCSV);
 
-  function mostrarResultados(reservaciones, exportadoEn) {
-    reservacionesActuales = reservaciones;
-
-    ajustarEtiquetas(documentoActual);
-    pintarResumen(reservaciones);
-    pintarMesas(reservaciones);
-    pintarFamilias(reservaciones);
-    pintarAsistentes(reservaciones);
-
-    const fecha = exportadoEn ? new Date(exportadoEn) : null;
-
-    const textoFecha = fecha && !Number.isNaN(fecha.getTime())
-      ? fecha.toLocaleString("es-MX")
-      : "No indicada";
-
-    document.getElementById("fechaExportacion").textContent =
-      "Fecha de exportación: " + textoFecha +
-      ". Los importes corresponden a los registros del archivo y no " +
-      "constituyen confirmación de pagos recibidos.";
-
-    resultados.classList.remove("oculto");
-    botonImprimir.disabled = false;
-  }
-
-  async function cargarArchivo() {
-    const archivo = archivoJSON.files[0];
-
-    if (!archivo) {
-      mostrarEstado("Selecciona un archivo JSON.", "error");
-      return;
-    }
-
-    if (archivo.size > MAX_ARCHIVO_BYTES) {
-      mostrarEstado(
-        "El archivo supera el límite permitido de 5 MB.",
-        "error"
-      );
-      archivoJSON.value = "";
-      return;
-    }
-
-    try {
-      mostrarEstado("Validando el archivo seleccionado...", "");
-
-      const documento = JSON.parse(await archivo.text());
-      const reservaciones = validarDocumento(documento);
-
-      documentoActual = documento;
-
-      mostrarResultados(
-        reservaciones,
-        documento.exportado_en
-      );
-
-      mostrarEstado(
-        "Consulta cargada correctamente. Reservaciones: " +
-        reservaciones.length +
-        ". Formato JSON v" + documento.formato_version + ".",
-        "ok"
-      );
-    } catch (error) {
-      limpiarResultados();
-
-      mostrarEstado(
-        "No se pudo cargar el archivo: " +
-        (error && error.message ? error.message : "error desconocido"),
-        "error"
-      );
-    }
-  }
-
-  function limpiarResultados() {
-    reservacionesActuales = [];
-    documentoActual = null;
-
-    resultados.classList.add("oculto");
-    botonImprimir.disabled = true;
-
-    [
-      "tablaMesas",
-      "totalesMesas",
-      "tablaFamilias",
-      "totalesFamilias",
-      "tablaAsistentes"
-    ].forEach(limpiarTabla);
-
-    // Restablecer las etiquetas iniciales para la siguiente consulta.
-    document.getElementById("etiquetaReservaciones").textContent =
-      "Reservaciones familiares";
-
-    document.getElementById("etiquetaAsistentes").textContent =
-      "Asistentes registrados";
-
-    document.getElementById("etiquetaOriginal").textContent =
-      "Importe original";
-
-    document.getElementById("etiquetaFinal").textContent =
-      "Importe final";
-
-    document.getElementById("resumenAjustes").textContent = "";
-
-    const encabezadoMesas = document
-      .querySelector("#tablaMesas")
-      .closest("table")
-      .querySelectorAll("thead th");
-
-    [
-      "Mesa",
-      "Familias",
-      "Asistentes",
-      "Importe original",
-      "Ajustes",
-      "Importe final"
-    ].forEach((titulo, i) => {
-      encabezadoMesas[i].textContent = titulo;
-    });
-
-    const encabezadosFamilias = document
-      .querySelector("#tablaFamilias")
-      .closest("table")
-      .querySelectorAll("thead th");
-
-    [
-      "Reservación",
-      "Familia",
-      "Responsable",
-      "Mesa",
-      "Asistentes",
-      "Importe original",
-      "Ajustes",
-      "Importe final"
-    ].forEach((titulo, i) => {
-      encabezadosFamilias[i].textContent = titulo;
-    });
-
-    const encabezadoAsistentes =
-      document.getElementById("encabezadoAsistentes");
-
-    encabezadoAsistentes.replaceChildren();
-
-    const fila = document.createElement("tr");
-
-    [
-      "Familia",
-      "Persona",
-      "Edad",
-      "Categoría",
-      "Beneficio",
-      "Mesa",
-      "Importe"
-    ].forEach(titulo => {
-      const th = document.createElement("th");
-      th.textContent = titulo;
-      fila.appendChild(th);
-    });
-
-    encabezadoAsistentes.appendChild(fila);
-
-    document.getElementById("notaDetalle").textContent =
-      "El detalle individual muestra los datos disponibles en el archivo original. No se generan datos personales que no estén registrados.";
-  }
-
-  archivoJSON.addEventListener("change", cargarArchivo);
-
-  botonLimpiar.addEventListener("click", () => {
-    archivoJSON.value = "";
-    limpiarResultados();
-
-    mostrarEstado(
-      "Consulta limpia. Selecciona un archivo JSON para comenzar.",
-      ""
-    );
-  });
-
-  botonImprimir.addEventListener("click", () => {
-    if (reservacionesActuales.length > 0) {
+    $("btnImprimir").addEventListener("click", () => {
       window.print();
-    }
-  });
-})();
-</script>
-
+    });
+  </script>
 </body>
 </html>
