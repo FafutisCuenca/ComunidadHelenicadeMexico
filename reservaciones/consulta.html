@@ -1538,6 +1538,477 @@
       URL.revokeObjectURL(url);
     }
 
+    
+    // =========================================================
+    // REPORTES OXI-2026
+    // =========================================================
+
+    function htmlReporte(titulo, contenido) {
+      return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapar(titulo)}</title>
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #263445;
+    margin: 25px;
+    font-size: 12px;
+  }
+  h1 { color: #17365d; margin-bottom: 4px; }
+  h2 { color: #17365d; margin-top: 25px; }
+  .encabezado {
+    border-bottom: 3px solid #b99a55;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+  .subtitulo { color: #667085; }
+  .resumen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 15px 0;
+  }
+  .tarjeta {
+    border: 1px solid #dce2e9;
+    border-top: 3px solid #b99a55;
+    padding: 10px;
+    break-inside: avoid;
+  }
+  .etiqueta { color: #667085; font-size: 10px; display: block; }
+  .valor { color: #17365d; font-size: 17px; font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 22px; }
+  th, td {
+    border: 1px solid #dce2e9;
+    padding: 6px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #eaf1f8; color: #17365d; }
+  .numero { text-align: right; white-space: nowrap; }
+  .pendiente { color: #9a3412; font-weight: bold; }
+  .mesa { break-inside: avoid; margin-bottom: 18px; }
+  .nota { color: #667085; font-size: 10px; }
+  .sin-datos { color: #667085; font-style: italic; }
+  .botones { margin-bottom: 20px; }
+  button {
+    padding: 9px 13px;
+    margin-right: 8px;
+    border: 0;
+    background: #17365d;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  @media print {
+    body { margin: 8mm; }
+    .botones { display: none; }
+    thead { display: table-header-group; }
+    tr { break-inside: avoid; }
+  }
+  @media (max-width: 650px) {
+    body { margin: 10px; }
+    .resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+</head>
+<body>
+  <div class="botones">
+    <button onclick="window.print()">Imprimir / Guardar PDF</button>
+    <button onclick="window.close()">Cerrar reporte</button>
+  </div>
+  <div class="encabezado">
+    <h1>Comunidad Helénica de México A.C.</h1>
+    <div><strong>OXI-2026</strong> · ${escapar(titulo)}</div>
+    <div class="subtitulo">Reporte generado desde la consulta de reservaciones</div>
+    <div class="subtitulo">Fecha de generación: ${escapar(new Date().toLocaleString("es-MX"))}</div>
+  </div>
+  ${contenido}
+</body>
+</html>`;
+    }
+
+    function abrirReporte(titulo, contenido) {
+      const ventana = window.open("", "_blank");
+
+      if (!ventana) {
+        mostrarEstado(
+          "El navegador bloqueó la ventana del reporte. Permite ventanas emergentes para esta página e inténtalo de nuevo.",
+          "error"
+        );
+        return;
+      }
+
+      ventana.document.open();
+      ventana.document.write(htmlReporte(titulo, contenido));
+      ventana.document.close();
+      ventana.focus();
+    }
+
+    function tarjetaReporte(etiqueta, valor) {
+      return `<div class="tarjeta">
+        <span class="etiqueta">${escapar(etiqueta)}</span>
+        <span class="valor">${escapar(valor)}</span>
+      </div>`;
+    }
+
+    function importeTotal(campo) {
+      return reservaciones.reduce(
+        (total, r) => total + numero(r[campo]),
+        0
+      );
+    }
+
+    function crearReporteFinanciero() {
+      if (!documentoActual || !reservaciones.length) {
+        mostrarEstado("Carga primero el JSON v2.", "error");
+        return;
+      }
+
+      const totalGrupos = reservaciones.filter(
+        r => r.tipo_reservacion !== "cortesia_institucional"
+      ).length;
+
+      const totalCortesias = reservaciones.filter(
+        r => r.tipo_reservacion === "cortesia_institucional"
+      ).length;
+
+      const totalAdultos = reservaciones.reduce(
+        (s, r) => s + adultos(r), 0
+      );
+
+      const totalNinos = reservaciones.reduce(
+        (s, r) => s + ninos(r), 0
+      );
+
+      const costo = importeTotal("costo_excel");
+      const cortesia = importeTotal("cortesia_excel");
+      const subtotal = importeTotal("subtotal_excel");
+      const pagado = importeTotal("pagado_excel");
+      const debe = importeTotal("debe_excel");
+
+      const conSaldo = reservaciones
+        .filter(r => numero(r.debe_excel) > 0)
+        .sort((a, b) =>
+          numero(b.debe_excel) - numero(a.debe_excel)
+        );
+
+      const contenido = `
+        <h2>Resumen ejecutivo</h2>
+        <div class="resumen">
+          ${tarjetaReporte("Reservaciones totales", reservaciones.length)}
+          ${tarjetaReporte("Grupos regulares", totalGrupos)}
+          ${tarjetaReporte("Cortesías institucionales", totalCortesias)}
+          ${tarjetaReporte("Adultos", totalAdultos)}
+          ${tarjetaReporte("Niños", totalNinos)}
+          ${tarjetaReporte("Asistentes registrados", totalAdultos + totalNinos)}
+          ${tarjetaReporte("Costo registrado en Excel", dinero(costo))}
+          ${tarjetaReporte("Cortesías registradas", dinero(cortesia))}
+          ${tarjetaReporte("Subtotal registrado", dinero(subtotal))}
+          ${tarjetaReporte("Importe pagado registrado", dinero(pagado))}
+          ${tarjetaReporte("Saldo pendiente registrado", dinero(debe))}
+        </div>
+
+        <p class="nota">
+          Los importes corresponden a los campos financieros importados del
+          Excel. No constituyen una conciliación bancaria ni una confirmación
+          independiente de los pagos. No se multiplican por persona.
+          Las cortesías se muestran según su campo de origen.
+        </p>
+
+        <h2>Reservaciones con saldo pendiente</h2>
+        ${
+          conSaldo.length
+          ? `<table>
+              <thead><tr>
+                <th>Referencia</th>
+                <th>Grupo / titular</th>
+                <th>Mesa</th>
+                <th>Estatus registrado</th>
+                <th>Forma de pago</th>
+                <th class="numero">Subtotal</th>
+                <th class="numero">Pagado</th>
+                <th class="numero">Saldo pendiente</th>
+              </tr></thead>
+              <tbody>
+                ${conSaldo.map(r => `<tr>
+                  <td>${escapar(referencia(r))}</td>
+                  <td>${escapar(nombreGrupo(r))}</td>
+                  <td>${mesaNumero(r) === null ? "Sin asignar" : "Mesa " + mesaNumero(r)}</td>
+                  <td>${escapar(estatusPago(r))}</td>
+                  <td>${escapar(formaPago(r))}</td>
+                  <td class="numero">${dinero(r.subtotal_excel)}</td>
+                  <td class="numero">${dinero(r.pagado_excel)}</td>
+                  <td class="numero pendiente">${dinero(r.debe_excel)}</td>
+                </tr>`).join("")}
+              </tbody>
+              <tfoot><tr>
+                <th colspan="7">Total de saldos pendientes</th>
+                <th class="numero">${dinero(conSaldo.reduce((s, r) => s + numero(r.debe_excel), 0))}</th>
+              </tr></tfoot>
+            </table>`
+          : `<p class="sin-datos">No hay saldos pendientes mayores que cero en el campo debe_excel.</p>`
+        }
+
+        <h2>Detalle financiero por reservación</h2>
+        <table>
+          <thead><tr>
+            <th>Referencia</th>
+            <th>Grupo / titular</th>
+            <th>Tipo</th>
+            <th>Mesa</th>
+            <th class="numero">Costo Excel</th>
+            <th class="numero">Cortesía</th>
+            <th class="numero">Subtotal</th>
+            <th class="numero">Pagado</th>
+            <th class="numero">Debe</th>
+            <th>Estatus registrado</th>
+            <th>Notas</th>
+          </tr></thead>
+          <tbody>
+            ${reservaciones.map(r => `<tr>
+              <td>${escapar(referencia(r))}</td>
+              <td>${escapar(nombreGrupo(r))}</td>
+              <td>${escapar(tipoReservacion(r))}</td>
+              <td>${mesaNumero(r) === null ? "Sin asignar" : mesaNumero(r)}</td>
+              <td class="numero">${dinero(r.costo_excel)}</td>
+              <td class="numero">${dinero(r.cortesia_excel)}</td>
+              <td class="numero">${dinero(r.subtotal_excel)}</td>
+              <td class="numero">${dinero(r.pagado_excel)}</td>
+              <td class="numero ${numero(r.debe_excel) > 0 ? "pendiente" : ""}">${dinero(r.debe_excel)}</td>
+              <td>${escapar(estatusPago(r))}</td>
+              <td>${escapar(texto(r.notas_excel, ""))}</td>
+            </tr>`).join("")}
+          </tbody>
+          <tfoot><tr>
+            <th colspan="4">TOTAL</th>
+            <th class="numero">${dinero(costo)}</th>
+            <th class="numero">${dinero(cortesia)}</th>
+            <th class="numero">${dinero(subtotal)}</th>
+            <th class="numero">${dinero(pagado)}</th>
+            <th class="numero">${dinero(debe)}</th>
+            <th colspan="2">Suma por reservación</th>
+          </tr></tfoot>
+        </table>
+      `;
+
+      abrirReporte("Reporte financiero", contenido);
+    }
+
+    function crearReporteMesas() {
+      if (!documentoActual || !reservaciones.length) {
+        mostrarEstado("Carga primero el JSON v2.", "error");
+        return;
+      }
+
+      const gruposPorMesa = new Map();
+
+      reservaciones.forEach(r => {
+        const mesa = mesaNumero(r);
+        if (mesa === null) return;
+
+        if (!gruposPorMesa.has(mesa)) {
+          gruposPorMesa.set(mesa, []);
+        }
+
+        gruposPorMesa.get(mesa).push(r);
+      });
+
+      const mesasOrdenadas = [...gruposPorMesa.keys()]
+        .sort((a, b) => a - b);
+
+      const asignados = padron.filter(p => p.mesa_numero !== null).length;
+      const sinMesa = padron.length - asignados;
+      const totalMesas = mesasOrdenadas.length;
+
+      let contenido = `
+        <h2>Resumen de distribución</h2>
+        <div class="resumen">
+          ${tarjetaReporte("Mesas utilizadas", totalMesas)}
+          ${tarjetaReporte("Grupos con mesa", mesas.filter(m => m.mesa_numero !== null).length)}
+          ${tarjetaReporte("Asistentes con mesa", asignados)}
+          ${tarjetaReporte("Asistentes sin mesa", sinMesa)}
+          ${tarjetaReporte("Capacidad por mesa", capacidadMesa)}
+        </div>
+        <p class="nota">
+          La distribución conserva las mesas del JSON original. Los lugares
+          disponibles se calculan como capacidad configurada menos asistentes
+          registrados; si el resultado es negativo, se indica el excedente.
+        </p>
+        <h2>Resumen por mesa</h2>
+        <table>
+          <thead><tr>
+            <th>Mesa</th>
+            <th class="numero">Grupos</th>
+            <th class="numero">Adultos</th>
+            <th class="numero">Niños</th>
+            <th class="numero">Asistentes</th>
+            <th class="numero">Capacidad</th>
+            <th class="numero">Disponibles</th>
+          </tr></thead>
+          <tbody>
+            ${mesas.map(m => `<tr>
+              <td><strong>Mesa ${m.mesa_numero}</strong></td>
+              <td class="numero">${m.grupos}</td>
+              <td class="numero">${m.adultos}</td>
+              <td class="numero">${m.ninos}</td>
+              <td class="numero">${m.asistentes}</td>
+              <td class="numero">${capacidadMesa}</td>
+              <td class="numero">${capacidadMesa - m.asistentes}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      `;
+
+      mesasOrdenadas.forEach(mesa => {
+        const grupos = gruposPorMesa.get(mesa);
+        const asistentesMesa = grupos.reduce(
+          (s, r) => s + totalAsientos(r), 0
+        );
+
+        contenido += `
+          <div class="mesa">
+            <h2>Mesa ${mesa}</h2>
+            <p>
+              <strong>Ocupación:</strong> ${asistentesMesa} de ${capacidadMesa}
+              lugares · <strong>Disponibles:</strong> ${capacidadMesa - asistentesMesa}
+            </p>
+            <table>
+              <thead><tr>
+                <th>Grupo / titular</th>
+                <th>Referencia</th>
+                <th class="numero">Adultos</th>
+                <th class="numero">Niños</th>
+                <th class="numero">Total</th>
+                <th>Observación</th>
+              </tr></thead>
+              <tbody>
+                ${grupos.map(r => `<tr>
+                  <td>${escapar(nombreGrupo(r))}</td>
+                  <td>${escapar(referencia(r))}</td>
+                  <td class="numero">${adultos(r)}</td>
+                  <td class="numero">${ninos(r)}</td>
+                  <td class="numero">${totalAsientos(r)}</td>
+                  <td>${escapar(tipoReservacion(r))}</td>
+                </tr>`).join("")}
+              </tbody>
+            </table>
+          </div>
+        `;
+      });
+
+      const sinAsignacion = reservaciones.filter(r => mesaNumero(r) === null);
+
+      contenido += `
+        <h2>Reservaciones sin mesa asignada</h2>
+        ${
+          sinAsignacion.length
+          ? `<table>
+              <thead><tr>
+                <th>Grupo / titular</th>
+                <th>Referencia</th>
+                <th class="numero">Adultos</th>
+                <th class="numero">Niños</th>
+                <th class="numero">Total</th>
+              </tr></thead>
+              <tbody>
+                ${sinAsignacion.map(r => `<tr>
+                  <td>${escapar(nombreGrupo(r))}</td>
+                  <td>${escapar(referencia(r))}</td>
+                  <td class="numero">${adultos(r)}</td>
+                  <td class="numero">${ninos(r)}</td>
+                  <td class="numero">${totalAsientos(r)}</td>
+                </tr>`).join("")}
+              </tbody>
+            </table>`
+          : `<p class="sin-datos">Todas las reservaciones tienen una mesa asignada.</p>`
+        }
+      `;
+
+      abrirReporte("Reporte de distribución de mesas", contenido);
+    }
+
+    function exportarFinanzasCSV() {
+      if (!documentoActual || !reservaciones.length) {
+        mostrarEstado("Carga primero el JSON v2.", "error");
+        return;
+      }
+
+      const encabezados = [
+        "Evento",
+        "Referencia",
+        "Tipo de reservacion",
+        "Grupo o titular",
+        "Mesa",
+        "Adultos",
+        "Ninos",
+        "Total asientos calculados",
+        "Total asientos Excel",
+        "Beneficio",
+        "Estatus pago registrado",
+        "Forma de pago registrada",
+        "Costo Excel",
+        "Cortesia Excel",
+        "Subtotal Excel",
+        "Pagado Excel",
+        "Debe Excel",
+        "Notas",
+        "Fila origen Excel"
+      ];
+
+      const filas = reservaciones.map(r => [
+        documentoActual.evento_id,
+        referencia(r),
+        tipoReservacion(r),
+        nombreGrupo(r),
+        mesaNumero(r) === null ? "" : mesaNumero(r),
+        adultos(r),
+        ninos(r),
+        totalAsientos(r),
+        r.total_asientos_excel ?? "",
+        r.beneficio_excel ?? "",
+        r.estado_pago_excel ?? "",
+        r.forma_pago_excel ?? "",
+        numero(r.costo_excel),
+        numero(r.cortesia_excel),
+        numero(r.subtotal_excel),
+        numero(r.pagado_excel),
+        numero(r.debe_excel),
+        r.notas_excel ?? "",
+        r.fila_origen_excel ?? ""
+      ]);
+
+      const campoCSV = valor =>
+        '"' + String(valor ?? "").replace(/"/g, '""') + '"';
+
+      const csv = [encabezados, ...filas]
+        .map(fila => fila.map(campoCSV).join(","))
+        .join("\r\n");
+
+      const blob = new Blob(
+        ["\uFEFF" + csv],
+        { type: "text/csv;charset=utf-8;" }
+      );
+
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement("a");
+
+      enlace.href = url;
+      enlace.download = "OXI-2026-reporte-financiero.csv";
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      mostrarEstado(
+        "Se generó la exportación financiera CSV por reservación.",
+        "ok"
+      );
+    }
+
     $("btnCargar").addEventListener("click", cargarArchivo);
 
     $("archivoJson").addEventListener("change", () => {
