@@ -908,11 +908,74 @@ function pintarAsistentes(reservaciones) {
     });
   });
 }
-  
+  function ajustarEtiquetas(documento) {
+  const esExcel = documento.formato_version === 2;
+
+  if (!esExcel) {
+    return;
+  }
+
+  // Tarjetas del resumen.
+  document.querySelector(
+    '[id="totalReservaciones"]'
+  ).previousElementSibling.textContent =
+    "Reservaciones de grupo";
+
+  document.querySelector(
+    '[id="totalAsistentes"]'
+  ).previousElementSibling.textContent =
+    "Asientos registrados en Excel";
+
+  document.querySelector(
+    '[id="totalOriginal"]'
+  ).previousElementSibling.textContent =
+    "Subtotal registrado en Excel";
+
+  document.querySelector(
+    '[id="totalFinal"]'
+  ).previousElementSibling.textContent =
+    "Saldo registrado en Excel";
+
+  // Encabezados del concentrado por mesa.
+  const encabezadosMesas = document.querySelectorAll(
+    "#tablaMesas"
+  )[0].closest("table").querySelectorAll("thead th");
+
+  if (encabezadosMesas.length === 6) {
+    encabezadosMesas[1].textContent = "Reservaciones";
+    encabezadosMesas[2].textContent = "Asientos";
+    encabezadosMesas[3].textContent = "Subtotal Excel";
+    encabezadosMesas[4].textContent = "Pagado según Excel";
+    encabezadosMesas[5].textContent = "Saldo según Excel";
+  }
+
+  // Encabezados de la tabla de grupos.
+  const encabezadosFamilias = document.querySelectorAll(
+    "#tablaFamilias"
+  )[0].closest("table").querySelectorAll("thead th");
+
+  if (encabezadosFamilias.length === 8) {
+    encabezadosFamilias[1].textContent = "Familia o grupo";
+    encabezadosFamilias[2].textContent = "Beneficio";
+    encabezadosFamilias[4].textContent = "Asientos";
+    encabezadosFamilias[5].textContent = "Subtotal Excel";
+    encabezadosFamilias[6].textContent = "Pagado según Excel";
+    encabezadosFamilias[7].textContent = "Saldo según Excel";
+  }
+
+  document.querySelector("#resumenAjustes").textContent =
+    "El importe pagado y el saldo se muestran como aparecen en el Excel; " +
+    "la consulta no confirma pagos ni recalcula los importes.";
+}
   function mostrarResultados(reservaciones, exportadoEn) {
     reservacionesActuales = reservaciones;
 
-    pintarResumen(reservaciones);
+// Las etiquetas dependen de la versión del archivo cargado.
+ajustarEtiquetas(
+  window.documentoConsultaActual
+);
+
+pintarResumen(reservaciones);
     pintarMesas(reservaciones);
     pintarFamilias(reservaciones);
     pintarAsistentes(reservaciones);
@@ -953,6 +1016,7 @@ function pintarAsistentes(reservaciones) {
       mostrarEstado("Validando el archivo seleccionado...", "");
 
       const documento = JSON.parse(await archivo.text());
+      window.documentoConsultaActual = documento;
       const reservaciones = validarDocumento(documento);
 
       mostrarResultados(
