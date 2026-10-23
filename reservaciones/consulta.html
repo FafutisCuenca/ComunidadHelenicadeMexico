@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Consulta de reservaciones | OXI 2026</title>
+
+  <style>
+    :root {
+      --azul: #17365d;
+      --azul-claro: #eaf1f8;
+      --fondo: #f4f6f9;
+      --borde: #d9e0e8;
+      --texto: #263445;
+      --verde: #176b43;
+      --rojo: #a4262c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--texto);
+      background: var(--fondo);
+    }
+
+    main {
+      max-width: 1250px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: var(--azul);
+      color: white;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 22px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 27px;
+    }
+
+    header p {
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .panel {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+    }
+
+    h2 {
+      color: var(--azul);
+      font-size: 20px;
+      margin-top: 0;
+    }
+
+    .nota {
+      color: #586779;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .controles {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    input[type="file"] {
+      max-width: 100%;
+      padding: 10px 0;
+    }
+
+    button {
+      background: var(--azul);
+      color: white;
+      border: none;
+      border-radius: 7px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .mensaje {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 7px;
+      background: var(--azul-claro);
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .mensaje.ok {
+      color: var(--verde);
+      background: #e8f5ed;
+    }
+
+    .mensaje.error {
+      color: var(--rojo);
+      background: #fcebea;
+    }
+
+    .resumen {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .indicador {
+      padding: 18px;
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      background: #fff;
+      min-width: 0;
+    }
+
+    .indicador .etiqueta {
+      display: block;
+      font-size: 13px;
+      color: #586779;
+      margin-bottom: 9px;
+    }
+
+    .indicador .valor {
+      display: block;
+      font-size: 23px;
+      font-weight: bold;
+      color: var(--azul);
+      overflow-wrap: anywhere;
+    }
+
+    .tabla-contenedor {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--borde);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--azul-claro);
+      color: var(--azul);
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    td.numero {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    tfoot {
+      font-weight: bold;
+      background: #f4f6f9;
+    }
+
+    .vacio {
+      color: #68788a;
+      padding: 18px 0;
+    }
+
+    .oculto {
+      display: none;
+    }
+
+    .pie {
+      color: #68788a;
+      text-align: center;
+      font-size: 13px;
+      padding: 10px;
+    }
+
+    @media (max-width: 850px) {
+      body {
+        padding: 12px;
+      }
+
+      .resumen {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 420px) {
+      .resumen {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 22px;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .panel-controles,
+      .pie,
+      button {
+        display: none !important;
+      }
+
+      .panel {
+        border: 0;
+        padding: 8px 0;
+        break-inside: avoid;
+      }
+
+      header {
+        background: white;
+        color: black;
+        padding: 10px 0;
+      }
+
+      .tabla-contenedor {
+        overflow: visible;
+      }
+
+      table {
+        font-size: 10px;
+      }
+
+      th, td {
+        padding: 5px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<main>
+
+  <header>
+    <h1>OXI 2026</h1>
+    <p>Consulta consolidada de reservaciones</p>
+    <p>Comunidad Helénica de México A.C.</p>
+  </header>
+
+  <section class="panel panel-controles">
+    <h2>1. Cargar archivo de reservaciones</h2>
+
+    <p class="nota">
+      Selecciona el archivo JSON generado desde la pantalla
+      de captura de reservaciones. La información se procesa
+      en este navegador y no se guarda en una base de datos.
+    </p>
+
+    <div class="controles">
+      <input
+        type="file"
+        id="archivoJSON"
+        accept=".json,application/json"
+      >
+
+      <button type="button" id="limpiarConsulta">
+        Limpiar consulta
+      </button>
+
+      <button type="button" id="imprimirConsulta" disabled>
+        Imprimir / Guardar PDF
+      </button>
+    </div>
+
+    <div
+      id="estadoConsulta"
+      class="mensaje"
+      role="status"
+      aria-live="polite"
+    >
+      Selecciona un archivo JSON para comenzar.
+    </div>
+  </section>
+
+  <div id="resultados" class="oculto">
+
+    <section class="panel">
+      <h2>2. Resumen general</h2>
+
+      <div class="resumen">
+        <div class="indicador">
+          <span class="etiqueta">Reservaciones familiares</span>
+          <span class="valor" id="totalReservaciones">0</span>
+        </div>
+
+        <div class="indicador">
+          <span class="etiqueta">Asistentes registrados</span>
+          <span class="valor" id="totalAsistentes">0</span>
+        </div>
+
+        <div class="indicador">
+          <span class="etiqueta">Importe original</span>
+          <span class="valor" id="totalOriginal">$0.00</span>
+        </div>
+
+        <div class="indicador">
+          <span class="etiqueta">Importe final</span>
+          <span class="valor" id="totalFinal">$0.00</span>
+        </div>
+      </div>
+
+      <p id="resumenAjustes" class="nota"></p>
+      <p id="fechaExportacion" class="nota"></p>
+    </section>
+
+    <section class="panel">
+      <h2>3. Concentrado por mesa</h2>
+
+      <p class="nota">
+        El concentrado agrupa las reservaciones por mesa asignada.
+        Los registros sin mesa se muestran como «Sin asignar».
+      </p>
+
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr>
+              <th>Mesa</th>
+              <th>Familias</th>
+              <th>Asistentes</th>
+              <th>Importe original</th>
+              <th>Ajustes</th>
+              <th>Importe final</th>
+            </tr>
+          </thead>
+          <tbody id="tablaMesas"></tbody>
+          <tfoot id="totalesMesas"></tfoot>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>4. Listado de familias</h2>
+
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr>
+              <th>Reservación</th>
+              <th>Familia</th>
+              <th>Responsable</th>
+              <th>Mesa</th>
+              <th>Asistentes</th>
+              <th>Importe original</th>
+              <th>Ajustes</th>
+              <th>Importe final</th>
+            </tr>
+          </thead>
+          <tbody id="tablaFamilias"></tbody>
+          <tfoot id="totalesFamilias"></tfoot>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>5. Detalle individual de asistentes</h2>
+
+      <div class="tabla-contenedor">
+        <table>
+          <thead>
+            <tr>
+              <th>Familia</th>
+              <th>Asistente</th>
+              <th>Edad</th>
+              <th>Categoría</th>
+              <th>Beneficio</th>
+              <th>Mesa</th>
+              <th>Importe final</th>
+            </tr>
+          </thead>
+          <tbody id="tablaAsistentes"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <p class="pie">
+    Comunidad Helénica de México A.C. · OXI 2026
+  </p>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  const EVENTO_ID = "OXI-2026";
+  const MAX_ARCHIVO_BYTES = 5 * 1024 * 1024;
+
+  const archivoJSON = document.getElementById("archivoJSON");
+  const estado = document.getElementById("estadoConsulta");
+  const resultados = document.getElementById("resultados");
+  const botonLimpiar = document.getElementById("limpiarConsulta");
+  const botonImprimir = document.getElementById("imprimirConsulta");
+
+  let reservacionesActuales = [];
+
+  function pesos(valor) {
+    return new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN"
+    }).format(valor);
+  }
+
+  function numero(valor) {
+    return typeof valor === "number" &&
+      Number.isFinite(valor) &&
+      valor >= 0;
+  }
+
+  function mostrarEstado(mensaje, tipo) {
+    estado.className = "mensaje" + (tipo ? " " + tipo : "");
+    estado.textContent = mensaje;
+  }
+
+  function crearCelda(valor, clase) {
+    const celda = document.createElement("td");
+    celda.textContent = valor == null ? "" : String(valor);
+
+    if (clase) {
+      celda.className = clase;
+    }
+
+    return celda;
+  }
+
+  function agregarFila(contenedor, valores) {
+    const fila = document.createElement("tr");
+
+    valores.forEach(item => {
+      if (item && typeof item === "object" && "valor" in item) {
+        fila.appendChild(crearCelda(item.valor, item.clase || ""));
+      } else {
+        fila.appendChild(crearCelda(item));
+      }
+    });
+
+    contenedor.appendChild(fila);
+    return fila;
+  }
+
+  function limpiarTabla(id) {
+    document.getElementById(id).replaceChildren();
+  }
+
+  function validarDocumento(documento) {
+    if (
+      !documento ||
+      documento.evento_id !== EVENTO_ID ||
+      documento.formato_version !== 1 ||
+      !Array.isArray(documento.reservaciones)
+    ) {
+      throw new Error(
+        "El archivo no tiene el formato esperado de reservaciones OXI-2026."
+      );
+    }
+
+    const ids = new Set();
+
+    documento.reservaciones.forEach(reservacion => {
+      if (
+        !reservacion ||
+        typeof reservacion.reservacion_id !== "string" ||
+        !reservacion.reservacion_id ||
+        typeof reservacion.nombre_familia !== "string" ||
+        !reservacion.nombre_familia.trim() ||
+        !Array.isArray(reservacion.asistentes) ||
+        !reservacion.totales
+      ) {
+        throw new Error(
+          "Se encontró una reservación incompleta o inválida."
+        );
+      }
+
+      if (ids.has(reservacion.reservacion_id)) {
+        throw new Error(
+          "El archivo contiene identificadores de reservación duplicados."
+        );
+      }
+
+      ids.add(reservacion.reservacion_id);
+
+      if (
+        !numero(reservacion.totales.importe_original) ||
+        !numero(reservacion.totales.importe_ajuste) ||
+        !numero(reservacion.totales.importe_final)
+      ) {
+        throw new Error(
+          "Una reservación contiene importes inválidos."
+        );
+      }
+
+      reservacion.asistentes.forEach(persona => {
+        if (
+          !persona ||
+          typeof persona.nombre !== "string" ||
+          !persona.nombre.trim() ||
+          !numero(persona.importe_final)
+        ) {
+          throw new Error(
+            "Se encontró un asistente con información inválida."
+          );
+        }
+      });
+    });
+
+    return documento.reservaciones;
+  }
+
+  function importe(reservacion, campo) {
+    const valor = reservacion.totales[campo];
+    return numero(valor) ? valor : 0;
+  }
+
+  function obtenerMesa(reservacion) {
+    const mesa = String(reservacion.mesa_id || "").trim();
+    return mesa || "Sin asignar";
+  }
+
+  function totalAsistentes(reservacion) {
+    return reservacion.asistentes.length;
+  }
+
+  function pintarResumen(reservaciones) {
+    const cantidadFamilias = reservaciones.length;
+
+    const cantidadPersonas = reservaciones.reduce(
+      (suma, reservacion) => suma + totalAsistentes(reservacion),
+      0
+    );
+
+    const original = reservaciones.reduce(
+      (suma, reservacion) =>
+        suma + importe(reservacion, "importe_original"),
+      0
+    );
+
+    const ajustes = reservaciones.reduce(
+      (suma, reservacion) =>
+        suma + importe(reservacion, "importe_ajuste"),
+      0
+    );
+
+    const final = reservaciones.reduce(
+      (suma, reservacion) =>
+        suma + importe(reservacion, "importe_final"),
+      0
+    );
+
+    document.getElementById("totalReservaciones").textContent =
+      String(cantidadFamilias);
+
+    document.getElementById("totalAsistentes").textContent =
+      String(cantidadPersonas);
+
+    document.getElementById("totalOriginal").textContent =
+      pesos(original);
+
+    document.getElementById("totalFinal").textContent =
+      pesos(final);
+
+    document.getElementById("resumenAjustes").textContent =
+      "Descuentos y cortesías registrados: " + pesos(ajustes) + ".";
+
+    const mesas = new Set(
+      reservaciones.map(obtenerMesa)
+    );
+
+    document.getElementById("fechaExportacion").textContent =
+      "Mesas con reservaciones: " + mesas.size +
+      ". Los importes representan reservaciones, no pagos recibidos.";
+  }
+
+  function pintarMesas(reservaciones) {
+    const tbody = document.getElementById("tablaMesas");
+    const tfoot = document.getElementById("totalesMesas");
+
+    limpiarTabla("tablaMesas");
+    limpiarTabla("totalesMesas");
+
+    const agrupadas = new Map();
+
+    reservaciones.forEach(reservacion => {
+      const mesa = obtenerMesa(reservacion);
+
+      if (!agrupadas.has(mesa)) {
+        agrupadas.set(mesa, {
+          familias: 0,
+          asistentes: 0,
+          original: 0,
+          ajustes: 0,
+          final: 0
+        });
+      }
+
+      const grupo = agrupadas.get(mesa);
+
+      grupo.familias++;
+      grupo.asistentes += totalAsistentes(reservacion);
+      grupo.original += importe(reservacion, "importe_original");
+      grupo.ajustes += importe(reservacion, "importe_ajuste");
+      grupo.final += importe(reservacion, "importe_final");
+    });
+
+    const ordenadas = Array.from(agrupadas.entries()).sort(
+      (a, b) => {
+        if (a[0] === "Sin asignar") return 1;
+        if (b[0] === "Sin asignar") return -1;
+        return a[0].localeCompare(b[0], "es");
+      }
+    );
+
+    ordenadas.forEach(([mesa, grupo]) => {
+      agregarFila(tbody, [
+        mesa,
+        grupo.familias,
+        grupo.asistentes,
+        { valor: pesos(grupo.original), clase: "numero" },
+        { valor: pesos(grupo.ajustes), clase: "numero" },
+        { valor: pesos(grupo.final), clase: "numero" }
+      ]);
+    });
+
+    const familias = reservaciones.length;
+
+    const personas = reservaciones.reduce(
+      (suma, r) => suma + totalAsistentes(r), 0
+    );
+
+    const original = reservaciones.reduce(
+      (suma, r) => suma + importe(r, "importe_original"), 0
+    );
+
+    const ajustes = reservaciones.reduce(
+      (suma, r) => suma + importe(r, "importe_ajuste"), 0
+    );
+
+    const final = reservaciones.reduce(
+      (suma, r) => suma + importe(r, "importe_final"), 0
+    );
+
+    agregarFila(tfoot, [
+      "TOTAL",
+      familias,
+      personas,
+      { valor: pesos(original), clase: "numero" },
+      { valor: pesos(ajustes), clase: "numero" },
+      { valor: pesos(final), clase: "numero" }
+    ]);
+  }
+
+  function pintarFamilias(reservaciones) {
+    const tbody = document.getElementById("tablaFamilias");
+    const tfoot = document.getElementById("totalesFamilias");
+
+    limpiarTabla("tablaFamilias");
+    limpiarTabla("totalesFamilias");
+
+    reservaciones.forEach(reservacion => {
+      agregarFila(tbody, [
+        reservacion.reservacion_id,
+        reservacion.nombre_familia,
+        reservacion.responsable || "No indicado",
+        obtenerMesa(reservacion),
+        totalAsistentes(reservacion),
+        {
+          valor: pesos(importe(reservacion, "importe_original")),
+          clase: "numero"
+        },
+        {
+          valor: pesos(importe(reservacion, "importe_ajuste")),
+          clase: "numero"
+        },
+        {
+          valor: pesos(importe(reservacion, "importe_final")),
+          clase: "numero"
+        }
+      ]);
+    });
+
+    const original = reservaciones.reduce(
+      (suma, r) => suma + importe(r, "importe_original"), 0
+    );
+
+    const ajustes = reservaciones.reduce(
+      (suma, r) => suma + importe(r, "importe_ajuste"), 0
+    );
+
+    const final = reservaciones.reduce(
+      (suma, r) => suma + importe(r, "importe_final"), 0
+    );
+
+    agregarFila(tfoot, [
+      "TOTAL",
+      "",
+      "",
+      "",
+      reservaciones.reduce(
+        (suma, r) => suma + totalAsistentes(r), 0
+      ),
+      { valor: pesos(original), clase: "numero" },
+      { valor: pesos(ajustes), clase: "numero" },
+      { valor: pesos(final), clase: "numero" }
+    ]);
+  }
+
+  function pintarAsistentes(reservaciones) {
+    const tbody = document.getElementById("tablaAsistentes");
+    limpiarTabla("tablaAsistentes");
+
+    reservaciones.forEach(reservacion => {
+      reservacion.asistentes.forEach(persona => {
+        agregarFila(tbody, [
+          reservacion.nombre_familia,
+          persona.nombre,
+          persona.edad == null ? "No indicada" : persona.edad,
+          persona.categoria === "adulto"
+            ? "Adulto"
+            : persona.categoria === "nino"
+              ? "Niño"
+              : (persona.categoria || "No indicada"),
+          persona.beneficio_nombre || "Ninguno",
+          obtenerMesa(reservacion),
+          { valor: pesos(persona.importe_final), clase: "numero" }
+        ]);
+      });
+    });
+  }
+
+  function mostrarResultados(reservaciones, exportadoEn) {
+    reservacionesActuales = reservaciones;
+
+    pintarResumen(reservaciones);
+    pintarMesas(reservaciones);
+    pintarFamilias(reservaciones);
+    pintarAsistentes(reservaciones);
+
+    const fecha = exportadoEn
+      ? new Date(exportadoEn)
+      : null;
+
+    document.getElementById("fechaExportacion").textContent =
+      "Fecha de exportación del archivo: " +
+      (fecha && !Number.isNaN(fecha.getTime())
+        ? fecha.toLocaleString("es-MX")
+        : "No indicada") +
+      ". Los importes no representan pagos recibidos.";
+
+    resultados.classList.remove("oculto");
+    botonImprimir.disabled = false;
+  }
+
+  async function cargarArchivo() {
+    const archivo = archivoJSON.files[0];
+
+    if (!archivo) {
+      mostrarEstado("Selecciona un archivo JSON.", "error");
+      return;
+    }
+
+    if (archivo.size > MAX_ARCHIVO_BYTES) {
+      mostrarEstado(
+        "El archivo supera el límite permitido de 5 MB.",
+        "error"
+      );
+      archivoJSON.value = "";
+      return;
+    }
+
+    try {
+      mostrarEstado("Validando el archivo seleccionado...", "");
+
+      const documento = JSON.parse(await archivo.text());
+      const reservaciones = validarDocumento(documento);
+
+      mostrarResultados(
+        reservaciones,
+        documento.exportado_en
+      );
+
+      mostrarEstado(
+        "Consulta cargada correctamente. Reservaciones: " +
+        reservaciones.length + ".",
+        "ok"
+      );
+    } catch (error) {
+      limpiarResultados();
+
+      mostrarEstado(
+        "No se pudo cargar el archivo: " + error.message,
+        "error"
+      );
+    }
+  }
+
+  function limpiarResultados() {
+    reservacionesActuales = [];
+    resultados.classList.add("oculto");
+    botonImprimir.disabled = true;
+
+    [
+      "tablaMesas",
+      "totalesMesas",
+      "tablaFamilias",
+      "totalesFamilias",
+      "tablaAsistentes"
+    ].forEach(limpiarTabla);
+  }
+
+  archivoJSON.addEventListener("change", cargarArchivo);
+
+  botonLimpiar.addEventListener("click", () => {
+    archivoJSON.value = "";
+    limpiarResultados();
+    mostrarEstado(
+      "Consulta limpia. Selecciona un archivo JSON para comenzar.",
+      ""
+    );
+  });
+
+  botonImprimir.addEventListener("click", () => {
+    if (reservacionesActuales.length > 0) {
+      window.print();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
