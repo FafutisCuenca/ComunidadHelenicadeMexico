@@ -631,6 +631,11 @@
     }
 
     function limpiarResultados() {
+      window.oxiIdBorradorActual = null;
+
+window.dispatchEvent(
+  new Event("oxi:reservacion-invalidada")
+);
       document.getElementById("totalPersonas").textContent = "0";
       document.getElementById("importeOriginal").textContent = pesos(0);
       document.getElementById("importeFinal").textContent = pesos(0);
