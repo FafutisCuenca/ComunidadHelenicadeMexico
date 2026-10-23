@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Módulo de reservaciones para los eventos de la Comunidad Helénica de México A.C.">
+  <title>Reservaciones | Comunidad Helénica</title>
+
+  <style>
+    :root {
+      --azul: #17365d;
+      --azul-claro: #eaf1f8;
+      --dorado: #b59655;
+      --fondo: #f5f6f8;
+      --texto: #263238;
+      --blanco: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--azul);
+      color: var(--blanco);
+      padding: 30px 20px;
+      text-align: center;
+      border-bottom: 5px solid var(--dorado);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+    }
+
+    header p {
+      margin: 8px 0 0;
+    }
+
+    main {
+      width: min(920px, 92%);
+      margin: 35px auto;
+    }
+
+    .evento {
+      background: var(--blanco);
+      padding: 26px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+      border-top: 4px solid var(--dorado);
+    }
+
+    .evento h2 {
+      color: var(--azul);
+      margin-top: 0;
+    }
+
+    .datos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    .dato {
+      background: var(--azul-claro);
+      padding: 14px;
+      border-radius: 8px;
+    }
+
+    .dato strong {
+      display: block;
+      color: var(--azul);
+    }
+
+    .opciones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .opcion {
+      background: var(--blanco);
+      padding: 22px;
+      border-radius: 10px;
+      border: 1px solid #dce2e8;
+    }
+
+    .opcion h3 {
+      margin-top: 0;
+      color: var(--azul);
+    }
+
+    .estado {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      background: #fff2d5;
+      color: #755519;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .nota {
+      margin-top: 24px;
+      padding: 15px;
+      background: #fff;
+      border-left: 4px solid var(--dorado);
+      border-radius: 4px;
+      font-size: 0.92rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 15px;
+      color: #5e6872;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Comunidad Helénica de México A.C.</h1>
+    <p>Sistema de reservaciones para eventos</p>
+  </header>
+
+  <main>
+    <section class="evento">
+      <span class="estado">En preparación</span>
+      <h2>Día del OXI 2026</h2>
+      <p>
+        Bienvenido al módulo de reservaciones del Día del OXI,
+        organizado por la Comunidad Helénica de México A.C.
+      </p>
+
+      <div class="datos">
+        <div class="dato">
+          <strong>Fecha del evento</strong>
+          25 de octubre de 2026
+        </div>
+
+        <div class="dato">
+          <strong>Adultos</strong>
+          $700 MXN · Desde los 9 años
+        </div>
+
+        <div class="dato">
+          <strong>Niños de 3 a 8 años</strong>
+          $350 MXN
+        </div>
+
+        <div class="dato">
+          <strong>Mesas</strong>
+          Capacidad predeterminada de 10 personas
+        </div>
+      </div>
+    </section>
+
+    <section class="opciones">
+      <article class="opcion">
+        <h3>Registrar reservación</h3>
+        <p>
+          Espacio previsto para capturar los datos del responsable,
+          el número de asistentes y la solicitud de mesa.
+        </p>
+        <p><strong>Disponible en una siguiente etapa.</strong></p>
+      </article>
+
+      <article class="opcion">
+        <h3>Consultar reservación</h3>
+        <p>
+          Espacio previsto para consultar el folio, la asignación
+          de mesa y el estado de la reservación.
+        </p>
+        <p><strong>Disponible en una siguiente etapa.</strong></p>
+      </article>
+
+      <article class="opcion">
+        <h3>Administración</h3>
+        <p>
+          Espacio previsto para administrar mesas, verificar pagos,
+          registrar saldos y preparar boletos.
+        </p>
+        <p><strong>Disponible en una siguiente etapa.</strong></p>
+      </article>
+    </section>
+
+    <div class="nota">
+      <strong>Importante:</strong> esta página es únicamente una
+      pantalla informativa. Todavía no registra reservaciones,
+      recibe pagos ni almacena información personal.
+    </div>
+  </main>
+
+  <footer>
+    Comunidad Helénica de México A.C. · Día del OXI 2026
+  </footer>
+</body>
+</html>
