@@ -740,84 +740,82 @@ function totalAsistentes(reservacion) {
       ". Los importes representan reservaciones, no pagos recibidos.";
   }
 
-  function pintarMesas(reservaciones) {
-    const tbody = document.getElementById("tablaMesas");
-    const tfoot = document.getElementById("totalesMesas");
+function pintarMesas(reservaciones) {
+  const tbody = document.getElementById("tablaMesas");
+  limpiarTabla("tablaMesas");
 
-    limpiarTabla("tablaMesas");
-    limpiarTabla("totalesMesas");
+  const mesas = new Map();
 
-    const agrupadas = new Map();
+  reservaciones.forEach(r => {
+    const numeroMesa = r.formato_origen === 2
+      ? r.mesa_numero
+      : obtenerNumeroMesa(r);
 
-    reservaciones.forEach(reservacion => {
-      const mesa = obtenerMesa(reservacion);
+    if (numeroMesa == null || numeroMesa === "") {
+      return;
+    }
 
-      if (!agrupadas.has(mesa)) {
-        agrupadas.set(mesa, {
-          familias: 0,
-          asistentes: 0,
-          original: 0,
-          ajustes: 0,
-          final: 0
-        });
-      }
+    const clave = String(numeroMesa);
 
-      const grupo = agrupadas.get(mesa);
+    if (!mesas.has(clave)) {
+      mesas.set(clave, {
+        mesa: numeroMesa,
+        reservaciones: 0,
+        asistentes: 0,
+        subtotal: 0,
+        pagado: 0,
+        saldo: 0
+      });
+    }
 
-      grupo.familias++;
-      grupo.asistentes += totalAsistentes(reservacion);
-      grupo.original += importe(reservacion, "importe_original");
-      grupo.ajustes += importe(reservacion, "importe_ajuste");
-      grupo.final += importe(reservacion, "importe_final");
-    });
+    const resumen = mesas.get(clave);
 
-    const ordenadas = Array.from(agrupadas.entries()).sort(
-      (a, b) => {
-        if (a[0] === "Sin asignar") return 1;
-        if (b[0] === "Sin asignar") return -1;
-        return a[0].localeCompare(b[0], "es");
-      }
-    );
+    resumen.reservaciones++;
+    resumen.asistentes += totalAsistentes(r);
 
-    ordenadas.forEach(([mesa, grupo]) => {
+    if (r.formato_origen === 2) {
+      resumen.subtotal += importeExcel(r.subtotal_excel);
+      resumen.pagado += importeExcel(r.pagado_excel);
+      resumen.saldo += importeExcel(r.debe_excel);
+    } else {
+      resumen.subtotal += importe(r, "importe_original");
+      resumen.pagado += importe(r, "importe_ajuste");
+      resumen.saldo += importe(r, "importe_final");
+    }
+  });
+
+  [...mesas.values()]
+    .sort((a, b) => Number(a.mesa) - Number(b.mesa))
+    .forEach(m => {
       agregarFila(tbody, [
-        mesa,
-        grupo.familias,
-        grupo.asistentes,
-        { valor: pesos(grupo.original), clase: "numero" },
-        { valor: pesos(grupo.ajustes), clase: "numero" },
-        { valor: pesos(grupo.final), clase: "numero" }
+        "Mesa " + m.mesa,
+        m.reservaciones,
+        m.asistentes,
+        pesos(m.subtotal),
+        pesos(m.pagado),
+        pesos(m.saldo)
       ]);
     });
+}
 
-    const familias = reservaciones.length;
-
-    const personas = reservaciones.reduce(
-      (suma, r) => suma + totalAsistentes(r), 0
-    );
-
-    const original = reservaciones.reduce(
-      (suma, r) => suma + importe(r, "importe_original"), 0
-    );
-
-    const ajustes = reservaciones.reduce(
-      (suma, r) => suma + importe(r, "importe_ajuste"), 0
-    );
-
-    const final = reservaciones.reduce(
-      (suma, r) => suma + importe(r, "importe_final"), 0
-    );
-
-    agregarFila(tfoot, [
-      "TOTAL",
-      familias,
-      personas,
-      { valor: pesos(original), clase: "numero" },
-      { valor: pesos(ajustes), clase: "numero" },
-      { valor: pesos(final), clase: "numero" }
-    ]);
+function obtenerNumeroMesa(reservacion) {
+  if (reservacion.mesa_numero != null) {
+    return reservacion.mesa_numero;
   }
 
+  const mesaId = reservacion.mesa_id;
+
+  if (typeof mesaId === "string") {
+    const coincidencia = mesaId.match(/(\d+)$/);
+
+    if (coincidencia) {
+      return Number(coincidencia[1]);
+    }
+  }
+
+  return null;
+}
+  
   function pintarFamilias(reservaciones) {
   const tbody = document.getElementById("tablaFamilias");
   limpiarTabla("tablaFamilias");
