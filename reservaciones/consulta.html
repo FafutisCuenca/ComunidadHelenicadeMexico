@@ -819,60 +819,37 @@ function totalAsistentes(reservacion) {
   }
 
   function pintarFamilias(reservaciones) {
-    const tbody = document.getElementById("tablaFamilias");
-    const tfoot = document.getElementById("totalesFamilias");
+  const tbody = document.getElementById("tablaFamilias");
+  limpiarTabla("tablaFamilias");
 
-    limpiarTabla("tablaFamilias");
-    limpiarTabla("totalesFamilias");
-
-    reservaciones.forEach(reservacion => {
+  reservaciones.forEach(r => {
+    if (r.formato_origen === 2) {
       agregarFila(tbody, [
-        reservacion.reservacion_id,
-        reservacion.nombre_familia,
-        reservacion.responsable || "No indicado",
-        obtenerMesa(reservacion),
-        totalAsistentes(reservacion),
-        {
-          valor: pesos(importe(reservacion, "importe_original")),
-          clase: "numero"
-        },
-        {
-          valor: pesos(importe(reservacion, "importe_ajuste")),
-          clase: "numero"
-        },
-        {
-          valor: pesos(importe(reservacion, "importe_final")),
-          clase: "numero"
-        }
+        r.reservacion_id,
+        r.nombre_reservacion,
+        r.beneficio_excel || "—",
+        r.estado_pago_excel || "No indicado",
+        totalAsistentes(r),
+        pesos(importeExcel(r.subtotal_excel)),
+        pesos(importeExcel(r.pagado_excel)),
+        pesos(importeExcel(r.debe_excel))
       ]);
-    });
 
-    const original = reservaciones.reduce(
-      (suma, r) => suma + importe(r, "importe_original"), 0
-    );
+      return;
+    }
 
-    const ajustes = reservaciones.reduce(
-      (suma, r) => suma + importe(r, "importe_ajuste"), 0
-    );
-
-    const final = reservaciones.reduce(
-      (suma, r) => suma + importe(r, "importe_final"), 0
-    );
-
-    agregarFila(tfoot, [
-      "TOTAL",
-      "",
-      "",
-      "",
-      reservaciones.reduce(
-        (suma, r) => suma + totalAsistentes(r), 0
-      ),
-      { valor: pesos(original), clase: "numero" },
-      { valor: pesos(ajustes), clase: "numero" },
-      { valor: pesos(final), clase: "numero" }
+    agregarFila(tbody, [
+      r.reservacion_id,
+      r.nombre_familia,
+      r.responsable || "No indicado",
+      obtenerMesa(r),
+      totalAsistentes(r),
+      pesos(importe(r, "importe_original")),
+      pesos(importe(r, "importe_ajuste")),
+      pesos(importe(r, "importe_final"))
     ]);
-  }
-
+  });
+}
 function pintarAsistentes(reservaciones) {
   const tbody = document.getElementById("tablaAsistentes");
   limpiarTabla("tablaAsistentes");
