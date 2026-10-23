@@ -487,54 +487,64 @@
     document.getElementById(id).replaceChildren();
   }
 
-  function validarDocumento(documento) {
+function validarDocumento(documento) {
+  if (
+    !documento ||
+    documento.evento_id !== EVENTO_ID ||
+    ![1, 2].includes(documento.formato_version) ||
+    !Array.isArray(documento.reservaciones)
+  ) {
+    throw new Error(
+      "El archivo no corresponde al formato JSON v1 o v2 de OXI-2026."
+    );
+  }
+
+  const ids = new Set();
+
+  documento.reservaciones.forEach(r => {
     if (
-      !documento ||
-      documento.evento_id !== EVENTO_ID ||
-      documento.formato_version !== 1 ||
-      !Array.isArray(documento.reservaciones)
+      !r ||
+      typeof r.reservacion_id !== "string" ||
+      !r.reservacion_id.trim()
     ) {
       throw new Error(
-        "El archivo no tiene el formato esperado de reservaciones OXI-2026."
+        "Se encontró una reservación sin identificador válido."
       );
     }
 
-    const ids = new Set();
+    if (ids.has(r.reservacion_id)) {
+      throw new Error(
+        "El archivo contiene identificadores de reservación duplicados."
+      );
+    }
 
-    documento.reservaciones.forEach(reservacion => {
+    ids.add(r.reservacion_id);
+
+    if (documento.formato_version === 1) {
       if (
-        !reservacion ||
-        typeof reservacion.reservacion_id !== "string" ||
-        !reservacion.reservacion_id ||
-        typeof reservacion.nombre_familia !== "string" ||
-        !reservacion.nombre_familia.trim() ||
-        !Array.isArray(reservacion.asistentes) ||
-        !reservacion.totales
+        typeof r.nombre_familia !== "string" ||
+        !r.nombre_familia.trim() ||
+        !Array.isArray(r.asistentes) ||
+        !r.totales
       ) {
         throw new Error(
-          "Se encontró una reservación incompleta o inválida."
+          "Se encontró una reservación v1 incompleta."
         );
       }
 
-      if (ids.has(reservacion.reservacion_id)) {
-        throw new Error(
-          "El archivo contiene identificadores de reservación duplicados."
-        );
-      }
+      [
+        "importe_original",
+        "importe_ajuste",
+        "importe_final"
+      ].forEach(campo => {
+        if (!numero(r.totales[campo])) {
+          throw new Error(
+            "Una reservación v1 contiene importes inválidos."
+          );
+        }
+      });
 
-      ids.add(reservacion.reservacion_id);
-
-      if (
-        !numero(reservacion.totales.importe_original) ||
-        !numero(reservacion.totales.importe_ajuste) ||
-        !numero(reservacion.totales.importe_final)
-      ) {
-        throw new Error(
-          "Una reservación contiene importes inválidos."
-        );
-      }
-
-      reservacion.asistentes.forEach(persona => {
+      r.asistentes.forEach(persona => {
         if (
           !persona ||
           typeof persona.nombre !== "string" ||
@@ -542,16 +552,125 @@
           !numero(persona.importe_final)
         ) {
           throw new Error(
-            "Se encontró un asistente con información inválida."
+            "Se encontró un asistente v1 con información inválida."
           );
         }
       });
+
+      return;
+    }
+
+    // Validaciones del formato v2 importado desde Excel.
+    if (
+      typeof r.nombre_reservacion !== "string" ||
+      !r.nombre_reservacion.trim()
+    ) {
+      throw new Error(
+        "Una reservación v2 no tiene nombre de familia o grupo."
+      );
+    }
+
+    [
+      "adultos",
+      "ninos",
+      "total_asientos_excel"
+    ].forEach(campo => {
+      if (!numero(r[campo])) {
+        throw new Error(
+          "La reservación " + r.reservacion_id +
+          " contiene una cantidad inválida en " + campo + "."
+        );
+      }
     });
 
-    return documento.reservaciones;
+    if (
+      r.adultos + r.ninos !== r.total_asientos_excel
+    ) {
+      throw new Error(
+        "La suma de adultos y niños no coincide con el total de asientos en " +
+        r.reservacion_id + ". Revisa el Excel original."
+      );
+    }
+
+    if (
+      r.mesa_numero != null &&
+      (!Number.isInteger(r.mesa_numero) || r.mesa_numero < 1)
+    ) {
+      throw new Error(
+        "La reservación " + r.reservacion_id +
+        " contiene un número de mesa inválido."
+      );
+    }
+  });
+
+  if (documento.formato_version === 2) {
+    if (
+      !documento.resumen_importacion ||
+      !Number.isInteger(documento.resumen_importacion.reservaciones_total)
+    ) {
+      throw new Error(
+        "El JSON v2 no contiene un resumen de importación válido."
+      );
+    }
+
+    if (
+      documento.resumen_importacion.reservaciones_total !==
+      documento.reservaciones.length
+    ) {
+      throw new Error(
+        "El total de reservaciones no coincide con el resumen de importación."
+      );
+    }
   }
 
-  function importe(reservacion, campo) {
+  return documento.reservaciones.map(r => {
+    if (documento.formato_version === 1) {
+      return {
+        ...r,
+        formato_origen: 1,
+        cantidad_asistentes: r.asistentes.length
+      };
+    }
+
+    // Se conservan los importes originales del Excel por separado.
+    // No se interpretan como importes cobrados o confirmados.
+    return {
+      ...r,
+      formato_origen: 2,
+      nombre_familia: r.nombre_reservacion,
+      responsable: r.beneficio_excel || "No indicado",
+      mesa_id: r.mesa_id || null,
+      asistentes: [],
+      cantidad_asistentes: r.total_asientos_excel,
+      totales: {
+        importe_original: importeExcel(r.subtotal_excel),
+        importe_ajuste: importeExcel(r.pagado_excel),
+        importe_final: importeExcel(r.debe_excel)
+      }
+    };
+  });
+}
+
+function importeExcel(valor) {
+  if (typeof valor === "number" && Number.isFinite(valor)) {
+    return Math.max(0, valor);
+  }
+
+  if (typeof valor === "string" && valor.trim() !== "") {
+    const limpio = valor
+      .replace(/[$,\s]/g, "");
+
+    const convertido = Number(limpio);
+
+    if (Number.isFinite(convertido) && convertido >= 0) {
+      return convertido;
+    }
+  }
+
+  // Una celda vacía o no interpretable no se convierte
+  // en un pago confirmado ni se inventa un importe.
+  return 0;
+}  function importe(reservacion, campo) {
     const valor = reservacion.totales[campo];
     return numero(valor) ? valor : 0;
   }
