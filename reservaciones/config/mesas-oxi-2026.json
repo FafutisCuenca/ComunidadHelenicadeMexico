@@ -4,7 +4,79 @@
   "evento_id": "OXI-2026",
   "capacidad_predeterminada": 10,
   "permitir_capacidad_personalizada": true,
-  "mesas": [],
+  "permitir_agregar_mesas": true,
+  "mesas": [
+    {
+      "id": "OXI-M001",
+      "numero": 1,
+      "nombre": "Mesa 1",
+      "capacidad": 10,
+      "estado": "disponible"
+    },
+    {
+      "id": "OXI-M002",
+      "numero": 2,
+      "nombre": "Mesa 2",
+      "capacidad": 10,
+      "estado": "disponible"
+    },
+    {
+      "id": "OXI-M003",
+      "numero": 3,
+      "nombre": "Mesa 3",
+      "capacidad": 10,
+      "estado": "disponible"
+    },
+    {
+      "id": "OXI-M004",
+      "numero": 4,
+      "nombre": "Mesa 4",
+      "capacidad": 10,
+      "estado": "disponible"
+    },
+    {
+      "id": "OXI-M005",
+      "numero": 5,
+      "nombre": "Mesa 5",
+      "capacidad": 10,
+      "estado": "disponible"
+    },
+    {
+      "id": "OXI-M006",
+      "numero": 6,
+      "nombre": "Mesa 6",
+      "capacidad": 10,
+      "estado": "disponible"
+    },
+    {
+      "id": "OXI-M007",
+      "numero": 7,
+      "nombre": "Mesa 7",
+      "capacidad": 10,
+      "estado": "disponible"
+    },
+    {
+      "id": "OXI-M008",
+      "numero": 8,
+      "nombre": "Mesa 8",
+      "capacidad": 10,
+      "estado": "disponible"
+    },
+    {
+      "id": "OXI-M009",
+      "numero": 9,
+      "nombre": "Mesa 9",
+      "capacidad": 10,
+      "estado": "disponible"
+    },
+    {
+      "id": "OXI-M010",
+      "numero": 10,
+      "nombre": "Mesa 10",
+      "capacidad": 10,
+      "estado": "disponible"
+    }
+  ],
   "reglas": {
     "asignacion_automatica": false,
     "permitir_sobrecupo": false,
