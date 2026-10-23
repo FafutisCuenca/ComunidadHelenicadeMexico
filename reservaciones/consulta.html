@@ -873,29 +873,42 @@ function totalAsistentes(reservacion) {
     ]);
   }
 
-  function pintarAsistentes(reservaciones) {
-    const tbody = document.getElementById("tablaAsistentes");
-    limpiarTabla("tablaAsistentes");
+function pintarAsistentes(reservaciones) {
+  const tbody = document.getElementById("tablaAsistentes");
+  limpiarTabla("tablaAsistentes");
 
-    reservaciones.forEach(reservacion => {
-      reservacion.asistentes.forEach(persona => {
-        agregarFila(tbody, [
-          reservacion.nombre_familia,
-          persona.nombre,
-          persona.edad == null ? "No indicada" : persona.edad,
-          persona.categoria === "adulto"
-            ? "Adulto"
-            : persona.categoria === "nino"
-              ? "Niño"
-              : (persona.categoria || "No indicada"),
-          persona.beneficio_nombre || "Ninguno",
-          obtenerMesa(reservacion),
-          { valor: pesos(persona.importe_final), clase: "numero" }
-        ]);
-      });
+  reservaciones.forEach(r => {
+    if (r.formato_origen === 2) {
+      agregarFila(tbody, [
+        r.nombre_reservacion,
+        r.adultos,
+        r.ninos,
+        r.total_asientos_excel,
+        r.mesa_numero == null
+          ? "Sin asignar"
+          : "Mesa " + r.mesa_numero,
+        r.beneficio_excel || "No indicado",
+        r.estado_pago_excel || "No indicado"
+      ]);
+
+      return;
+    }
+
+    // Compatibilidad con las reservaciones individuales v1.
+    r.asistentes.forEach(persona => {
+      agregarFila(tbody, [
+        r.nombre_familia,
+        persona.nombre,
+        persona.edad == null ? "No indicada" : persona.edad,
+        persona.categoria || "No indicada",
+        persona.beneficio_nombre || "Ninguno",
+        obtenerMesa(r),
+        pesos(persona.importe_final)
+      ]);
     });
-  }
-
+  });
+}
+  
   function mostrarResultados(reservaciones, exportadoEn) {
     reservacionesActuales = reservaciones;
 
