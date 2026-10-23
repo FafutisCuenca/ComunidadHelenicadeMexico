@@ -2043,6 +2043,21 @@ $("btnExportarFinanzas").disabled = true;
     $("btnImprimir").addEventListener("click", () => {
       window.print();
     });
+    
+$("btnReporteFinanciero").addEventListener(
+  "click",
+  crearReporteFinanciero
+);
+
+$("btnReporteMesas").addEventListener(
+  "click",
+  crearReporteMesas
+);
+
+$("btnExportarFinanzas").addEventListener(
+  "click",
+  exportarFinanzasCSV
+);
   </script>
 </body>
 </html>
