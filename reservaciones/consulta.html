@@ -680,9 +680,15 @@ function importeExcel(valor) {
     return mesa || "Sin asignar";
   }
 
-  function totalAsistentes(reservacion) {
-    return reservacion.asistentes.length;
+function totalAsistentes(reservacion) {
+  if (Number.isInteger(reservacion.cantidad_asistentes)) {
+    return reservacion.cantidad_asistentes;
   }
+
+  return Array.isArray(reservacion.asistentes)
+    ? reservacion.asistentes.length
+    : 0;
+}
 
   function pintarResumen(reservaciones) {
     const cantidadFamilias = reservaciones.length;
