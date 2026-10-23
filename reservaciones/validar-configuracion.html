@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Validación de configuración OXI 2026</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 850px;
+      margin: 30px auto;
+      padding: 0 18px;
+      line-height: 1.6;
+      color: #263238;
+    }
+
+    h1 {
+      color: #17365d;
+    }
+
+    button {
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 6px;
+      background: #17365d;
+      color: white;
+      cursor: pointer;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    #resumen-validacion {
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    #resumen-validacion[data-estado="correcto"] {
+      color: #176b39;
+    }
+
+    #resumen-validacion[data-estado="error"] {
+      color: #b42318;
+    }
+  </style>
+</head>
+<body>
+  <h1>Validación de cuotas y beneficios</h1>
+  <p>Evento: Día del OXI 2026</p>
+
+  <button id="ejecutar" type="button">
+    Ejecutar validación
+  </button>
+
+  <p id="resumen-validacion" aria-live="polite">
+    Pendiente de validación.
+  </p>
+
+  <ol id="resultado-validacion"></ol>
+
+  <script src="./js/validar-configuracion.js"></script>
+  <script>
+    document.getElementById("ejecutar").addEventListener("click", () => {
+      document.getElementById("resultado-validacion").replaceChildren();
+      document.getElementById("resumen-validacion").textContent =
+        "Validando configuración...";
+      window.ValidarConfiguracionOXI.iniciar();
+    });
+  </script>
+</body>
+</html>
