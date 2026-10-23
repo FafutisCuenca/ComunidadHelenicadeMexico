@@ -640,6 +640,119 @@
               </tbody>
               <tfoot id="totalesGrupos"></tfoot>
             </table>
+
+            
+<div id="editorReservacion" class="panel" hidden>
+  <h3>Editar reservación seleccionada</h3>
+  <p class="ayuda">
+    Los campos se modifican únicamente cuando guardas. Los importes
+    históricos no se recalculan automáticamente.
+  </p>
+
+  <form id="formEditarReservacion">
+    <input type="hidden" id="editId">
+
+    <div class="barra-controles">
+      <label>
+        Nombre de reservación
+        <input id="editNombre" required>
+      </label>
+
+      <label>
+        Tipo de reservación
+        <select id="editTipo">
+          <option value="grupo">Grupo</option>
+          <option value="cortesia_institucional">
+            Cortesía institucional
+          </option>
+        </select>
+      </label>
+
+      <label>
+        Adultos
+        <input id="editAdultos" type="number" min="0" step="1" required>
+      </label>
+
+      <label>
+        Niños
+        <input id="editNinos" type="number" min="0" step="1" required>
+      </label>
+
+      <label>
+        Mesa
+        <select id="editMesa">
+          <option value="">Sin mesa</option>
+          <option value="1">Mesa 1</option>
+          <option value="2">Mesa 2</option>
+          <option value="3">Mesa 3</option>
+          <option value="4">Mesa 4</option>
+          <option value="5">Mesa 5</option>
+          <option value="6">Mesa 6</option>
+          <option value="7">Mesa 7</option>
+          <option value="8">Mesa 8</option>
+          <option value="9">Mesa 9</option>
+          <option value="10">Mesa 10</option>
+        </select>
+      </label>
+
+      <label>
+        Beneficio
+        <input id="editBeneficio">
+      </label>
+
+      <label>
+        Estatus de pago
+        <input id="editEstadoPago">
+      </label>
+
+      <label>
+        Forma de pago
+        <input id="editFormaPago">
+      </label>
+
+      <label>
+        Costo Excel
+        <input id="editCosto" type="number" step="0.01">
+      </label>
+
+      <label>
+        Cortesía Excel
+        <input id="editCortesia" type="number" step="0.01">
+      </label>
+
+      <label>
+        Subtotal Excel
+        <input id="editSubtotal" type="number" step="0.01">
+      </label>
+
+      <label>
+        Pagado Excel
+        <input id="editPagado" type="number" step="0.01">
+      </label>
+
+      <label>
+        Debe Excel
+        <input id="editDebe" type="number" step="0.01">
+      </label>
+    </div>
+
+    <p>
+      <label for="editNotas">Notas</label>
+      <textarea id="editNotas" rows="3"
+        style="width:100%;padding:10px;border:1px solid #c7ced8;border-radius:7px"></textarea>
+    </p>
+
+    <div class="barra-controles">
+      <button type="submit">Guardar cambios</button>
+      <button id="btnCancelarEdicion" type="button" class="secundario">
+        Cancelar
+      </button>
+    </div>
+
+    <div id="estadoEdicion" class="estado" role="status"></div>
+  </form>
+</div>
+
           </div>
         </div>
       </section>
