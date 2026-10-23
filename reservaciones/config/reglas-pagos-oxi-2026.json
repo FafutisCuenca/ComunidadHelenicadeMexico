@@ -1,0 +1,43 @@
+
+{
+  "version_configuracion": 1,
+  "evento_id": "OXI-2026",
+  "moneda": "MXN",
+  "tarifas": {
+    "adulto": {
+      "importe": 700,
+      "edad_minima": 9
+    },
+    "nino_3_a_8": {
+      "importe": 350,
+      "edad_minima": 3,
+      "edad_maxima": 8
+    }
+  },
+  "reglas_calculo": {
+    "total_asistentes": "adultos + ninos",
+    "importe_total": "(adultos * tarifa_adulto) + (ninos * tarifa_nino)",
+    "total_pagado": "suma_de_pagos_validados",
+    "saldo_pendiente": "importe_total - total_pagado"
+  },
+  "reglas_pago": {
+    "permitir_pagos_parciales": true,
+    "validacion_administrativa_obligatoria": true,
+    "permitir_sobrepagos": false,
+    "generar_boleto_con_pago_parcial": false,
+    "generar_boleto_con_saldo_pendiente": false
+  },
+  "estados_pago": [
+    "pendiente",
+    "parcial",
+    "pagado",
+    "requiere_revision"
+  ],
+  "estados_reservacion": [
+    "capturada",
+    "pendiente_de_pago",
+    "pago_parcial",
+    "pagada",
+    "cancelada"
+  ]
+}
