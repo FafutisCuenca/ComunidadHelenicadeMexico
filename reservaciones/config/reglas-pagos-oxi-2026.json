@@ -1,6 +1,6 @@
 
 {
-  "version_configuracion": 1,
+  "version_configuracion": 2,
   "evento_id": "OXI-2026",
   "moneda": "MXN",
   "tarifas": {
@@ -14,11 +14,42 @@
       "edad_maxima": 8
     }
   },
+  "beneficios": [
+    {
+      "id": "ITHAKI_50",
+      "nombre": "Miembro de ITHAKI",
+      "tipo": "porcentaje",
+      "valor": 50,
+      "aplicable_a": ["adulto"],
+      "requiere_autorizacion": true
+    },
+    {
+      "id": "EGEO_50",
+      "nombre": "Miembro de EGEO",
+      "tipo": "porcentaje",
+      "valor": 50,
+      "aplicable_a": ["adulto"],
+      "requiere_autorizacion": true
+    },
+    {
+      "id": "CORTESIA",
+      "nombre": "Cortesía institucional o especial",
+      "tipo": "importe_fijo",
+      "valor": 0,
+      "aplicable_a": ["adulto", "nino_3_a_8"],
+      "requiere_autorizacion": true,
+      "requiere_motivo": true,
+      "requiere_control_cantidad": true
+    }
+  ],
   "reglas_calculo": {
-    "total_asistentes": "adultos + ninos",
-    "importe_total": "(adultos * tarifa_adulto) + (ninos * tarifa_nino)",
-    "total_pagado": "suma_de_pagos_validados",
-    "saldo_pendiente": "importe_total - total_pagado"
+    "calculo_inicial": true,
+    "ajustes_por_asistente": true,
+    "conservar_tarifa_original": true,
+    "registrar_motivo_ajuste": true,
+    "registrar_autorizador": true,
+    "evitar_doble_beneficio_por_asistente": true,
+    "importe_minimo": 0
   },
   "reglas_pago": {
     "permitir_pagos_parciales": true,
