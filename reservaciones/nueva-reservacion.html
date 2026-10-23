@@ -721,12 +721,13 @@
             edad: resultado.edad,
             categoria: resultado.categoria,
             tarifa_original: resultado.tarifa_original,
-            beneficio_id: resultado.beneficio_id,
-            beneficio_nombre: resultado.beneficio_nombre,
-            importe_ajuste: resultado.importe_ajuste,
-            importe_final: resultado.importe_final,
-            motivo: resultado.motivo,
-            autorizador: resultado.autorizador
+beneficio_id: resultado.beneficio_id,
+beneficio_nombre: resultado.beneficio_nombre,
+autorizado: datos.autorizado,
+importe_ajuste: resultado.importe_ajuste,
+importe_final: resultado.importe_final,
+motivo: resultado.motivo,
+autorizador: resultado.autorizador
           };
         });
 
@@ -744,6 +745,34 @@
           (totalOriginal - totalFinal) * 100
         ) / 100;
 
+        if (!window.oxiIdBorradorActual) {
+  window.oxiIdBorradorActual =
+    "OXI-" + Date.now() + "-" +
+    Math.random().toString(16).slice(2);
+}
+
+const registroFamiliar = {
+  reservacion_id: window.oxiIdBorradorActual,
+  evento_id: "OXI-2026",
+  nombre_familia: nombreFamilia,
+  responsable: document.getElementById("responsable").value.trim(),
+  mesa_id: document.getElementById("mesa").value,
+  fecha_captura: new Date().toISOString(),
+  asistentes: asistentes,
+  totales: {
+    cantidad_asistentes: asistentes.length,
+    importe_original: totalOriginal,
+    importe_ajuste: totalAjustes,
+    importe_final: totalFinal
+  }
+};
+
+window.dispatchEvent(
+  new CustomEvent("oxi:reservacion-calculada", {
+    detail: registroFamiliar
+  })
+);
+        
         document.getElementById("totalPersonas").textContent =
           String(asistentes.length);
 
