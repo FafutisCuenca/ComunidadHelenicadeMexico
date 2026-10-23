@@ -32,7 +32,7 @@
   "pagos": {
     "requiere_validacion_administrativa": true,
     "permitir_pagos_parciales": true,
-    "permitir_sob pagos": false
+    "permitir_sobrepagos": false
   },
   "boletos": {
     "requiere_pago_validado": true,
