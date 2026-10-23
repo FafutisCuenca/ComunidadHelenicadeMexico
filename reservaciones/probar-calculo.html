@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pruebas de cálculo | OXI 2026</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 18px;
+      color: #243047;
+      line-height: 1.5;
+    }
+
+    h1 {
+      color: #174b43;
+    }
+
+    button {
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 6px;
+      background: #174b43;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #resumen {
+      margin: 18px 0;
+      padding: 14px;
+      border-radius: 8px;
+      background: #f1f5f4;
+    }
+
+    .prueba {
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .correcta {
+      border-left: 5px solid #27834a;
+    }
+
+    .fallida {
+      border-left: 5px solid #bb3030;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pruebas de cálculo por asistente</h1>
+  <p>Comunidad Helénica de México · Día del OXI 2026</p>
+  <p>
+    Estas pruebas utilizan datos ficticios.
+    No crean reservaciones ni registran pagos.
+  </p>
+
+  <button id="ejecutar">Ejecutar pruebas</button>
+
+  <div id="resumen" aria-live="polite">
+    Las pruebas todavía no se han ejecutado.
+  </div>
+
+  <div id="resultados"></div>
+
+  <script src="./js/calculo-asistentes.js"></script>
+  <script>
+    const boton = document.getElementById("ejecutar");
+    const resumen = document.getElementById("resumen");
+    const resultados = document.getElementById("resultados");
+
+    function exigir(condicion, mensaje) {
+      if (!condicion) throw new Error(mensaje);
+    }
+
+    function casiIgual(actual, esperado) {
+      return Math.abs(actual - esperado) < 0.001;
+    }
+
+    async function ejecutarPruebas() {
+      boton.disabled = true;
+      resultados.replaceChildren();
+      resumen.textContent = "Ejecutando pruebas...";
+
+      let correctas = 0;
+      let fallidas = 0;
+
+      function prueba(nombre, funcion) {
+        const elemento = document.createElement("div");
+        elemento.className = "prueba";
+
+        try {
+          funcion();
+          elemento.classList.add("correcta");
+          elemento.textContent = "APROBADA: " + nombre;
+          correctas++;
+        } catch (error) {
+          elemento.classList.add("fallida");
+          elemento.textContent =
+            "FALLIDA: " + nombre + " — " + error.message;
+          fallidas++;
+        }
+
+        resultados.appendChild(elemento);
+      }
+
+      try {
+        await window.CalculoAsistentesOXI.iniciar();
+
+        prueba("Adulto: tarifa estándar de $700", () => {
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 30
+          });
+          exigir(r.tarifa_original === 700, "Tarifa original incorrecta");
+          exigir(r.importe_final === 700, "Importe final incorrecto");
+        });
+
+        prueba("Niño de 3 años: $350", () => {
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 3
+          });
+          exigir(r.importe_final === 350, "Importe incorrecto");
+        });
+
+        prueba("Niño de 8 años: $350", () => {
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 8
+          });
+          exigir(r.importe_final === 350, "Importe incorrecto");
+        });
+
+        prueba("A los 9 años corresponde tarifa de adulto", () => {
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 9
+          });
+          exigir(r.importe_final === 700, "Tarifa incorrecta");
+        });
+
+        prueba("ITHAKI: descuento del 50%", () => {
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 35,
+            beneficio_id: "ITHAKI_50",
+            autorizado: true,
+            autorizador: "Prueba administrativa",
+            motivo: "Prueba de beneficio ITHAKI"
+          });
+          exigir(r.tarifa_original === 700, "No conservó tarifa original");
+          exigir(r.importe_final === 350, "Descuento incorrecto");
+          exigir(r.importe_ajuste === 350, "Ajuste incorrecto");
+        });
+
+        prueba("EGEO: descuento del 50%", () => {
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 35,
+            beneficio_id: "EGEO_50",
+            autorizado: true,
+            autorizador: "Prueba administrativa",
+            motivo: "Prueba de beneficio EGEO"
+          });
+          exigir(r.importe_final === 350, "Descuento incorrecto");
+        });
+
+        prueba("No se aplica beneficio sin autorización", () => {
+          let rechazo = false;
+          try {
+            CalculoAsistentesOXI.calcularAsistente({
+              edad: 30,
+              beneficio_id: "ITHAKI_50",
+              motivo: "Prueba sin autorización"
+            });
+          } catch (error) {
+            rechazo = error.message.includes("autorizacion");
+          }
+          exigir(rechazo, "El beneficio no fue bloqueado");
+        });
+
+        prueba("Se exige identificar al autorizador", () => {
+          let rechazo = false;
+          try {
+            CalculoAsistentesOXI.calcularAsistente({
+              edad: 30,
+              beneficio_id: "EGEO_50",
+              autorizado: true,
+              motivo: "Prueba sin autorizador"
+            });
+          } catch (error) {
+            rechazo = error.message.includes("autorizador");
+          }
+          exigir(rechazo, "No exigió autorizador");
+        });
+
+        prueba("Se exige motivo para el descuento", () => {
+          let rechazo = false;
+          try {
+            CalculoAsistentesOXI.calcularAsistente({
+              edad: 30,
+              beneficio_id: "ITHAKI_50",
+              autorizado: true,
+              autorizador: "Prueba administrativa"
+            });
+          } catch (error) {
+            rechazo = error.message.includes("motivo");
+          }
+          exigir(rechazo, "No exigió motivo");
+        });
+
+        prueba("Cortesía autorizada: importe final cero", () => {
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 40,
+            beneficio_id: "CORTESIA",
+            autorizado: true,
+            autorizador: "Prueba administrativa",
+            motivo: "Representación institucional"
+          });
+          exigir(r.tarifa_original === 700, "No conservó tarifa original");
+          exigir(r.importe_final === 0, "La cortesía no quedó en cero");
+          exigir(r.importe_ajuste === 700, "Ajuste incorrecto");
+        });
+
+        prueba("Se rechaza beneficio inexistente", () => {
+          let rechazo = false;
+          try {
+            CalculoAsistentesOXI.calcularAsistente({
+              edad: 30,
+              beneficio_id: "BENEFICIO_INEXISTENTE"
+            });
+          } catch (error) {
+            rechazo = error.message.includes("no existe");
+          }
+          exigir(rechazo, "Aceptó un beneficio inexistente");
+        });
+
+        prueba("Se rechaza beneficio infantil no aplicable", () => {
+          let rechazo = false;
+          try {
+            CalculoAsistentesOXI.calcularAsistente({
+              edad: 6,
+              beneficio_id: "ITHAKI_50",
+              autorizado: true,
+              autorizador: "Prueba",
+              motivo: "Prueba"
+            });
+          } catch (error) {
+            rechazo = error.message.includes("no aplica");
+          }
+          exigir(rechazo, "Aceptó descuento para niño");
+        });
+
+        prueba("Menor de 3 años: tarifa aún no definida", () => {
+          let rechazo = false;
+          try {
+            CalculoAsistentesOXI.calcularAsistente({
+              edad: 2
+            });
+          } catch (error) {
+            rechazo = error.message.includes("menores de 3");
+          }
+          exigir(rechazo, "No señaló que falta definir la tarifa");
+        });
+
+        prueba("Se rechaza edad no válida", () => {
+          let rechazo = false;
+          try {
+            CalculoAsistentesOXI.calcularAsistente({
+              edad: -1
+            });
+          } catch (error) {
+            rechazo = error.message.includes("edad");
+          }
+          exigir(rechazo, "Aceptó una edad inválida");
+        });
+
+        prueba("El resultado conserva el identificador del evento", () => {
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 30
+          });
+          exigir(r.evento_id === "OXI-2026", "Evento incorrecto");
+        });
+
+        prueba("El cálculo no modifica la tarifa estándar", () => {
+          CalculoAsistentesOXI.calcularAsistente({
+            edad: 30,
+            beneficio_id: "ITHAKI_50",
+            autorizado: true,
+            autorizador: "Prueba",
+            motivo: "Prueba"
+          });
+
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 30
+          });
+          exigir(r.importe_final === 700, "La tarifa estándar cambió");
+        });
+
+        prueba("Un asistente recibe un solo beneficio por cálculo", () => {
+          const r = CalculoAsistentesOXI.calcularAsistente({
+            edad: 30,
+            beneficio_id: "EGEO_50",
+            autorizado: true,
+            autorizador: "Prueba",
+            motivo: "Pertenece a ITHAKI y EGEO"
+          });
+          exigir(r.importe_final === 350, "El descuento se acumuló");
+          exigir(r.beneficio_id === "EGEO_50", "Beneficio no identificado");
+        });
+
+        resumen.textContent =
+          "Pruebas ejecutadas: " + (correctas + fallidas) +
+          " | Aprobadas: " + correctas +
+          " | Fallidas: " + fallidas +
+          (fallidas === 0 ? " | Todas las pruebas pasaron." :
+            " | Revisa los errores señalados.");
+      } catch (error) {
+        resumen.textContent =
+          "No fue posible ejecutar todas las pruebas: " +
+          error.message +
+          ". Verifica que el archivo de configuración exista y que la página se abra desde GitHub Pages.";
+      } finally {
+        boton.disabled = false;
+      }
+    }
+
+    boton.addEventListener("click", ejecutarPruebas);
+  </script>
+</body>
+</html>
