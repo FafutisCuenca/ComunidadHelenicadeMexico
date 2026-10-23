@@ -179,7 +179,7 @@
               motivo: "Prueba sin autorización"
             });
           } catch (error) {
-            rechazo = error.message.includes("autorizacion");
+            rechazo = error.message.toLowerCase().includes("autorización");
           }
           exigir(rechazo, "El beneficio no fue bloqueado");
         });
