@@ -1,0 +1,936 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nueva reservación familiar | OXI 2026</title>
+
+  <style>
+    :root {
+      --verde: #174b43;
+      --verde-claro: #eaf3ef;
+      --azul: #263c57;
+      --borde: #d9e0e5;
+      --fondo: #f5f7f8;
+      --texto: #263238;
+      --rojo: #a32929;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--verde);
+      color: white;
+      padding: 22px 18px;
+    }
+
+    header .contenedor,
+    main {
+      max-width: 1050px;
+      margin: auto;
+    }
+
+    header h1 {
+      margin: 0 0 5px;
+      font-size: 25px;
+    }
+
+    header p { margin: 0; }
+
+    main {
+      padding: 22px 16px 40px;
+    }
+
+    .aviso {
+      background: #fff8df;
+      border: 1px solid #ead58d;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: var(--verde);
+      font-size: 20px;
+      margin: 0 0 16px;
+    }
+
+    h3 {
+      color: var(--azul);
+      font-size: 17px;
+      margin: 0 0 14px;
+    }
+
+    .rejilla {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .campo.completo {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid #b9c5cd;
+      border-radius: 6px;
+      background: white;
+      color: var(--texto);
+      font: inherit;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      min-width: auto;
+    }
+
+    .asistente {
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+
+    .asistente-cabecera {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .asistente-cabecera h3 { margin: 0; }
+
+    .opciones-autorizacion {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+      padding: 13px;
+      background: #f6f8fa;
+      border-radius: 7px;
+    }
+
+    .check-linea {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-weight: normal;
+    }
+
+    .botones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: bold;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .primario {
+      background: var(--verde);
+      color: white;
+    }
+
+    .secundario {
+      background: var(--verde-claro);
+      color: var(--verde);
+    }
+
+    .peligro {
+      background: #faeaea;
+      color: var(--rojo);
+      padding: 7px 10px;
+      font-size: 13px;
+    }
+
+    .resumen-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .indicador {
+      background: var(--verde-claro);
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .indicador span {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .indicador strong {
+      font-size: 22px;
+      overflow-wrap: anywhere;
+    }
+
+    .tabla-contenedor {
+      overflow-x: auto;
+      margin-top: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid var(--borde);
+      vertical-align: top;
+    }
+
+    th { background: #f3f6f7; }
+
+    .mensaje {
+      padding: 12px;
+      border-radius: 7px;
+      margin-top: 14px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .mensaje.error {
+      color: #8c2020;
+      background: #fff0f0;
+      border: 1px solid #efc5c5;
+    }
+
+    .mensaje.ok {
+      color: #145b35;
+      background: #eaf6ee;
+      border: 1px solid #b8dfc5;
+    }
+
+    .oculto { display: none !important; }
+
+    .nota {
+      color: #5a6870;
+      font-size: 13px;
+    }
+
+    footer {
+      text-align: center;
+      color: #65727a;
+      padding: 18px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 650px) {
+      .rejilla,
+      .opciones-autorizacion,
+      .resumen-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .panel { padding: 15px; }
+
+      header h1 { font-size: 21px; }
+
+      .indicador strong { font-size: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="contenedor">
+      <h1>Reservaciones familiares</h1>
+      <p>Comunidad Helénica de México · Día del OXI · 25 de octubre de 2026</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="aviso">
+      <strong>Modo de prueba.</strong>
+      Utiliza nombres ficticios. Esta pantalla calcula importes,
+      pero todavía no guarda reservaciones ni registra pagos.
+    </div>
+
+    <form id="formReservacion">
+      <section class="panel">
+        <h2>1. Datos de la reservación</h2>
+
+        <div class="rejilla">
+          <div class="campo completo">
+            <label for="nombreFamilia">Nombre de la familia o reservación *</label>
+            <input
+              id="nombreFamilia"
+              name="nombreFamilia"
+              required
+              maxlength="100"
+              placeholder="Ej. Familia de prueba">
+          </div>
+
+          <div class="campo">
+            <label for="responsable">Persona responsable (opcional)</label>
+            <input
+              id="responsable"
+              name="responsable"
+              maxlength="100"
+              placeholder="Nombre ficticio">
+          </div>
+
+          <div class="campo">
+            <label for="mesa">Mesa</label>
+            <select id="mesa">
+              <option value="">Sin asignar por ahora</option>
+              <option value="OXI-M001">Mesa OXI-M001</option>
+              <option value="OXI-M002">Mesa OXI-M002</option>
+              <option value="OXI-M003">Mesa OXI-M003</option>
+              <option value="OXI-M004">Mesa OXI-M004</option>
+              <option value="OXI-M005">Mesa OXI-M005</option>
+              <option value="OXI-M006">Mesa OXI-M006</option>
+              <option value="OXI-M007">Mesa OXI-M007</option>
+              <option value="OXI-M008">Mesa OXI-M008</option>
+              <option value="OXI-M009">Mesa OXI-M009</option>
+              <option value="OXI-M010">Mesa OXI-M010</option>
+            </select>
+            <p class="nota">
+              La disponibilidad y la capacidad se verificarán en una etapa posterior.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>2. Asistentes individuales</h2>
+        <p class="nota">
+          Cada asistente tiene su propia edad, tarifa y beneficio.
+          Los descuentos no se acumulan dentro de un mismo cálculo.
+        </p>
+
+        <div id="listaAsistentes"></div>
+
+        <div class="botones">
+          <button type="button" class="secundario" id="agregarAsistente">
+            + Agregar asistente
+          </button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>3. Resumen económico</h2>
+
+        <div class="resumen-grid">
+          <div class="indicador">
+            <span>Asistentes</span>
+            <strong id="totalPersonas">0</strong>
+          </div>
+
+          <div class="indicador">
+            <span>Importe original</span>
+            <strong id="importeOriginal">$0.00</strong>
+          </div>
+
+          <div class="indicador">
+            <span>Importe ajustado</span>
+            <strong id="importeFinal">$0.00</strong>
+          </div>
+        </div>
+
+        <p id="resumenAjustes" class="nota">
+          Agrega asistentes y pulsa «Calcular reservación».
+        </p>
+
+        <div id="tablaResultado" class="tabla-contenedor"></div>
+
+        <div class="botones">
+          <button type="button" class="primario" id="calcular">
+            Calcular reservación
+          </button>
+          <button type="reset" class="secundario" id="limpiar">
+            Limpiar formulario
+          </button>
+        </div>
+
+        <div id="mensaje" aria-live="polite"></div>
+      </section>
+    </form>
+ 
+<section class="panel" id="panelIntercambioJSON">
+  <h2>4. Archivo de reservaciones</h2>
+
+  <p>
+    Agrega cada reservación calculada a la lista de trabajo.
+    Después podrás descargar el conjunto en formato JSON o
+    importar un archivo anterior.
+  </p>
+
+  <p class="nota">
+    Los registros permanecen en la memoria de esta página hasta
+    que los exportes. Al recargarla, la lista de trabajo se pierde.
+    El archivo descargado puede contener datos personales.
+  </p>
+
+  <div class="botones">
+    <button type="button" class="primario" id="agregarAlArchivo">
+      Agregar reservación calculada
+    </button>
+
+    <button type="button" class="secundario" id="exportarJSON">
+      Descargar JSON
+    </button>
+  </div>
+
+  <div class="campo" style="margin-top:16px">
+    <label for="archivoJSON">Importar archivo JSON existente</label>
+    <input
+      id="archivoJSON"
+      type="file"
+      accept=".json,application/json">
+  </div>
+
+  <div id="estadoJSON" class="mensaje" aria-live="polite">
+    Todavía no hay reservaciones en la lista de trabajo.
+  </div>
+
+  <div id="listaJSON" class="tabla-contenedor"></div>
+</section>
+
+  
+  </main>
+
+  <footer>
+    Comunidad Helénica de México A.C. · Herramienta de pruebas OXI 2026
+  </footer>
+
+  <script src="./js/calculo-asistentes.js"></script>
+
+  <script>
+    "use strict";
+
+    const formulario = document.getElementById("formReservacion");
+    const lista = document.getElementById("listaAsistentes");
+    const mensaje = document.getElementById("mensaje");
+    const botonCalcular = document.getElementById("calcular");
+
+    let siguienteId = 0;
+    let motorListo = false;
+
+    const moneda = new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN"
+    });
+
+    function pesos(valor) {
+      return moneda.format(valor);
+    }
+
+    function crearElemento(etiqueta, texto, clase) {
+      const elemento = document.createElement(etiqueta);
+      if (texto !== undefined) elemento.textContent = texto;
+      if (clase) elemento.className = clase;
+      return elemento;
+    }
+
+    function crearAsistente() {
+      siguienteId++;
+
+      const id = siguienteId;
+      const tarjeta = crearElemento("article", undefined, "asistente");
+      tarjeta.dataset.id = String(id);
+
+      const cabecera = crearElemento("div", undefined, "asistente-cabecera");
+      cabecera.appendChild(
+        crearElemento("h3", "Asistente " + id)
+      );
+
+      const eliminar = crearElemento("button", "Eliminar", "peligro");
+      eliminar.type = "button";
+      eliminar.addEventListener("click", () => {
+        tarjeta.remove();
+        actualizarTitulos();
+        limpiarResultados();
+      });
+
+      cabecera.appendChild(eliminar);
+      tarjeta.appendChild(cabecera);
+
+      const rejilla = crearElemento("div", undefined, "rejilla");
+
+      const campoNombre = crearElemento("div", undefined, "campo");
+      const etiquetaNombre = crearElemento("label", "Nombre del asistente *");
+      const nombre = crearElemento("input");
+      nombre.type = "text";
+      nombre.required = true;
+      nombre.maxLength = 100;
+      nombre.placeholder = "Nombre ficticio";
+      nombre.dataset.campo = "nombre";
+      etiquetaNombre.htmlFor = "nombre-" + id;
+      nombre.id = "nombre-" + id;
+      campoNombre.append(etiquetaNombre, nombre);
+
+      const campoEdad = crearElemento("div", undefined, "campo");
+      const etiquetaEdad = crearElemento("label", "Edad *");
+      const edad = crearElemento("input");
+      edad.type = "number";
+      edad.min = "0";
+      edad.max = "120";
+      edad.step = "1";
+      edad.required = true;
+      edad.placeholder = "Edad en años";
+      edad.dataset.campo = "edad";
+      edad.id = "edad-" + id;
+      etiquetaEdad.htmlFor = edad.id;
+      campoEdad.append(etiquetaEdad, edad);
+
+      const campoBeneficio = crearElemento("div", undefined, "campo completo");
+      const etiquetaBeneficio = crearElemento("label", "Beneficio individual");
+      const beneficio = crearElemento("select");
+      beneficio.dataset.campo = "beneficio";
+
+      [
+        ["", "Sin beneficio"],
+        ["ITHAKI_50", "Miembro de ITHAKI — 50% adulto"],
+        ["EGEO_50", "Miembro de EGEO — 50% adulto"],
+        ["CORTESIA", "Cortesía institucional o especial"]
+      ].forEach(([valor, texto]) => {
+        const opcion = document.createElement("option");
+        opcion.value = valor;
+        opcion.textContent = texto;
+        beneficio.appendChild(opcion);
+      });
+
+      beneficio.id = "beneficio-" + id;
+      etiquetaBeneficio.htmlFor = beneficio.id;
+      campoBeneficio.append(etiquetaBeneficio, beneficio);
+
+      rejilla.append(campoNombre, campoEdad, campoBeneficio);
+      tarjeta.appendChild(rejilla);
+
+      const autorizacion = crearElemento(
+        "div",
+        undefined,
+        "opciones-autorizacion oculto"
+      );
+
+      const campoCheck = crearElemento("div", undefined, "campo completo");
+      const etiquetaCheck = crearElemento(
+        "label",
+        undefined,
+        "check-linea"
+      );
+
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.dataset.campo = "autorizado";
+
+      etiquetaCheck.append(
+        check,
+        document.createTextNode(" Beneficio autorizado por la administración")
+      );
+      campoCheck.appendChild(etiquetaCheck);
+
+      const campoAutorizador = crearElemento("div", undefined, "campo");
+      const etiquetaAutorizador = crearElemento("label", "Autorizador *");
+      const autorizador = crearElemento("input");
+      autorizador.type = "text";
+      autorizador.maxLength = 100;
+      autorizador.placeholder = "Nombre ficticio";
+      autorizador.dataset.campo = "autorizador";
+      campoAutorizador.append(etiquetaAutorizador, autorizador);
+
+      const campoMotivo = crearElemento("div", undefined, "campo");
+      const etiquetaMotivo = crearElemento("label", "Motivo *");
+      const motivo = crearElemento("input");
+      motivo.type = "text";
+      motivo.maxLength = 250;
+      motivo.placeholder = "Motivo del beneficio";
+      motivo.dataset.campo = "motivo";
+      campoMotivo.append(etiquetaMotivo, motivo);
+
+      autorizacion.append(
+        campoCheck,
+        campoAutorizador,
+        campoMotivo
+      );
+
+      tarjeta.appendChild(autorizacion);
+
+      beneficio.addEventListener("change", () => {
+        const requiereAutorizacion = Boolean(beneficio.value);
+        autorizacion.classList.toggle(
+          "oculto",
+          !requiereAutorizacion
+        );
+
+        check.checked = false;
+        autorizador.value = "";
+        motivo.value = "";
+
+        limpiarResultados();
+      });
+
+      tarjeta.addEventListener("input", evento => {
+        if (evento.target !== eliminar) limpiarResultados();
+      });
+
+      tarjeta.addEventListener("change", limpiarResultados);
+
+      lista.appendChild(tarjeta);
+      actualizarTitulos();
+    }
+
+    function actualizarTitulos() {
+      Array.from(lista.querySelectorAll(".asistente")).forEach(
+        (tarjeta, indice) => {
+          tarjeta.querySelector("h3").textContent =
+            "Asistente " + (indice + 1);
+        }
+      );
+    }
+
+    function limpiarResultados() {
+      window.oxiIdBorradorActual = null;
+
+window.dispatchEvent(
+  new Event("oxi:reservacion-invalidada")
+);
+      document.getElementById("totalPersonas").textContent = "0";
+      document.getElementById("importeOriginal").textContent = pesos(0);
+      document.getElementById("importeFinal").textContent = pesos(0);
+      document.getElementById("resumenAjustes").textContent =
+        "Vuelve a calcular para actualizar los importes.";
+      document.getElementById("tablaResultado").replaceChildren();
+      mensaje.className = "";
+      mensaje.textContent = "";
+    }
+
+    function leerDatosTarjeta(tarjeta) {
+      const valor = campo =>
+        tarjeta.querySelector('[data-campo="' + campo + '"]');
+
+      const edadTexto = valor("edad").value.trim();
+
+      if (!valor("nombre").value.trim()) {
+        throw new Error("Escribe el nombre de cada asistente.");
+      }
+
+      if (!edadTexto || !Number.isInteger(Number(edadTexto))) {
+        throw new Error("Captura una edad entera válida.");
+      }
+
+      const beneficioId = valor("beneficio").value;
+
+      return {
+        nombre: valor("nombre").value.trim(),
+        edad: Number(edadTexto),
+        beneficio_id: beneficioId || null,
+        autorizado: beneficioId
+          ? valor("autorizado").checked
+          : false,
+        autorizador: beneficioId
+          ? valor("autorizador").value.trim()
+          : "",
+        motivo: beneficioId
+          ? valor("motivo").value.trim()
+          : ""
+      };
+    }
+
+    async function iniciarMotor() {
+      if (motorListo) return;
+
+      if (!window.CalculoAsistentesOXI) {
+        throw new Error(
+          "No se encontró calculo-asistentes.js. Verifica la ruta del archivo."
+        );
+      }
+
+      await window.CalculoAsistentesOXI.iniciar();
+      motorListo = true;
+    }
+
+    async function calcularReservacion() {
+      mensaje.className = "mensaje";
+      mensaje.textContent = "";
+
+      try {
+        if (!formulario.reportValidity()) return;
+
+        await iniciarMotor();
+
+        const nombreFamilia =
+          document.getElementById("nombreFamilia").value.trim();
+
+        if (!nombreFamilia) {
+          throw new Error("Escribe el nombre de la reservación familiar.");
+        }
+
+        const tarjetas = Array.from(
+          lista.querySelectorAll(".asistente")
+        );
+
+        if (tarjetas.length === 0) {
+          throw new Error("Agrega al menos un asistente.");
+        }
+
+        const asistentes = tarjetas.map(tarjeta => {
+          const datos = leerDatosTarjeta(tarjeta);
+
+          const resultado =
+            window.CalculoAsistentesOXI.calcularAsistente(datos);
+
+          return {
+            nombre: datos.nombre,
+            edad: resultado.edad,
+            categoria: resultado.categoria,
+            tarifa_original: resultado.tarifa_original,
+beneficio_id: resultado.beneficio_id,
+beneficio_nombre: resultado.beneficio_nombre,
+autorizado: datos.autorizado,
+importe_ajuste: resultado.importe_ajuste,
+importe_final: resultado.importe_final,
+motivo: resultado.motivo,
+autorizador: resultado.autorizador
+          };
+        });
+
+        const totalOriginal = asistentes.reduce(
+          (suma, persona) => suma + persona.tarifa_original,
+          0
+        );
+
+        const totalFinal = asistentes.reduce(
+          (suma, persona) => suma + persona.importe_final,
+          0
+        );
+
+        const totalAjustes = Math.round(
+          (totalOriginal - totalFinal) * 100
+        ) / 100;
+
+        if (!window.oxiIdBorradorActual) {
+  window.oxiIdBorradorActual =
+    "OXI-" + Date.now() + "-" +
+    Math.random().toString(16).slice(2);
+}
+
+const mesaSeleccionada = document.getElementById("mesa").value;
+const coincidenciaMesa = mesaSeleccionada.match(/(\\d+)/);
+const mesaNumero = coincidenciaMesa ? Number(coincidenciaMesa[1]) : null;
+
+const beneficios = [
+  ...new Set(
+    asistentes
+      .filter(persona => persona.beneficio_nombre)
+      .map(persona => persona.beneficio_nombre)
+  )
+];
+
+const importeCortesias = asistentes.reduce((suma, persona) => {
+  if (persona.beneficio_id !== "CORTESIA") return suma;
+
+  return suma + Math.max(
+    0,
+    Number(persona.tarifa_original || 0) -
+    Number(persona.importe_final || 0)
+  );
+}, 0);
+
+// Estructura compatible con el archivo maestro JSON v2.
+// Los datos originales del Excel se conservan en sus campos propios;
+// las nuevas reservaciones usan los campos de captura web.
+const registroFamiliar = {
+  reservacion_id: window.oxiIdBorradorActual,
+  tipo_reservacion: "grupo",
+  nombre_reservacion: nombreFamilia,
+
+  beneficio_excel: beneficios.length ? beneficios.join(", ") : null,
+  estado_pago_excel: "POR PAGAR",
+  forma_pago_excel: null,
+
+  adultos: asistentes.filter(
+    persona => persona.categoria === "adulto"
+  ).length,
+
+  ninos: asistentes.filter(
+    persona => persona.categoria !== "adulto"
+  ).length,
+
+  total_asientos_excel: asistentes.length,
+
+  mesa_numero: mesaNumero,
+  mesa_id: mesaSeleccionada || null,
+
+  costo_excel: totalOriginal,
+  estado_excel_columna_J: null,
+  notas_excel: null,
+
+  cortesia_excel: Math.round(importeCortesias * 100) / 100,
+  subtotal_excel: totalFinal,
+  pagado_excel: 0,
+  debe_excel: totalFinal,
+
+  fila_origen_excel: null,
+
+  responsable: document.getElementById("responsable").value.trim(),
+  origen_registro: "captura_web",
+  fecha_captura: new Date().toISOString(),
+
+  detalle_asistentes: asistentes.map(persona => ({
+    nombre: persona.nombre,
+    edad: persona.edad,
+    categoria: persona.categoria,
+    tarifa_original: persona.tarifa_original,
+    beneficio_id: persona.beneficio_id,
+    beneficio_nombre: persona.beneficio_nombre,
+    autorizado: persona.autorizado,
+    importe_ajuste: persona.importe_ajuste,
+    importe_final: persona.importe_final,
+    motivo: persona.motivo,
+    autorizador: persona.autorizador
+  }))
+};
+
+window.dispatchEvent(
+  new CustomEvent("oxi:reservacion-calculada", {
+    detail: registroFamiliar
+  })
+);
+        
+        document.getElementById("totalPersonas").textContent =
+          String(asistentes.length);
+
+        document.getElementById("importeOriginal").textContent =
+          pesos(totalOriginal);
+
+        document.getElementById("importeFinal").textContent =
+          pesos(totalFinal);
+
+        document.getElementById("resumenAjustes").textContent =
+          "Ajustes aplicados: " + pesos(totalAjustes) +
+          ". Esta cifra representa descuentos y cortesías, no pagos recibidos.";
+
+        const tabla = document.getElementById("tablaResultado");
+        tabla.replaceChildren();
+
+        const tablaHTML = document.createElement("table");
+        const thead = document.createElement("thead");
+        const filaCabeza = document.createElement("tr");
+
+        [
+          "Asistente",
+          "Categoría",
+          "Tarifa original",
+          "Beneficio",
+          "Ajuste",
+          "Importe final"
+        ].forEach(texto => {
+          filaCabeza.appendChild(crearElemento("th", texto));
+        });
+
+        thead.appendChild(filaCabeza);
+        tablaHTML.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        asistentes.forEach(persona => {
+          const fila = document.createElement("tr");
+
+          [
+            persona.nombre,
+            persona.categoria === "adulto"
+              ? "Adulto"
+              : "Niño de 3 a 8 años",
+            pesos(persona.tarifa_original),
+            persona.beneficio_nombre || "Ninguno",
+            pesos(persona.importe_ajuste),
+            pesos(persona.importe_final)
+          ].forEach(texto => {
+            fila.appendChild(crearElemento("td", texto));
+          });
+
+          tbody.appendChild(fila);
+        });
+
+        tablaHTML.appendChild(tbody);
+        tabla.appendChild(tablaHTML);
+
+        mensaje.className = "mensaje ok";
+        mensaje.textContent =
+          "Cálculo completado correctamente para " +
+          nombreFamilia + ".\n" +
+          "Mesa seleccionada: " +
+          (document.getElementById("mesa").value || "Sin asignar") +
+          ".\n" +
+          "Este resultado solo está en pantalla; aún no se ha guardado.";
+
+      } catch (error) {
+        mensaje.className = "mensaje error";
+        mensaje.textContent = error.message;
+      }
+    }
+
+    document.getElementById("agregarAsistente")
+      .addEventListener("click", () => {
+        crearAsistente();
+        limpiarResultados();
+      });
+
+    botonCalcular.addEventListener("click", calcularReservacion);
+
+    document.getElementById("limpiar").addEventListener("click", () => {
+      setTimeout(() => {
+        lista.replaceChildren();
+        siguienteId = 0;
+        crearAsistente();
+        limpiarResultados();
+      }, 0);
+    });
+
+    crearAsistente();
+  </script>
+  <script src="./js/intercambio-json.js"></script>
+</body>
+</html>
