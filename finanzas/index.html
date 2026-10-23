@@ -1,0 +1,1112 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102b49">
+  <title>Administración Financiera | Comunidad Helénica</title>
+
+  <style>
+    :root {
+      --azul: #102b49;
+      --azul2: #183d63;
+      --dorado: #c5a15a;
+      --fondo: #f3f6fa;
+      --texto: #25364a;
+      --gris: #66768a;
+      --borde: #dce4ed;
+      --blanco: #fff;
+      --verde: #18794e;
+      --rojo: #b42318;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    header {
+      background: linear-gradient(125deg, var(--azul), var(--azul2));
+      color: white;
+      padding: 28px 22px;
+      border-bottom: 4px solid var(--dorado);
+    }
+
+    .encabezado {
+      max-width: 1250px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo {
+      width: 95px;
+      height: 95px;
+      background: white;
+      border: 1px solid var(--dorado);
+      border-radius: 15px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 6px 20px #0003, 0 0 0 3px #c5a15a22;
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .sobrelinea {
+      margin: 0 0 6px;
+      color: #e9d7a9;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(23px, 3vw, 34px);
+      line-height: 1.2;
+    }
+
+    .subtitulo {
+      margin: 9px 0 0;
+      color: #e1eaf3;
+      font-size: 15px;
+    }
+
+    .fundacion {
+      margin: 6px 0 0;
+      color: #e9d7a9;
+      font-size: 12px;
+    }
+
+    main {
+      max-width: 1250px;
+      padding: 25px 18px 45px;
+      margin: auto;
+    }
+
+    .barra {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .barra h2 {
+      color: var(--azul);
+      margin: 0;
+      font-size: 23px;
+    }
+
+    .acciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button, .boton {
+      border: 0;
+      border-radius: 7px;
+      padding: 10px 14px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .primario { background: var(--azul); color: white; }
+    .secundario { background: #e5edf5; color: var(--azul); }
+    .dorado { background: var(--dorado); color: #172b41; }
+    .peligro { background: #fde8e7; color: var(--rojo); }
+
+    button:hover, .boton:hover { filter: brightness(.96); }
+
+    .nota {
+      padding: 13px 15px;
+      background: #fff9e9;
+      border: 1px solid #ead9a9;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .resumen {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 15px;
+      margin-bottom: 24px;
+    }
+
+    .indicador {
+      background: white;
+      padding: 19px;
+      border-radius: 11px;
+      border: 1px solid var(--borde);
+      box-shadow: 0 3px 10px #102b4908;
+      min-width: 0;
+    }
+
+    .indicador .etiqueta {
+      color: var(--gris);
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    .indicador .valor {
+      display: block;
+      margin-top: 11px;
+      color: var(--azul);
+      font-size: clamp(19px, 2vw, 27px);
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
+
+    .indicador small {
+      display: block;
+      margin-top: 7px;
+      color: var(--gris);
+      font-size: 12px;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--borde);
+      border-radius: 11px;
+      margin-bottom: 22px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px #102b4908;
+    }
+
+    .panel-titulo {
+      padding: 17px 20px;
+      background: #fafdff;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .panel-titulo h3 {
+      margin: 0;
+      color: var(--azul);
+      font-size: 18px;
+    }
+
+    .panel-titulo p {
+      margin: 6px 0 0;
+      color: var(--gris);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .contenido { padding: 20px; }
+
+    .formulario {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 15px;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .campo.completo { grid-column: 1 / -1; }
+
+    label {
+      font-size: 13px;
+      font-weight: bold;
+      color: #34485e;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-width: 0;
+      padding: 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: white;
+      color: var(--texto);
+      font: inherit;
+      font-size: 14px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid #c5a15a66;
+      border-color: var(--dorado);
+    }
+
+    .ayuda {
+      color: var(--gris);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .botones-form {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .tabla-contenedor { overflow-x: auto; }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 13px 15px;
+      border-bottom: 1px solid #e8edf3;
+      vertical-align: top;
+    }
+
+    th {
+      color: #52647a;
+      background: #f8fafc;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      white-space: nowrap;
+    }
+
+    td { line-height: 1.45; }
+    td strong { color: var(--azul); }
+    .numerico { text-align: right; white-space: nowrap; }
+
+    .estado {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 4px 8px;
+      background: #e9f5ee;
+      color: var(--verde);
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .vacio {
+      text-align: center;
+      color: var(--gris);
+      padding: 25px 15px;
+    }
+
+    .oculto { display: none !important; }
+
+    .aviso-estado {
+      margin: 14px 0 0;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: var(--azul);
+      color: #dbe5ef;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 850px) {
+      .resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .formulario { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 540px) {
+      header { padding: 20px 15px; }
+      .encabezado { align-items: flex-start; gap: 13px; }
+      .logo { width: 68px; height: 68px; padding: 5px; }
+      .sobrelinea { font-size: 10px; letter-spacing: .8px; }
+      h1 { font-size: 22px; }
+      .subtitulo { font-size: 13px; }
+      .fundacion { font-size: 10px; }
+      main { padding: 20px 12px 30px; }
+      .resumen { gap: 9px; }
+      .indicador { padding: 13px; }
+      .indicador .etiqueta { font-size: 10px; }
+      .formulario { grid-template-columns: 1fr; }
+      .campo.completo { grid-column: auto; }
+      .contenido { padding: 14px; }
+      .barra { align-items: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="encabezado">
+    <div class="logo">
+      <img
+        src="../images/Logo%20COMHELMEX.jpg"
+        alt="Logotipo de la Comunidad Helénica de México"
+        onerror="this.style.display='none'"
+      >
+    </div>
+    <div>
+      <p class="sobrelinea">Comunidad Helénica de México, A.C.</p>
+      <h1>Administración Financiera</h1>
+      <p class="subtitulo">Control de proveedores, presupuesto y pagos</p>
+      <p class="fundacion">Fundada el 13 de marzo de 1956</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="barra">
+    <div>
+      <h2>Control financiero · OXI 2026</h2>
+      <p class="ayuda">Registro administrativo independiente de las reservaciones.</p>
+    </div>
+    <div class="acciones">
+      <a class="boton secundario" href="../index.html">← Volver al portal</a>
+      <button class="secundario" id="exportar">Exportar JSON</button>
+      <button class="secundario" id="importar">Importar JSON</button>
+      <input type="file" id="archivoImportar" accept=".json,application/json" class="oculto">
+    </div>
+  </div>
+
+  <div class="nota">
+    <strong>Importante:</strong> los datos de esta versión se guardan en el navegador
+    de este dispositivo. Exporta periódicamente un respaldo JSON. Esta pantalla
+    todavía no consulta automáticamente las reservaciones ni constituye un sistema
+    contable oficial.
+  </div>
+
+  <section class="resumen" aria-label="Resumen financiero">
+    <div class="indicador">
+      <span class="etiqueta">Presupuesto autorizado</span>
+      <strong class="valor" id="totalPresupuesto">$0.00</strong>
+      <small>Monto de referencia</small>
+    </div>
+    <div class="indicador">
+      <span class="etiqueta">Compromisos registrados</span>
+      <strong class="valor" id="totalCompromisos">$0.00</strong>
+      <small>Importes acordados con proveedores</small>
+    </div>
+    <div class="indicador">
+      <span class="etiqueta">Pagos registrados</span>
+      <strong class="valor" id="totalPagado">$0.00</strong>
+      <small>Anticipos y abonos capturados</small>
+    </div>
+    <div class="indicador">
+      <span class="etiqueta">Saldo comprometido</span>
+      <strong class="valor" id="totalSaldo">$0.00</strong>
+      <small>Compromisos menos pagos</small>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-titulo">
+      <h3>1. Presupuesto general</h3>
+      <p>Define el importe autorizado para el evento. Puedes actualizarlo posteriormente.</p>
+    </div>
+    <div class="contenido">
+      <form id="formPresupuesto">
+        <div class="formulario">
+          <div class="campo">
+            <label for="presupuesto">Presupuesto autorizado (MXN)</label>
+            <input id="presupuesto" type="number" min="0" step="0.01" required placeholder="Ej. 50000">
+          </div>
+          <div class="campo">
+            <label for="evento">Evento o ejercicio</label>
+            <input id="evento" value="OXI 2026" required>
+          </div>
+        </div>
+        <div class="botones-form">
+          <button class="primario" type="submit">Guardar presupuesto</button>
+        </div>
+        <p id="estadoPresupuesto" class="aviso-estado" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-titulo">
+      <h3>2. Registro de proveedores</h3>
+      <p>Captura los datos de las personas o empresas que prestarán servicios o suministrarán productos.</p>
+    </div>
+    <div class="contenido">
+      <form id="formProveedor">
+        <div class="formulario">
+          <div class="campo">
+            <label for="proveedorNombre">Nombre del proveedor *</label>
+            <input id="proveedorNombre" required maxlength="120" placeholder="Nombre o razón social">
+          </div>
+          <div class="campo">
+            <label for="proveedorCategoria">Categoría *</label>
+            <select id="proveedorCategoria" required>
+              <option value="">Selecciona</option>
+              <option>Alimentos y banquete</option>
+              <option>Bebidas</option>
+              <option>Carpas y mobiliario</option>
+              <option>Música y entretenimiento</option>
+              <option>Meseros y personal</option>
+              <option>Decoración</option>
+              <option>Hielo y suministros</option>
+              <option>Renta de equipo</option>
+              <option>Transporte y logística</option>
+              <option>Otros</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="proveedorContacto">Contacto</label>
+            <input id="proveedorContacto" maxlength="120" placeholder="Nombre de contacto">
+          </div>
+          <div class="campo">
+            <label for="proveedorTelefono">Teléfono</label>
+            <input id="proveedorTelefono" type="tel" maxlength="40">
+          </div>
+          <div class="campo">
+            <label for="proveedorCorreo">Correo electrónico</label>
+            <input id="proveedorCorreo" type="email" maxlength="120">
+          </div>
+          <div class="campo">
+            <label for="proveedorNotas">Notas</label>
+            <input id="proveedorNotas" maxlength="250" placeholder="Detalles del servicio">
+          </div>
+        </div>
+        <div class="botones-form">
+          <button class="primario" type="submit">Agregar proveedor</button>
+          <button class="secundario" type="reset">Limpiar formulario</button>
+        </div>
+      </form>
+    </div>
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Proveedor</th>
+            <th>Categoría</th>
+            <th>Contacto</th>
+            <th>Teléfono / correo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaProveedores"></tbody>
+      </table>
+      <div class="vacio" id="vacioProveedores">Todavía no hay proveedores registrados.</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-titulo">
+      <h3>3. Compromisos y cotizaciones</h3>
+      <p>Registra el costo acordado con un proveedor. El compromiso no se suma como un pago.</p>
+    </div>
+    <div class="contenido">
+      <form id="formCompromiso">
+        <div class="formulario">
+          <div class="campo">
+            <label for="compProveedor">Proveedor *</label>
+            <select id="compProveedor" required>
+              <option value="">Primero registra un proveedor</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="compDescripcion">Servicio o concepto *</label>
+            <input id="compDescripcion" required maxlength="160" placeholder="Ej. Renta de carpas">
+          </div>
+          <div class="campo">
+            <label for="compTipo">Tipo de importe</label>
+            <select id="compTipo">
+              <option value="cotizacion">Cotización estimada</option>
+              <option value="compromiso">Compromiso confirmado</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="compMonto">Importe (MXN) *</label>
+            <input id="compMonto" type="number" min="0.01" step="0.01" required>
+          </div>
+          <div class="campo">
+            <label for="compFecha">Fecha</label>
+            <input id="compFecha" type="date">
+          </div>
+          <div class="campo">
+            <label for="compNotas">Observaciones</label>
+            <input id="compNotas" maxlength="250" placeholder="Condiciones, vigencia, etc.">
+          </div>
+        </div>
+        <div class="botones-form">
+          <button class="primario" type="submit">Registrar importe</button>
+        </div>
+      </form>
+    </div>
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Proveedor / concepto</th>
+            <th>Tipo</th>
+            <th>Fecha</th>
+            <th class="numerico">Importe</th>
+            <th class="numerico">Pagado</th>
+            <th class="numerico">Saldo</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaCompromisos"></tbody>
+      </table>
+      <div class="vacio" id="vacioCompromisos">Todavía no hay importes registrados.</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-titulo">
+      <h3>4. Registro de pagos y anticipos</h3>
+      <p>Registra cada movimiento una sola vez y asígnalo al compromiso correspondiente.</p>
+    </div>
+    <div class="contenido">
+      <form id="formPago">
+        <div class="formulario">
+          <div class="campo">
+            <label for="pagoCompromiso">Compromiso *</label>
+            <select id="pagoCompromiso" required>
+              <option value="">Primero registra un compromiso</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="pagoMonto">Importe del pago (MXN) *</label>
+            <input id="pagoMonto" type="number" min="0.01" step="0.01" required>
+          </div>
+          <div class="campo">
+            <label for="pagoFecha">Fecha de pago *</label>
+            <input id="pagoFecha" type="date" required>
+          </div>
+          <div class="campo">
+            <label for="pagoTipo">Tipo de movimiento</label>
+            <select id="pagoTipo">
+              <option>Anticipo</option>
+              <option>Abono</option>
+              <option>Liquidación</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="pagoMetodo">Forma de pago</label>
+            <select id="pagoMetodo">
+              <option>Transferencia</option>
+              <option>Efectivo</option>
+              <option>Tarjeta</option>
+              <option>Cheque</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="pagoReferencia">Referencia / comprobante</label>
+            <input id="pagoReferencia" maxlength="120" placeholder="Folio o referencia">
+          </div>
+        </div>
+        <div class="botones-form">
+          <button class="primario" type="submit">Registrar pago</button>
+        </div>
+        <p id="estadoPago" class="aviso-estado" aria-live="polite"></p>
+      </form>
+    </div>
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Proveedor / concepto</th>
+            <th>Movimiento</th>
+            <th>Forma de pago</th>
+            <th>Referencia</th>
+            <th class="numerico">Importe</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPagos"></tbody>
+      </table>
+      <div class="vacio" id="vacioPagos">Todavía no hay pagos registrados.</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-titulo">
+      <h3>5. Resumen para revisión</h3>
+      <p>Indicadores calculados a partir de los registros capturados en este módulo.</p>
+    </div>
+    <div class="contenido">
+      <div class="formulario">
+        <div class="campo">
+          <label>Presupuesto disponible frente a compromisos confirmados</label>
+          <strong id="disponible" style="font-size:22px;color:#102b49">$0.00</strong>
+          <span class="ayuda">Presupuesto menos compromisos confirmados. No incluye cotizaciones.</span>
+        </div>
+        <div class="campo">
+          <label>Cotizaciones estimadas</label>
+          <strong id="totalCotizaciones" style="font-size:22px;color:#102b49">$0.00</strong>
+          <span class="ayuda">No se suman a los compromisos confirmados.</span>
+        </div>
+        <div class="campo">
+          <label>Proveedores registrados</label>
+          <strong id="numeroProveedores" style="font-size:22px;color:#102b49">0</strong>
+          <span class="ayuda">Total de proveedores capturados.</span>
+        </div>
+      </div>
+      <p class="ayuda" style="margin-top:22px">
+        Este resumen no incluye todavía ingresos por reservaciones, gastos no asociados
+        a proveedores, cuentas por cobrar ni conciliación bancaria. Se incorporarán en
+        las siguientes etapas para mantener separados los datos y evitar duplicidades.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <strong>Comunidad Helénica de México, A.C.</strong><br>
+  Administración financiera · OXI 2026<br>
+  Herramienta administrativa preliminar. Verifica los registros y conserva respaldos.
+</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  const CLAVE = "comunidadHelenicaFinanzasOXI2026_v1";
+
+  const estado = {
+    evento: "OXI 2026",
+    presupuesto: 0,
+    proveedores: [],
+    compromisos: [],
+    pagos: []
+  };
+
+  const $ = id => document.getElementById(id);
+
+  const dinero = valor => new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN"
+  }).format(Number(valor) || 0);
+
+  const idNuevo = prefijo =>
+    prefijo + "-" + Date.now().toString(36) +
+    "-" + Math.random().toString(36).slice(2, 7);
+
+  const texto = valor => String(valor ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[c]);
+
+  const fechaHoy = () => {
+    const d = new Date();
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 10);
+  };
+
+  function guardar() {
+    try {
+      localStorage.setItem(CLAVE, JSON.stringify(estado));
+      return true;
+    } catch (error) {
+      alert("No fue posible guardar los datos en este navegador. Exporta un respaldo y verifica el almacenamiento disponible.");
+      return false;
+    }
+  }
+
+  function cargar() {
+    try {
+      const bruto = localStorage.getItem(CLAVE);
+      if (!bruto) return;
+      const datos = JSON.parse(bruto);
+
+      if (!datos || typeof datos !== "object" ||
+          !Array.isArray(datos.proveedores) ||
+          !Array.isArray(datos.compromisos) ||
+          !Array.isArray(datos.pagos)) {
+        throw new Error("Estructura no válida");
+      }
+
+      estado.evento = typeof datos.evento === "string" ? datos.evento : "OXI 2026";
+      estado.presupuesto = Math.max(0, Number(datos.presupuesto) || 0);
+      estado.proveedores = datos.proveedores;
+      estado.compromisos = datos.compromisos;
+      estado.pagos = datos.pagos;
+    } catch (error) {
+      alert("No se pudieron cargar los datos guardados. No se han importado datos nuevos.");
+    }
+  }
+
+  function importePagado(compromisoId) {
+    return estado.pagos
+      .filter(p => p.compromisoId === compromisoId)
+      .reduce((suma, p) => suma + Number(p.monto), 0);
+  }
+
+  function compromisoPorId(id) {
+    return estado.compromisos.find(c => c.id === id);
+  }
+
+  function proveedorPorId(id) {
+    return estado.proveedores.find(p => p.id === id);
+  }
+
+  function renderizar() {
+    $("presupuesto").value = estado.presupuesto || "";
+    $("evento").value = estado.evento || "OXI 2026";
+
+    const confirmados = estado.compromisos
+      .filter(c => c.tipo === "compromiso")
+      .reduce((s, c) => s + Number(c.monto), 0);
+
+    const cotizaciones = estado.compromisos
+      .filter(c => c.tipo === "cotizacion")
+      .reduce((s, c) => s + Number(c.monto), 0);
+
+    const pagado = estado.pagos.reduce((s, p) => s + Number(p.monto), 0);
+    const saldo = estado.compromisos
+      .filter(c => c.tipo === "compromiso")
+      .reduce((s, c) => s + Number(c.monto) - importePagado(c.id), 0);
+
+    $("totalPresupuesto").textContent = dinero(estado.presupuesto);
+    $("totalCompromisos").textContent = dinero(confirmados);
+    $("totalPagado").textContent = dinero(pagado);
+    $("totalSaldo").textContent = dinero(saldo);
+    $("disponible").textContent = dinero(estado.presupuesto - confirmados);
+    $("totalCotizaciones").textContent = dinero(cotizaciones);
+    $("numeroProveedores").textContent = estado.proveedores.length;
+
+    $("tablaProveedores").innerHTML = estado.proveedores.map(p => `
+      <tr>
+        <td><strong>${texto(p.nombre)}</strong><br><span class="ayuda">${texto(p.notas)}</span></td>
+        <td>${texto(p.categoria)}</td>
+        <td>${texto(p.contacto || "—")}</td>
+        <td>${texto(p.telefono || "—")}<br>${texto(p.correo || "")}</td>
+        <td><button class="peligro" data-borrar-proveedor="${texto(p.id)}">Eliminar</button></td>
+      </tr>
+    `).join("");
+
+    $("vacioProveedores").classList.toggle("oculto", estado.proveedores.length > 0);
+
+    $("compProveedor").innerHTML =
+      '<option value="">Selecciona un proveedor</option>' +
+      estado.proveedores.map(p =>
+        `<option value="${texto(p.id)}">${texto(p.nombre)}</option>`
+      ).join("");
+
+    $("tablaCompromisos").innerHTML = estado.compromisos.map(c => {
+      const p = proveedorPorId(c.proveedorId);
+      const pagadoC = importePagado(c.id);
+      return `
+        <tr>
+          <td><strong>${texto(p ? p.nombre : "Proveedor no disponible")}</strong><br>${texto(c.descripcion)}<br><span class="ayuda">${texto(c.notas)}</span></td>
+          <td>${c.tipo === "compromiso" ? '<span class="estado">Confirmado</span>' : "Cotización"}</td>
+          <td>${texto(c.fecha || "—")}</td>
+          <td class="numerico">${dinero(c.monto)}</td>
+          <td class="numerico">${dinero(pagadoC)}</td>
+          <td class="numerico">${dinero(Number(c.monto) - pagadoC)}</td>
+          <td><button class="peligro" data-borrar-compromiso="${texto(c.id)}">Eliminar</button></td>
+        </tr>
+      `;
+    }).join("");
+
+    $("vacioCompromisos").classList.toggle("oculto", estado.compromisos.length > 0);
+
+    const opcionesPago = estado.compromisos.filter(c => c.tipo === "compromiso");
+    $("pagoCompromiso").innerHTML =
+      '<option value="">Selecciona un compromiso confirmado</option>' +
+      opcionesPago.map(c => {
+        const p = proveedorPorId(c.proveedorId);
+        return `<option value="${texto(c.id)}">${texto(p ? p.nombre : "Proveedor")} — ${texto(c.descripcion)} (saldo ${dinero(Number(c.monto) - importePagado(c.id))})</option>`;
+      }).join("");
+
+    $("tablaPagos").innerHTML = estado.pagos.map(p => {
+      const c = compromisoPorId(p.compromisoId);
+      const prov = c ? proveedorPorId(c.proveedorId) : null;
+      return `
+        <tr>
+          <td>${texto(p.fecha)}</td>
+          <td><strong>${texto(prov ? prov.nombre : "Proveedor")}</strong><br>${texto(c ? c.descripcion : "Compromiso no disponible")}</td>
+          <td>${texto(p.tipo)}</td>
+          <td>${texto(p.metodo)}</td>
+          <td>${texto(p.referencia || "—")}</td>
+          <td class="numerico">${dinero(p.monto)}</td>
+          <td><button class="peligro" data-borrar-pago="${texto(p.id)}">Eliminar</button></td>
+        </tr>
+      `;
+    }).join("");
+
+    $("vacioPagos").classList.toggle("oculto", estado.pagos.length > 0);
+  }
+
+  $("formPresupuesto").addEventListener("submit", e => {
+    e.preventDefault();
+    const monto = Number($("presupuesto").value);
+    if (!Number.isFinite(monto) || monto < 0) {
+      alert("Captura un presupuesto válido.");
+      return;
+    }
+
+    estado.presupuesto = monto;
+    estado.evento = $("evento").value.trim() || "OXI 2026";
+    guardar();
+    renderizar();
+    $("estadoPresupuesto").textContent = "Presupuesto guardado en este navegador.";
+  });
+
+  $("formProveedor").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const proveedor = {
+      id: idNuevo("PROV"),
+      nombre: $("proveedorNombre").value.trim(),
+      categoria: $("proveedorCategoria").value,
+      contacto: $("proveedorContacto").value.trim(),
+      telefono: $("proveedorTelefono").value.trim(),
+      correo: $("proveedorCorreo").value.trim(),
+      notas: $("proveedorNotas").value.trim(),
+      creado: fechaHoy()
+    };
+
+    if (!proveedor.nombre || !proveedor.categoria) {
+      alert("Completa el nombre y la categoría del proveedor.");
+      return;
+    }
+
+    estado.proveedores.push(proveedor);
+    guardar();
+    e.target.reset();
+    renderizar();
+  });
+
+  $("formCompromiso").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const proveedorId = $("compProveedor").value;
+    const monto = Number($("compMonto").value);
+
+    if (!proveedorPorId(proveedorId)) {
+      alert("Selecciona un proveedor válido.");
+      return;
+    }
+
+    if (!Number.isFinite(monto) || monto <= 0) {
+      alert("El importe debe ser mayor que cero.");
+      return;
+    }
+
+    estado.compromisos.push({
+      id: idNuevo("COMP"),
+      proveedorId,
+      descripcion: $("compDescripcion").value.trim(),
+      tipo: $("compTipo").value,
+      monto,
+      fecha: $("compFecha").value || fechaHoy(),
+      notas: $("compNotas").value.trim(),
+      creado: fechaHoy()
+    });
+
+    guardar();
+    e.target.reset();
+    renderizar();
+  });
+
+  $("formPago").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const compromisoId = $("pagoCompromiso").value;
+    const compromiso = compromisoPorId(compromisoId);
+    const monto = Number($("pagoMonto").value);
+
+    if (!compromiso || compromiso.tipo !== "compromiso") {
+      alert("Selecciona un compromiso confirmado.");
+      return;
+    }
+
+    const saldoActual = Number(compromiso.monto) - importePagado(compromiso.id);
+
+    if (!Number.isFinite(monto) || monto <= 0) {
+      alert("El importe del pago debe ser mayor que cero.");
+      return;
+    }
+
+    if (monto > saldoActual + 0.000001) {
+      alert("El pago excede el saldo pendiente de " + dinero(saldoActual) + ".");
+      return;
+    }
+
+    estado.pagos.push({
+      id: idNuevo("PAGO"),
+      compromisoId,
+      monto,
+      fecha: $("pagoFecha").value || fechaHoy(),
+      tipo: $("pagoTipo").value,
+      metodo: $("pagoMetodo").value,
+      referencia: $("pagoReferencia").value.trim(),
+      creado: fechaHoy()
+    });
+
+    guardar();
+    e.target.reset();
+    $("pagoFecha").value = fechaHoy();
+    renderizar();
+    $("estadoPago").textContent = "Pago registrado correctamente.";
+  });
+
+  document.addEventListener("click", e => {
+    const boton = e.target.closest("button");
+    if (!boton) return;
+
+    if (boton.dataset.borrarProveedor) {
+      const id = boton.dataset.borrarProveedor;
+      const tieneMovimientos = estado.compromisos.some(c => c.proveedorId === id);
+      if (tieneMovimientos) {
+        alert("No se puede eliminar este proveedor porque tiene compromisos asociados. Conserva la trazabilidad de sus movimientos.");
+        return;
+      }
+      if (!confirm("¿Eliminar este proveedor?")) return;
+      estado.proveedores = estado.proveedores.filter(p => p.id !== id);
+      guardar();
+      renderizar();
+    }
+
+    if (boton.dataset.borrarCompromiso) {
+      const id = boton.dataset.borrarCompromiso;
+      if (estado.pagos.some(p => p.compromisoId === id)) {
+        alert("Este compromiso tiene pagos asociados. Elimina primero los pagos si necesitas corregirlo.");
+        return;
+      }
+      if (!confirm("¿Eliminar este registro?")) return;
+      estado.compromisos = estado.compromisos.filter(c => c.id !== id);
+      guardar();
+      renderizar();
+    }
+
+    if (boton.dataset.borrarPago) {
+      const id = boton.dataset.borrarPago;
+      if (!confirm("¿Eliminar este registro de pago? Verifica el comprobante antes de continuar.")) return;
+      estado.pagos = estado.pagos.filter(p => p.id !== id);
+      guardar();
+      renderizar();
+    }
+  });
+
+  $("exportar").addEventListener("click", () => {
+    const respaldo = {
+      version: 1,
+      sistema: "Comunidad Helénica - Administración Financiera",
+      exportado: new Date().toISOString(),
+      ...estado
+    };
+
+    const archivo = new Blob(
+      [JSON.stringify(respaldo, null, 2)],
+      { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(archivo);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "respaldo-finanzas-oxi-2026.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  $("importar").addEventListener("click", () => $("archivoImportar").click());
+
+  $("archivoImportar").addEventListener("change", async e => {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+
+    try {
+      const datos = JSON.parse(await archivo.text());
+
+      if (!datos || !Array.isArray(datos.proveedores) ||
+          !Array.isArray(datos.compromisos) || !Array.isArray(datos.pagos) ||
+          !Number.isFinite(Number(datos.presupuesto)) ||
+          Number(datos.presupuesto) < 0) {
+        throw new Error("Formato de respaldo no válido.");
+      }
+
+      const idsProv = new Set(datos.proveedores.map(p => p.id));
+      const idsComp = new Set(datos.compromisos.map(c => c.id));
+
+      if (idsProv.size !== datos.proveedores.length ||
+          idsComp.size !== datos.compromisos.length) {
+        throw new Error("El archivo contiene identificadores duplicados.");
+      }
+
+      for (const p of datos.proveedores) {
+        if (!p.id || !p.nombre || !p.categoria) {
+          throw new Error("Hay un proveedor incompleto.");
+        }
+      }
+
+      for (const c of datos.compromisos) {
+        if (!c.id || !idsProv.has(c.proveedorId) ||
+            !Number.isFinite(Number(c.monto)) || Number(c.monto) <= 0 ||
+            !["cotizacion", "compromiso"].includes(c.tipo)) {
+          throw new Error("Hay un compromiso inválido o sin proveedor.");
+        }
+      }
+
+      for (const p of datos.pagos) {
+        const c = datos.compromisos.find(x => x.id === p.compromisoId);
+        if (!p.id || !c || c.tipo !== "compromiso" ||
+            !Number.isFinite(Number(p.monto)) || Number(p.monto) <= 0) {
+          throw new Error("Hay un pago inválido o sin compromiso confirmado.");
+        }
+      }
+
+      for (const c of datos.compromisos) {
+        const total = datos.pagos
+          .filter(p => p.compromisoId === c.id)
+          .reduce((s, p) => s + Number(p.monto), 0);
+        if (total > Number(c.monto) + 0.000001) {
+          throw new Error("Los pagos exceden el importe de un compromiso.");
+        }
+      }
+
+      if (!confirm("Importar reemplazará los datos actuales de este módulo. Exporta un respaldo primero. ¿Deseas continuar?")) return;
+
+      estado.evento = typeof datos.evento === "string" ? datos.evento : "OXI 2026";
+      estado.presupuesto = Number(datos.presupuesto);
+      estado.proveedores = datos.proveedores;
+      estado.compromisos = datos.compromisos;
+      estado.pagos = datos.pagos;
+
+      if (guardar()) {
+        renderizar();
+        alert("Respaldo importado correctamente.");
+      }
+    } catch (error) {
+      alert("No se pudo importar el archivo: " + error.message);
+    } finally {
+      e.target.value = "";
+    }
+  });
+
+  $("compFecha").value = fechaHoy();
+  $("pagoFecha").value = fechaHoy();
+
+  cargar();
+  renderizar();
+})();
+</script>
+</body>
+</html>
