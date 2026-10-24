@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -73,58 +72,48 @@
       gap: 20px;
     }
 
-   
-.logo-comunidad {
-  width: 124px;
-  height: 124px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
-  background: #ffffff;
-  border: 1px solid rgba(218, 185, 120, 0.9);
-  border-radius: 18px;
+    .logo-comunidad {
+      width: 124px;
+      height: 124px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid rgba(218, 185, 120, 0.9);
+      border-radius: 18px;
+      box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.28),
+        0 0 0 3px rgba(218, 185, 120, 0.16),
+        0 0 18px rgba(218, 185, 120, 0.22);
+      overflow: hidden;
+    }
 
-  /* Sombra exterior y resplandor dorado */
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.28),
-    0 0 0 3px rgba(218, 185, 120, 0.16),
-    0 0 18px rgba(218, 185, 120, 0.22);
+    .logo-comunidad img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
 
-  overflow: hidden;
-}
+    .titulo-comunidad {
+      margin: 0;
+      color: #ffffff;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: 0.3px;
+    }
 
-.logo-comunidad img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+    .fundacion {
+      margin: 8px 0 0;
+      color: #e9d7a9;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
 
-
-.logo-comunidad img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.titulo-comunidad {
-  margin: 0;
-  color: #ffffff;
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: 0.3px;
-}
-.fundacion {
-  margin: 8px 0 0;
-  color: #e9d7a9;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-    
     .emblema {
       width: 76px;
       height: 76px;
@@ -139,13 +128,13 @@
     }
 
     .sobrelinea {
-  margin: 0;
-  color: #ffffff;
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: 0.3px;
-}
+      margin: 0;
+      color: #ffffff;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: 0.3px;
+    }
 
     h1 {
       margin: 0;
@@ -172,6 +161,59 @@
       color: #ffffff;
       background: rgba(255,255,255,0.08);
       font-size: 13px;
+    }
+
+    /* Acceso discreto a reservaciones en el encabezado */
+    .encabezado-derecha {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .acceso-reservaciones {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      padding: 9px 12px;
+      color: #ffffff;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.32);
+      border-radius: 24px;
+      background: rgba(255,255,255,0.06);
+      font-size: 13px;
+      font-weight: 600;
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .acceso-reservaciones svg {
+      display: block;
+      width: 19px;
+      height: 19px;
+      flex-shrink: 0;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .acceso-reservaciones:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(233,215,169,0.9);
+      transform: translateY(-1px);
+    }
+
+    .acceso-reservaciones:focus-visible {
+      outline: 2px solid #e9d7a9;
+      outline-offset: 4px;
     }
 
     main {
@@ -376,29 +418,47 @@
         padding: 27px 16px 40px;
       }
 
+      .encabezado-derecha {
+        gap: 10px;
+      }
+
       .identidad {
         align-items: flex-start;
         gap: 13px;
+        min-width: 0;
       }
 
       .logo-comunidad {
-  width: 70px;
-  height: 70px;
-  padding: 5px;
-}
-
-      
-.titulo-comunidad {
-  font-size: 23px;
-}
-
-.fundacion {
-  font-size: 10px;
-}
+        width: 70px;
+        height: 70px;
+        padding: 5px;
+      }
 
       .sobrelinea {
+        font-size: clamp(17px, 4.5vw, 23px);
+        overflow-wrap: anywhere;
+      }
+
+      .fundacion {
         font-size: 10px;
-        letter-spacing: 1.2px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .acceso-reservaciones {
+        gap: 0;
+        padding: 9px;
+      }
+
+      .acceso-reservaciones span {
+        display: none;
+      }
+
+      .acceso-reservaciones svg {
+        width: 21px;
+        height: 21px;
       }
 
       .subtitulo {
@@ -415,8 +475,16 @@
       }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      .acceso-reservaciones,
+      .modulo {
+        transition: none;
+      }
+    }
+
     @media print {
-      .accion {
+      .accion,
+      .acceso-reservaciones {
         display: none;
       }
 
@@ -437,30 +505,53 @@
 
   <header>
     <div class="contenedor">
-      <div class="identidad">
-        <div class="logo-comunidad">
-  <img
-    src="./images/Logo%20COMHELMEX.jpg"
-    alt="Logotipo oficial de la Comunidad Helénica de México, A.C."
-  >
-</div>
+      <div class="encabezado-derecha">
 
-        <div>
-          <p class="sobrelinea">
-            Comunidad Helénica de México, A.C.
-          </p>
+        <div class="identidad">
+          <div class="logo-comunidad">
+            <img
+              src="./images/Logo%20COMHELMEX.jpg"
+              alt="Logotipo oficial de la Comunidad Helénica de México, A.C."
+            >
+          </div>
 
-          <p class="fundacion">
-            Fundada el 13 de marzo de 1956
-          </p>
+          <div>
+            <p class="sobrelinea">
+              Comunidad Helénica de México, A.C.
+            </p>
 
-          <h1>Portal Administrativo</h1>
+            <p class="fundacion">
+              Fundada el 13 de marzo de 1956
+            </p>
 
-          <p class="subtitulo">
-            Un espacio centralizado para administrar eventos,
-            reservaciones, proveedores y recursos de nuestra comunidad.
-          </p>
+            <h1>Portal Administrativo</h1>
+
+            <p class="subtitulo">
+              Un espacio centralizado para administrar eventos,
+              reservaciones, proveedores y recursos de nuestra comunidad.
+            </p>
+          </div>
         </div>
+
+        <!-- Acceso discreto a reservaciones desde el encabezado -->
+        <a
+          class="acceso-reservaciones"
+          href="./reservaciones/index.html"
+          aria-label="Ir al módulo de reservaciones"
+          title="Reservaciones OXI 2026"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <rect x="3" y="4" width="18" height="17" rx="2"></rect>
+            <path d="M16 2v4M8 2v4M3 9h18"></path>
+            <path d="M8 13h3M8 17h2"></path>
+          </svg>
+          <span>Reservaciones</span>
+        </a>
+
       </div>
 
       <div class="etiqueta-evento">
