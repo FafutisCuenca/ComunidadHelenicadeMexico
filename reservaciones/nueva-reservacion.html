@@ -737,9 +737,19 @@ $("calcular").addEventListener("click", () => {
     if (!tarjetas.length) throw new Error("Agrega al menos un asistente.");
 
     for (const tarjeta of tarjetas) {
-      const nombre = tarjeta.querySelector('[data-campo="nombre"]');
-      const edad = tarjeta.querySelector('[data-campo="edad"]');
-      if (!nombre.reportValidity() || !edad.reportValidity()) return;
+     const nombre = tarjeta.querySelector('[data-campo="nombre"]');
+const tipoAsistente = tarjeta.querySelector(
+  '[data-campo="tipo_asistente"]'
+);
+
+if (
+  !nombre ||
+  !tipoAsistente ||
+  !nombre.reportValidity() ||
+  !tipoAsistente.reportValidity()
+) {
+  return;
+}
     }
 
     registroCalculado = crearRegistro();
