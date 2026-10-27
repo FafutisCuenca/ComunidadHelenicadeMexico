@@ -72,13 +72,15 @@ textarea:focus-visible {
 
 /* Encabezado institucional */
 
+
 .topbar {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 28px max(24px, calc((100% - 1250px) / 2));
+  min-height: 180px;
+  padding: 38px max(24px, calc((100% - 1250px) / 2));
   color: var(--blanco);
   background:
     radial-gradient(
