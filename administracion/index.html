@@ -4,9 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#173c35">
+  <meta name="theme-color" content="#12345a">
 
-  <title>Personas y Socios | Comunidad Helénica de México</title>
+  <meta
+    name="description"
+    content="Módulo local de administración de Personas y Socios de la Comunidad Helénica de México, A.C."
+  >
+
+  <title>Personas y Socios | Comunidad Helénica de México, A.C.</title>
 
   <link rel="stylesheet" href="./css/estilos.css">
   <script src="./js/app.js" defer></script>
@@ -16,14 +21,16 @@
   <header class="topbar">
     <div class="brand">
       <div class="brand-mark">
-  <img
-    src="../images/Logo%20COMHELMEX.jpg"
-    alt="Logotipo oficial de la Comunidad Helénica de México, A.C."
-  >
-</div>
-      <div>
+        <img
+          src="../images/Logo%20COMHELMEX.jpg"
+          alt="Logotipo oficial de la Comunidad Helénica de México, A.C."
+        >
+      </div>
+
+      <div class="brand-copy">
         <p class="eyebrow">Comunidad Helénica de México, A.C.</p>
         <h1>Personas y Socios</h1>
+        <p class="brand-subtitle">Fundada el 13 de marzo de 1956</p>
       </div>
     </div>
 
@@ -34,16 +41,19 @@
 
   <main class="page">
 
-    <section class="notice">
+    <!-- Aviso de privacidad operativa y funcionamiento local -->
+    <section class="notice" aria-label="Información del módulo">
       <strong>Modo local</strong>
       <span>
         Importa un archivo JSON desde tu computadora y exporta
-        los cambios cuando termines. Este módulo es independiente
-        de las reservaciones del OXI.
+        los cambios al terminar. Los datos se mantienen en memoria
+        durante la sesión. Este módulo es independiente de las
+        reservaciones del OXI.
       </span>
     </section>
 
-    <section class="stats">
+    <!-- Indicadores generales -->
+    <section class="stats" aria-label="Resumen de registros">
       <article class="stat-card">
         <span>Registros cargados</span>
         <strong id="totalRegistros">0</strong>
@@ -60,11 +70,12 @@
       </article>
     </section>
 
-    <section class="panel">
+    <!-- Directorio y herramientas -->
+    <section class="panel" aria-labelledby="tituloDirectorio">
       <div class="panel-heading">
         <div>
           <p class="eyebrow">Directorio institucional</p>
-          <h2>Buscar y consultar personas</h2>
+          <h2 id="tituloDirectorio">Buscar y consultar personas</h2>
         </div>
 
         <button
@@ -82,12 +93,14 @@
             id="buscar"
             type="search"
             placeholder="Buscar por nombre, folio, correo o categoría..."
-            autocomplete="off">
+            autocomplete="off"
+            aria-label="Buscar personas"
+          >
         </label>
 
         <label class="filter-field">
           <span class="sr-only">Filtrar por estatus</span>
-          <select id="filtroEstatus">
+          <select id="filtroEstatus" aria-label="Filtrar por estatus">
             <option value="">Todos los estatus</option>
             <option value="Vigente">Vigente</option>
             <option value="Inactivo">Inactivo</option>
@@ -114,19 +127,21 @@
           id="archivoJson"
           type="file"
           accept=".json,application/json"
-          hidden>
+          hidden
+          aria-label="Seleccionar archivo JSON"
+        >
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Folio</th>
-              <th>Nombre completo</th>
-              <th>Categoría</th>
-              <th>Estatus</th>
-              <th>Contacto</th>
-              <th>Acciones</th>
+              <th scope="col">Nombre / Folio</th>
+              <th scope="col">Tipo de registro</th>
+              <th scope="col">Categoría / Subcategoría</th>
+              <th scope="col">Estatus</th>
+              <th scope="col">Contacto</th>
+              <th scope="col">Acciones</th>
             </tr>
           </thead>
 
@@ -141,13 +156,21 @@
         </table>
       </div>
 
-      <p class="table-foot" id="resultadoBusqueda">
+      <p
+        class="table-foot"
+        id="resultadoBusqueda"
+        aria-live="polite">
         0 registros
       </p>
     </section>
 
     <!-- Formulario de alta y edición -->
-    <section class="panel form-panel" id="formPanel" hidden>
+    <section
+      class="panel form-panel"
+      id="formPanel"
+      aria-labelledby="formTitulo"
+      hidden>
+
       <div class="panel-heading">
         <div>
           <p class="eyebrow" id="formEyebrow">Nuevo registro</p>
@@ -169,17 +192,31 @@
         <div class="form-grid">
           <label>
             Nombre(s) *
-            <input id="nombres" required maxlength="100">
+            <input
+              id="nombres"
+              name="nombres"
+              type="text"
+              required
+              maxlength="100"
+              autocomplete="given-name"
+            >
           </label>
 
           <label>
             Apellidos *
-            <input id="apellidos" required maxlength="120">
+            <input
+              id="apellidos"
+              name="apellidos"
+              type="text"
+              required
+              maxlength="120"
+              autocomplete="family-name"
+            >
           </label>
 
           <label>
             Tipo de registro *
-            <select id="tipoRegistro" required>
+            <select id="tipoRegistro" name="tipoRegistro" required>
               <option value="Socio">Socio</option>
               <option value="Persona relacionada">Persona relacionada</option>
               <option value="Participante externo">Participante externo</option>
@@ -187,25 +224,31 @@
           </label>
 
           <label>
-  Categoría *
-  <select id="categoria" required>
-    <option value="">Selecciona una categoría</option>
-    <option value="Socio">Socio</option>
-    <option value="Amistad">Amistad</option>
-    <option value="Otra categoría">Otra categoría</option>
-  </select>
-</label>
+            Categoría *
+            <select id="categoria" name="categoria" required>
+              <option value="">Selecciona una categoría</option>
+              <option value="Socio">Socio</option>
+              <option value="Amistad">Amistad</option>
+              <option value="Otra categoría">Otra categoría</option>
+            </select>
+          </label>
 
-<label>
-  Subcategoría *
-  <select id="subcategoria" required>
-    <option value="">Selecciona una subcategoría</option>
-  </select>
-</label>
+          <label>
+            Subcategoría
+            <select
+              id="subcategoria"
+              name="subcategoria"
+              aria-describedby="ayudaSubcategoria">
+              <option value="">Selecciona una subcategoría</option>
+            </select>
+            <span class="field-hint" id="ayudaSubcategoria">
+              Socio: Numerario u Honorario. Amistad: Filoheleno.
+            </span>
+          </label>
 
           <label>
             Estatus del registro *
-            <select id="estatus" required>
+            <select id="estatus" name="estatus" required>
               <option value="Por revisar">Por revisar</option>
               <option value="Vigente">Vigente</option>
               <option value="Inactivo">Inactivo</option>
@@ -215,31 +258,55 @@
 
           <label>
             Fecha de ingreso
-            <input id="fechaIngreso" type="date">
+            <input
+              id="fechaIngreso"
+              name="fechaIngreso"
+              type="date"
+            >
           </label>
 
           <label>
             Correo electrónico
-            <input id="correo" type="email" maxlength="160">
+            <input
+              id="correo"
+              name="correo"
+              type="email"
+              maxlength="160"
+              autocomplete="email"
+            >
           </label>
 
           <label>
             Teléfono / celular
-            <input id="telefono" type="tel" maxlength="40">
+            <input
+              id="telefono"
+              name="telefono"
+              type="tel"
+              maxlength="40"
+              autocomplete="tel"
+            >
           </label>
 
           <label class="full-width">
             Domicilio
-            <input id="domicilio" maxlength="240">
+            <input
+              id="domicilio"
+              name="domicilio"
+              type="text"
+              maxlength="240"
+              autocomplete="street-address"
+            >
           </label>
 
           <label class="full-width">
             Notas administrativas
             <textarea
               id="notas"
+              name="notas"
               rows="3"
               maxlength="1000"
-              placeholder="Solo información confirmada."></textarea>
+              placeholder="Solo información confirmada."
+            ></textarea>
           </label>
         </div>
 
@@ -256,20 +323,27 @@
             Cancelar
           </button>
 
-          <button class="button button-primary" type="submit">
+          <button
+            class="button button-primary"
+            type="submit">
             Guardar registro
           </button>
         </div>
 
         <p class="save-warning">
-          Los cambios permanecen en la sesión hasta exportar
-          el JSON actualizado. Guarda el archivo en tu carpeta privada.
+          Los cambios permanecen en memoria durante la sesión hasta
+          exportar el JSON actualizado. Guarda el archivo en una
+          ubicación privada y segura.
         </p>
       </form>
     </section>
 
     <!-- Consulta detallada -->
-    <dialog id="detalleDialog" class="detail-dialog">
+    <dialog
+      id="detalleDialog"
+      class="detail-dialog"
+      aria-labelledby="detalleNombre">
+
       <div class="panel-heading">
         <div>
           <p class="eyebrow">Ficha de persona</p>
@@ -304,6 +378,7 @@
       </div>
     </dialog>
 
+    <!-- Mensajes de operación -->
     <div
       id="mensaje"
       class="toast"
@@ -316,7 +391,8 @@
 
   <footer>
     <span>Comunidad Helénica de México, A.C.</span>
-    <span>Personas y Socios · Versión 0.1.0</span>
+    <span>Fundada el 13 de marzo de 1956</span>
+    <span>Personas y Socios · Versión 0.2.0</span>
   </footer>
 </body>
 </html>
