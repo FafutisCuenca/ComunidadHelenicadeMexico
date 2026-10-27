@@ -1,8 +1,22 @@
 
 {
-  "version_configuracion": 2,
+  "version_configuracion": 3,
   "evento_id": "OXI-2026",
   "moneda": "MXN",
+  "categorias_asistente": {
+    "adulto": {
+      "nombre": "Adulto",
+      "edad_minima": 9,
+      "edad_maxima": null,
+      "tarifa_id": "adulto"
+    },
+    "menor": {
+      "nombre": "Menor",
+      "edad_minima": 3,
+      "edad_maxima": 8,
+      "tarifa_id": "nino_3_a_8"
+    }
+  },
   "tarifas": {
     "adulto": {
       "importe": 700,
@@ -21,7 +35,8 @@
       "tipo": "porcentaje",
       "valor": 50,
       "aplicable_a": ["adulto"],
-      "requiere_autorizacion": true
+      "requiere_autorizacion": true,
+      "requiere_motivo": true
     },
     {
       "id": "EGEO_50",
@@ -29,7 +44,8 @@
       "tipo": "porcentaje",
       "valor": 50,
       "aplicable_a": ["adulto"],
-      "requiere_autorizacion": true
+      "requiere_autorizacion": true,
+      "requiere_motivo": true
     },
     {
       "id": "CORTESIA",
