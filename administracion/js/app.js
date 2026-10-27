@@ -215,6 +215,138 @@ function prepararNavegacionModulos() {
 }
 
 
+/* =========================================================
+   NAVEGACIÓN ENTRE MÓDULOS
+   ========================================================= */
+
+function prepararNavegacionModulos() {
+  const navegacion = document.querySelector(".module-navigation");
+
+  if (!navegacion) return;
+
+  const enlaces = Array.from(
+    navegacion.querySelectorAll(".module-link")
+  );
+
+  const secciones = Array.from(
+    document.querySelectorAll(".module-section")
+  );
+
+  function mostrarModulo(id, actualizarHistorial = false) {
+    const seccionActiva = secciones.find(
+      (seccion) => seccion.id === id
+    );
+
+    if (!seccionActiva) return;
+
+    secciones.forEach((seccion) => {
+      const activa = seccion === seccionActiva;
+
+      seccion.classList.toggle("is-hidden", !activa);
+      seccion.setAttribute("aria-hidden", String(!activa));
+    });
+
+    enlaces.forEach((enlace) => {
+      const activa = enlace.getAttribute("href") === `#${id}`;
+
+      enlace.classList.toggle("active", activa);
+
+      if (activa) {
+        enlace.setAttribute("aria-current", "page");
+      } else {
+        enlace.removeAttribute("aria-current");
+      }
+    });
+
+    const enlaceActivo = enlaces.find(
+      (enlace) => enlace.getAttribute("href") === `#${id}`
+    );
+
+    const textoActivo = document.getElementById("moduloActivoTexto");
+
+    if (textoActivo && enlaceActivo) {
+      textoActivo.textContent = enlaceActivo.textContent.trim();
+    }
+
+    if (actualizarHistorial) {
+      history.pushState(null, "", `#${id}`);
+    }
+  }
+
+  navegacion.addEventListener("click", (evento) => {
+    const enlace = evento.target.closest(".module-link");
+
+    if (!enlace || !navegacion.contains(enlace)) return;
+
+    const destino = enlace.getAttribute("href");
+
+    if (!destino || !destino.startsWith("#")) return;
+
+    const id = destino.slice(1);
+
+    if (!secciones.some((seccion) => seccion.id === id)) return;
+
+    evento.preventDefault();
+    mostrarModulo(id, true);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  });
+
+  // Permite usar los botones Atrás y Adelante del navegador.
+  window.addEventListener("popstate", () => {
+    const id = window.location.hash.slice(1);
+
+    mostrarModulo(
+      secciones.some((seccion) => seccion.id === id)
+        ? id
+        : "directorio"
+    );
+  });
+
+  // Abre directamente el módulo indicado en la dirección.
+  const idInicial = window.location.hash.slice(1);
+
+  mostrarModulo(
+    secciones.some((seccion) => seccion.id === idInicial)
+      ? idInicial
+      : "directorio"
+  );
+}
+
+/* =========================================================
+   BOTÓN VOLVER ARRIBA
+   ========================================================= */
+
+function prepararBotonVolverArriba() {
+  const boton = $("btnVolverArriba");
+
+  if (!boton) return;
+
+  function actualizarVisibilidad() {
+    const mostrar = window.scrollY > 350;
+
+    boton.hidden = !mostrar;
+    boton.classList.toggle("is-visible", mostrar);
+  }
+
+  boton.addEventListener("click", () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  });
+
+  window.addEventListener("scroll", actualizarVisibilidad, {
+    passive: true
+  });
+
+  actualizarVisibilidad();
+}
+
+
 function conectarEventos() {
   /* Directorio */
 
@@ -249,7 +381,18 @@ function conectarEventos() {
       cerrarDetalle();
     }
   });
+  
+$("btnImportarPadronInicial")?.addEventListener(
+  "click",
+  abrirSelectorArchivo
+);
 
+$("btnCrearPadronInicial")?.addEventListener(
+  "click",
+  abrirFormularioNuevo
+);
+
+  
   /* Configuración de cuotas */
 
   $("cuotaForm")?.addEventListener("submit", guardarCuotaAnual);
@@ -560,6 +703,58 @@ function mostrarMensaje(texto, tipo = "aviso") {
   }
 }
 
+
+/* =========================================================
+   ESTADO DE CARGA DEL PADRÓN
+   ========================================================= */
+
+function actualizarEstadoPadron() {
+  const panel = $("estadoCargaPadron");
+  const titulo = $("estadoCargaTitulo");
+  const texto = $("estadoCargaTexto");
+
+  if (!panel || !titulo || !texto) return;
+
+  panel.classList.remove("status-loaded", "status-pending");
+
+  if (!padronCargado) {
+    panel.classList.add("status-pending");
+
+    titulo.textContent = "Padrón pendiente de cargar";
+
+    texto.textContent =
+      "Importa tu archivo JSON para recuperar los registros existentes " +
+      "o inicia un padrón nuevo. Los cambios deberán exportarse a JSON " +
+      "para conservarse después de cerrar la sesión.";
+
+    return;
+  }
+
+  if (padronPendienteExportar) {
+    panel.classList.add("status-pending");
+
+    titulo.textContent = "Cambios pendientes de exportar";
+
+    texto.textContent =
+      `Hay ${personas.length} registro(s) en memoria. ` +
+      "Exporta el padrón JSON para conservar las modificaciones " +
+      "en tu computadora.";
+
+    return;
+  }
+
+  panel.classList.add("status-loaded");
+
+  titulo.textContent = "Padrón cargado";
+
+  texto.textContent = personas.length === 0
+    ? "El padrón está cargado, pero no contiene registros. " +
+      "Puedes comenzar a registrar personas."
+    : `Se encuentran disponibles ${personas.length} registro(s). ` +
+      "Puedes consultar, buscar o editar la información.";
+}
+
+
 /* =========================================================
    INDICADORES Y TABLA DEL DIRECTORIO
    ========================================================= */
@@ -567,6 +762,7 @@ function mostrarMensaje(texto, tipo = "aviso") {
 function renderizarTodo() {
   renderizarIndicadores();
   renderizarTabla();
+  actualizarEstadoPadron();
 }
 
 function renderizarIndicadores() {
@@ -888,6 +1084,9 @@ function guardarPersona(evento) {
     );
   }
 
+  padronCargado = true;
+  padronPendienteExportar = true;
+
   cerrarFormulario();
   renderizarTodo();
 }
@@ -1051,6 +1250,9 @@ async function importarJSON(evento) {
 
     personas = normalizadas;
 
+    padronCargado = true;
+padronPendienteExportar = false;
+
     cerrarFormulario();
     cerrarDetalle();
     renderizarTodo();
@@ -1088,6 +1290,11 @@ function exportarJSON() {
     documento,
     `personas-socios-${fechaLocalISO()}.json`
   );
+
+    padronCargado = true;
+  padronPendienteExportar = false;
+
+  actualizarEstadoPadron();
 
   mostrarMensaje(
     "Se generó la descarga del padrón. Verifica que el archivo quedó guardado en tu ubicación privada.",
