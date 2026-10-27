@@ -806,7 +806,7 @@ for (const r of doc.reservaciones) {
 
 function construirPadron() {
   padron = reservaciones.map(r => ({
-    id: String(r.id),
+    id: idReservacion(r),
     referencia: referencia(r),
     nombre: nombreGrupo(r),
     tipo: tipoReservacion(r),
@@ -1068,7 +1068,7 @@ function renderizarSinMesa() {
     <td class="num">${totalAsientos(r)}</td>
     <td>${celdaPago(r)}</td>
     <td class="acciones-celda no-imprimir">
-      <button class="secundario btn-editar-reservacion" type="button" data-id="${escapar(String(r.id))}">Editar / asignar mesa</button>
+      <button class="secundario btn-editar-reservacion" type="button" data-id="${escapar(idReservacion(r))}">Editar / asignar mesa</button>
     </td>
   </tr>`).join("");
 }
@@ -1131,15 +1131,16 @@ function valorCampoNumerico(id, nombre) {
 }
 
 function iniciarEdicion(id) {
-  const r = reservaciones.find(x => String(x.id) === String(id));
+ const r = reservaciones.find(x => idReservacion(x) === String(id));
   if (!r) {
     mostrarEstado("No se encontró la reservación que intentas editar.", "error");
     return;
   }
 
   actualizarSelectorMesa();
-  $("editId").value = String(r.id);
-  $("editReferenciaTexto").textContent = `Referencia: ${referencia(r)} · ID: ${r.id}`;
+$("editId").value = idReservacion(r);
+$("editReferenciaTexto").textContent =
+  `Referencia: ${referencia(r)} · ID: ${idReservacion(r)}`;
   $("editNombre").value = nombreGrupo(r) === "Sin nombre registrado" ? "" : nombreGrupo(r);
   $("editTipo").value = tipoReservacion(r);
   const m = mesaNumero(r);
@@ -1170,7 +1171,9 @@ function guardarEdicion(evento) {
   evento.preventDefault();
 
   const id = $("editId").value;
-  const indice = reservaciones.findIndex(r => String(r.id) === String(id));
+const indice = reservaciones.findIndex(
+  r => idReservacion(r) === String(id)
+);
   if (indice < 0) {
     mostrarEstado("No se encontró la reservación para guardar.", "error");
     return;
@@ -1387,7 +1390,7 @@ function crearReporteAlfabetico() {
       <td>${escapar(m !== null && m >= 1 ? String(m) : "Sin mesa")}</td>
       <td>${escapar(estadoCobro(r))}</td>
       <td>${dinero(saldoPendiente(r))}</td>
-      <td>${escapar(String(r.id))}</td>
+      <td>${escapar(idReservacion(r))}</td>
     </tr>`;
   }).join("");
 
