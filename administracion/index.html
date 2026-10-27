@@ -706,6 +706,340 @@
 
     </section>
 
+    <!-- Módulo 03: Histórico de pagos -->
+<section id="historicoPagosPanel" class="module-section">
+
+  <div class="section-heading">
+    <div>
+      <p class="section-eyebrow">Módulo 03</p>
+      <h2>Histórico de pagos de socios</h2>
+      <p class="section-description">
+        Control de cuotas asignadas, pagos parciales, liquidaciones
+        y saldos por ejercicio.
+      </p>
+    </div>
+  </div>
+
+  <section class="notice">
+    <div class="notice-icon" aria-hidden="true">i</div>
+    <div>
+      <h3>Control histórico</h3>
+      <p>
+        Cada cuota individual debe registrarse expresamente.
+        Los cambios posteriores a la cuota general no modificarán
+        los importes históricos ya asignados. Los pagos cancelados
+        no se suman al total pagado.
+      </p>
+    </div>
+  </section>
+
+  <!-- Registro de cuota y pago -->
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h3>Registrar cuota o pago</h3>
+        <p>
+          Selecciona un socio y un ejercicio. Puedes asignar la cuota
+          y registrar pagos en una o varias exhibiciones.
+        </p>
+      </div>
+    </div>
+
+    <form id="formMovimientoPago">
+
+      <div class="form-grid">
+
+        <div class="form-field">
+          <label for="pagoPersonaId">Socio *</label>
+          <select id="pagoPersonaId" required>
+            <option value="">Selecciona un socio</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="pagoAnio">Ejercicio *</label>
+          <input
+            type="number"
+            id="pagoAnio"
+            min="2000"
+            max="2100"
+            step="1"
+            required
+            placeholder="Ej. 2026"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="pagoCuotaMonto">Cuota individual asignada (MXN) *</label>
+          <input
+            type="number"
+            id="pagoCuotaMonto"
+            min="0.01"
+            max="10000000"
+            step="0.01"
+            required
+            placeholder="Importe aprobado para el socio"
+          >
+          <p class="field-help">
+            Se propone la cuota general del ejercicio, si existe.
+            Confirma el importe antes de asignarlo.
+          </p>
+        </div>
+
+        <div class="form-field">
+          <label for="pagoFecha">Fecha del pago</label>
+          <input type="date" id="pagoFecha">
+        </div>
+
+        <div class="form-field">
+          <label for="pagoImporte">Importe del pago (MXN)</label>
+          <input
+            type="number"
+            id="pagoImporte"
+            min="0.01"
+            max="10000000"
+            step="0.01"
+            placeholder="Importe recibido"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="pagoForma">Forma de pago</label>
+          <select id="pagoForma">
+            <option value="">No especificada</option>
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia">Transferencia</option>
+            <option value="Depósito">Depósito</option>
+            <option value="Cheque">Cheque</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="pagoReferencia">Referencia</label>
+          <input
+            type="text"
+            id="pagoReferencia"
+            maxlength="120"
+            placeholder="Folio o referencia bancaria"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="pagoObservaciones">Observaciones</label>
+          <input
+            type="text"
+            id="pagoObservaciones"
+            maxlength="500"
+            placeholder="Nota administrativa"
+          >
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          id="btnAsignarCuotaSocio"
+        >
+          Asignar o actualizar cuota
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="btnRegistrarPago"
+        >
+          Registrar pago
+        </button>
+      </div>
+
+    </form>
+  </section>
+
+  <!-- Consultas -->
+  <section class="panel">
+
+    <div class="panel-header">
+      <div>
+        <h3>Consulta de cuotas y saldos</h3>
+        <p>
+          Consulta un ejercicio específico o el historial acumulado
+          de los ejercicios registrados.
+        </p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+
+      <div class="toolbar-filter">
+        <label for="pagosVista">Tipo de consulta</label>
+        <select id="pagosVista">
+          <option value="anio">Por ejercicio anual</option>
+          <option value="general">Histórico general</option>
+        </select>
+      </div>
+
+      <div class="toolbar-filter" id="filtroAnioPagos">
+        <label for="pagosAnioConsulta">Ejercicio</label>
+        <input
+          type="number"
+          id="pagosAnioConsulta"
+          min="2000"
+          max="2100"
+          step="1"
+          placeholder="Ej. 2026"
+        >
+      </div>
+
+      <div class="toolbar-search">
+        <label for="buscarSocioPagos">Buscar socio</label>
+        <input
+          type="search"
+          id="buscarSocioPagos"
+          placeholder="Nombre o apellidos"
+        >
+      </div>
+
+    </div>
+
+    <div class="stats-grid" aria-label="Resumen de pagos">
+
+      <article class="stat-card">
+        <div class="stat-label">Cuotas asignadas</div>
+        <div class="stat-value" id="pagosTotalCuotas">$0.00</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">Total pagado</div>
+        <div class="stat-value" id="pagosTotalPagado">$0.00</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">Saldo pendiente</div>
+        <div class="stat-value" id="pagosTotalSaldo">$0.00</div>
+      </article>
+
+      <article class="stat-card">
+        <div class="stat-label">Socios con registro</div>
+        <div class="stat-value" id="pagosTotalSocios">0</div>
+      </article>
+
+    </div>
+
+    <div
+      id="resultadoHistoricoPagos"
+      class="table-summary"
+      aria-live="polite"
+    >
+      Sin información de pagos cargada.
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead id="encabezadoHistoricoPagos"></thead>
+        <tbody id="tablaHistoricoPagos">
+          <tr>
+            <td class="empty-state">
+              No hay cuotas individuales registradas.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- Movimientos registrados -->
+  <section class="panel">
+
+    <div class="panel-header">
+      <div>
+        <h3>Movimientos de pago</h3>
+        <p>
+          Detalle de los pagos y abonos registrados.
+          Los movimientos cancelados se conservan para consulta.
+        </p>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Socio</th>
+            <th>Ejercicio</th>
+            <th>Importe</th>
+            <th>Forma de pago</th>
+            <th>Referencia / observaciones</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody id="tablaMovimientosPagos">
+          <tr>
+            <td colspan="8" class="empty-state">
+              No hay movimientos registrados.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <!-- Respaldo del histórico -->
+  <section class="panel">
+
+    <div class="panel-header">
+      <div>
+        <h3>Respaldo de cuotas individuales y pagos</h3>
+        <p>
+          Conserva una copia privada independiente del padrón
+          y de la configuración general de cuotas.
+        </p>
+      </div>
+    </div>
+
+    <div class="toolbar-actions backup-actions">
+
+      <button
+        type="button"
+        class="btn btn-secondary"
+        id="btnImportarPagos"
+      >
+        Importar histórico JSON
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-secondary"
+        id="btnExportarPagos"
+      >
+        Exportar histórico JSON
+      </button>
+
+      <input
+        type="file"
+        id="archivoPagosJson"
+        accept=".json,application/json"
+        hidden
+      >
+
+    </div>
+
+    <p class="field-help">
+      Guarda el archivo exportado en una carpeta privada y conserva
+      respaldos anteriores. No lo subas al repositorio público.
+    </p>
+
+  </section>
+
+</section>
+    
     <!-- Ficha de detalle de una persona -->
     <dialog
       id="detalleDialog"
