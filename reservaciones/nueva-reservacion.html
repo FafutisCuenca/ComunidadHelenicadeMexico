@@ -12,41 +12,68 @@
       --fondo:#f5f7f8; --texto:#263238; --rojo:#a32929;
     }
     * { box-sizing:border-box }
-    body { margin:0; background:var(--fondo); color:var(--texto);
-      font:16px/1.5 Arial,sans-serif }
+    body {
+      margin:0; background:var(--fondo); color:var(--texto);
+      font:16px/1.5 Arial,sans-serif
+    }
     header { background:var(--verde); color:white; padding:22px 18px }
     header div, main { max-width:1100px; margin:auto }
     main { padding:22px 16px 40px }
     h1 { margin:0 0 5px; font-size:25px }
     h2 { color:var(--verde); font-size:20px; margin:0 0 16px }
     h3 { margin:0; font-size:17px }
-    .panel,.aviso { background:white; border:1px solid var(--borde);
-      border-radius:9px; padding:16px; margin-bottom:20px }
+    .panel,.aviso {
+      background:white; border:1px solid var(--borde);
+      border-radius:9px; padding:16px; margin-bottom:20px
+    }
     .aviso { background:#fff8df; border-color:#ead58d }
-    .paso { display:inline-block; background:var(--verde); color:white;
-      border-radius:5px; padding:3px 9px; margin-right:6px; font-size:13px }
-    .rejilla { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px }
+    .paso {
+      display:inline-block; background:var(--verde); color:white;
+      border-radius:5px; padding:3px 9px; margin-right:6px;
+      font-size:13px
+    }
+    .rejilla {
+      display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px
+    }
     .campo { display:flex; flex-direction:column; gap:5px; min-width:0 }
     .completo { grid-column:1/-1 }
     label { font-size:14px; font-weight:bold }
-    input,select { width:100%; min-width:0; padding:10px; border:1px solid #b9c5cd;
-      border-radius:6px; background:white; color:var(--texto); font:inherit }
+    input,select {
+      width:100%; min-width:0; padding:10px;
+      border:1px solid #b9c5cd; border-radius:6px;
+      background:white; color:var(--texto); font:inherit
+    }
     input[type=checkbox] { width:auto }
-    button { border:0; border-radius:6px; padding:11px 16px; cursor:pointer;
-      font:inherit; font-weight:bold }
+    button {
+      border:0; border-radius:6px; padding:11px 16px;
+      cursor:pointer; font:inherit; font-weight:bold
+    }
     button:disabled { opacity:.5; cursor:not-allowed }
     .primario { background:var(--verde); color:white }
     .secundario { background:var(--claro); color:var(--verde) }
     .peligro { background:#faeaea; color:var(--rojo); padding:7px 10px }
     .botones { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px }
-    .asistente { background:white; border:1px solid var(--borde);
-      border-radius:8px; padding:15px; margin:14px 0 }
-    .asistente-cabecera { display:flex; justify-content:space-between;
-      align-items:center; gap:10px; margin-bottom:14px }
-    .autorizacion { margin-top:14px; padding:13px; background:#f6f8fa;
-      border-radius:7px }
-    .check-linea { display:flex; align-items:flex-start; gap:8px; font-weight:normal }
-    .resumen-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px }
+    .asistente {
+      background:white; border:1px solid var(--borde);
+      border-radius:8px; padding:15px; margin:14px 0
+    }
+    .asistente-cabecera {
+      display:flex; justify-content:space-between;
+      align-items:center; gap:10px; margin-bottom:14px
+    }
+    .autorizacion {
+      margin-top:14px; padding:13px; background:#f6f8fa;
+      border-radius:7px
+    }
+    .check-linea {
+      display:flex; align-items:flex-start; gap:8px;
+      font-weight:normal
+    }
+    .resumen-grid {
+      display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px
+    }
     .indicador { background:var(--claro); padding:15px; border-radius:8px }
     .indicador span { display:block; font-size:13px }
     .indicador strong { font-size:22px; overflow-wrap:anywhere }
@@ -54,22 +81,37 @@
     table { width:100%; border-collapse:collapse; font-size:14px }
     th,td { text-align:left; padding:10px; border-bottom:1px solid var(--borde) }
     th { background:#f3f6f7 }
-    .mensaje { padding:12px; border-radius:7px; margin-top:14px;
-      white-space:pre-wrap; overflow-wrap:anywhere }
+    .mensaje {
+      padding:12px; border-radius:7px; margin-top:14px;
+      white-space:pre-wrap; overflow-wrap:anywhere
+    }
     .mensaje.error { color:#8c2020; background:#fff0f0; border:1px solid #efc5c5 }
     .mensaje.ok { color:#145b35; background:#eaf6ee; border:1px solid #b8dfc5 }
     .nota { color:#5a6870; font-size:13px }
     .oculto { display:none!important }
     .bloqueado { opacity:.65 }
     footer { text-align:center; color:#65727a; padding:18px; font-size:13px }
-    .home-float { position:fixed; right:20px; bottom:20px; z-index:999;
-      padding:12px 16px; border-radius:30px; background:#17365d; color:white;
-      text-decoration:none; box-shadow:0 4px 12px #0003 }
+    .home-float {
+      position:fixed; right:20px; bottom:20px; z-index:999;
+      padding:12px 16px; border-radius:30px; background:#17365d;
+      color:white; text-decoration:none; box-shadow:0 4px 12px #0003
+    }
+    .pago-indicadores {
+      display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px; margin:16px 0
+    }
+    .pago-indicador {
+      background:#f3f6f7; border:1px solid var(--borde);
+      padding:13px; border-radius:8px
+    }
+    .pago-indicador span { display:block; font-size:13px }
+    .pago-indicador strong { font-size:20px; overflow-wrap:anywhere }
     @media(max-width:650px) {
-      .rejilla,.resumen-grid { grid-template-columns:1fr }
+      .rejilla,.resumen-grid,.pago-indicadores { grid-template-columns:1fr }
       .panel { padding:14px }
       h1 { font-size:21px }
-      .indicador strong { font-size:20px }
+      .indicador strong,.pago-indicador strong { font-size:20px }
+      .home-float { right:12px; bottom:12px }
     }
   </style>
 </head>
@@ -85,10 +127,11 @@
   <div class="aviso">
     <strong>Importante:</strong>
     primero debes cargar el JSON maestro. La página no modifica archivos de GitHub
-    automáticamente. Después de agregar una reserva, descarga y verifica el JSON actualizado.
+    automáticamente. Después de agregar una reserva o registrar un pago, descarga
+    y verifica el JSON actualizado.
   </div>
 
-  <!-- PASO 1: OBLIGATORIO -->
+  <!-- PASO 1 -->
   <section class="panel" id="panelCarga">
     <h2><span class="paso">PASO 1</span> Cargar el JSON maestro</h2>
     <p>Selecciona el archivo existente de reservaciones de OXI-2026.</p>
@@ -101,13 +144,16 @@
     </div>
     <div id="resumenJSON" class="resumen-grid oculto">
       <div class="indicador">
-        <span>Reservaciones cargadas</span><strong id="cantidadReservas">0</strong>
+        <span>Reservaciones cargadas</span>
+        <strong id="cantidadReservas">0</strong>
       </div>
       <div class="indicador">
-        <span>Personas registradas</span><strong id="cantidadPersonas">0</strong>
+        <span>Personas registradas</span>
+        <strong id="cantidadPersonas">0</strong>
       </div>
       <div class="indicador">
-        <span>Mesas identificadas</span><strong id="cantidadMesas">0</strong>
+        <span>Mesas identificadas</span>
+        <strong id="cantidadMesas">0</strong>
       </div>
     </div>
     <div id="listaJSON" class="tabla-contenedor"></div>
@@ -120,11 +166,13 @@
       <div class="rejilla">
         <div class="campo completo">
           <label for="nombreFamilia">Nombre del grupo o reservación *</label>
-          <input id="nombreFamilia" maxlength="100" required placeholder="Ej. Familia de prueba">
+          <input id="nombreFamilia" maxlength="100" required
+            placeholder="Ej. Familia de prueba">
         </div>
         <div class="campo">
           <label for="responsable">Persona responsable</label>
-          <input id="responsable" maxlength="100" placeholder="Nombre del responsable">
+          <input id="responsable" maxlength="100"
+            placeholder="Nombre del responsable">
         </div>
         <div class="campo">
           <label for="mesa">Mesa</label>
@@ -136,37 +184,54 @@
 
     <section class="panel">
       <h2>Asistentes individuales</h2>
-<p class="nota">
-  Adulto: desde la edad mínima configurada. Menor: dentro del rango
-  de edad configurado. No es necesario registrar la edad exacta.
-  Las tarifas se consultan desde la configuración del evento.
-  Cada asistente puede tener un solo beneficio.
-</p>
+      <p class="nota">
+        Adulto: desde la edad mínima configurada. Menor: dentro del rango
+        de edad configurado. No es necesario registrar la edad exacta.
+        Las tarifas se consultan desde la configuración del evento.
+        Cada asistente puede tener un solo beneficio.
+      </p>
       <div id="listaAsistentes"></div>
       <div class="botones">
-        <button type="button" class="secundario" id="agregarAsistente">+ Agregar asistente</button>
+        <button type="button" class="secundario" id="agregarAsistente">
+          + Agregar asistente
+        </button>
       </div>
     </section>
 
     <section class="panel">
       <h2><span class="paso">PASO 3</span> Calcular la reservación</h2>
       <div class="resumen-grid">
-        <div class="indicador"><span>Asistentes</span><strong id="totalPersonas">0</strong></div>
-        <div class="indicador"><span>Importe original</span><strong id="importeOriginal">$0.00</strong></div>
-        <div class="indicador"><span>Importe ajustado</span><strong id="importeFinal">$0.00</strong></div>
+        <div class="indicador">
+          <span>Asistentes</span><strong id="totalPersonas">0</strong>
+        </div>
+        <div class="indicador">
+          <span>Importe original</span><strong id="importeOriginal">$0.00</strong>
+        </div>
+        <div class="indicador">
+          <span>Importe ajustado</span><strong id="importeFinal">$0.00</strong>
+        </div>
       </div>
-      <p id="resumenAjustes" class="nota">Captura los asistentes y calcula la reservación.</p>
+      <p id="resumenAjustes" class="nota">
+        Captura los asistentes y calcula la reservación.
+      </p>
       <div id="tablaResultado" class="tabla-contenedor"></div>
       <div class="botones">
-        <button type="button" class="primario" id="calcular">Calcular reservación</button>
-        <button type="button" class="secundario" id="limpiar">Limpiar formulario</button>
+        <button type="button" class="primario" id="calcular">
+          Calcular reservación
+        </button>
+        <button type="button" class="secundario" id="limpiar">
+          Limpiar formulario
+        </button>
       </div>
       <div id="mensaje" aria-live="polite"></div>
     </section>
 
     <section class="panel">
       <h2><span class="paso">PASO 4</span> Agregar y exportar</h2>
-      <p>La reserva se incorpora al documento cargado. Las reservaciones anteriores no se recalculan.</p>
+      <p>
+        La reserva se incorpora al documento cargado.
+        Las reservaciones anteriores no se recalculan.
+      </p>
       <div class="botones">
         <button type="button" class="primario" id="agregarAlArchivo" disabled>
           Agregar reservación calculada
@@ -176,8 +241,108 @@
         </button>
       </div>
       <p class="nota">
-        Después de descargar, revisa el archivo. Para la siguiente sesión, carga la versión más reciente.
+        Después de descargar, revisa el archivo. Para la siguiente sesión,
+        carga la versión más reciente.
       </p>
+    </section>
+
+    <!-- PASO 5: CONTROL DE PAGOS -->
+    <section class="panel" id="panelPagos">
+      <h2><span class="paso">PASO 5</span> Control de pagos</h2>
+      <p>
+        Selecciona una reservación para consultar su importe, registrar
+        un pago o abono y revisar el saldo pendiente.
+      </p>
+      <p class="nota">
+        Cada movimiento se agrega al historial del JSON. El registro no
+        modifica los importes históricos de Excel. Debes descargar el JSON
+        actualizado para conservar los cambios fuera de esta página.
+      </p>
+
+      <div class="rejilla">
+        <div class="campo completo">
+          <label for="pagoReservacion">Reservación *</label>
+          <select id="pagoReservacion">
+            <option value="">Carga primero el JSON maestro</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="pagoImporte">Importe del pago o abono (MXN) *</label>
+          <input id="pagoImporte" type="number" min="0.01"
+            step="0.01" placeholder="Ej. 700.00">
+        </div>
+
+        <div class="campo">
+          <label for="pagoForma">Forma de pago *</label>
+          <select id="pagoForma">
+            <option value="">Selecciona una forma de pago</option>
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="deposito">Depósito</option>
+            <option value="otra">Otra</option>
+          </select>
+        </div>
+
+        <div class="campo completo">
+          <label for="pagoReferencia">Referencia o número de comprobante *</label>
+          <input id="pagoReferencia" maxlength="150"
+            placeholder="Folio, referencia bancaria o número de comprobante">
+        </div>
+
+        <div class="campo completo">
+          <label for="pagoResponsable">Responsable autorizado que registra el pago *</label>
+          <select id="pagoResponsable">
+            <option value="">Selecciona un responsable autorizado</option>
+          </select>
+          <p class="nota">
+            La lista se configura en el código de esta página. No agregues
+            aquí nombres que no estén autorizados por la administración.
+          </p>
+        </div>
+
+        <div class="campo completo">
+          <label class="check-linea">
+            <input id="pagoValidado" type="checkbox">
+            Confirmo que verifiqué administrativamente el pago y su comprobante.
+          </label>
+        </div>
+      </div>
+
+      <div class="pago-indicadores">
+        <div class="pago-indicador">
+          <span>Total de la reservación</span>
+          <strong id="pagoTotal">$0.00</strong>
+        </div>
+        <div class="pago-indicador">
+          <span>Total pagado reconocido</span>
+          <strong id="pagoAcumulado">$0.00</strong>
+        </div>
+        <div class="pago-indicador">
+          <span>Saldo pendiente</span>
+          <strong id="pagoSaldo">$0.00</strong>
+        </div>
+      </div>
+
+      <div class="botones">
+        <button type="button" class="primario" id="registrarPago">
+          Registrar pago o abono
+        </button>
+        <button type="button" class="secundario" id="exportarJSONPagos">
+          Descargar JSON con pagos
+        </button>
+      </div>
+
+      <div id="mensajePago" aria-live="polite"></div>
+
+      <h3 style="margin-top:24px">Historial de pagos capturados</h3>
+      <p class="nota">
+        Los pagos registrados previamente en Excel se reflejan en el total
+        pagado reconocido cuando existe el campo correspondiente. El historial
+        de abajo muestra los movimientos individuales guardados en
+        historial_pagos.
+      </p>
+      <div id="tablaHistorialPagos" class="tabla-contenedor"></div>
     </section>
   </div>
 </main>
@@ -192,6 +357,18 @@
 const CONFIG_URL = "./config/reglas-pagos-oxi-2026.json";
 const EVENTO_ID = "OXI-2026";
 const FORMATO_VERSION = 2;
+
+/*
+  IMPORTANTE:
+  Agrega aquí los nombres reales de las personas autorizadas para registrar
+  pagos. Mientras el arreglo permanezca vacío, no se podrá registrar ningún
+  pago. No inventes ni uses nombres de ejemplo en producción.
+
+  Ejemplo de formato:
+  const RESPONSABLES_AUTORIZADOS = ["Nombre autorizado 1", "Nombre autorizado 2"];
+*/
+const RESPONSABLES_AUTORIZADOS = [];
+
 const $ = id => document.getElementById(id);
 const listaAsistentes = $("listaAsistentes");
 const moneda = new Intl.NumberFormat("es-MX", {
@@ -208,23 +385,28 @@ let archivoMaestro = "";
 function pesos(valor) {
   return moneda.format(Number(valor || 0));
 }
+
 function crear(tag, texto, clase) {
   const nodo = document.createElement(tag);
   if (texto !== undefined && texto !== null) nodo.textContent = texto;
   if (clase) nodo.className = clase;
   return nodo;
 }
+
 function mostrarMensaje(id, texto, tipo) {
   const el = $(id);
   el.className = "mensaje" + (tipo ? " " + tipo : "");
   el.textContent = texto;
 }
+
 function bloquearCaptura() {
   $("zonaCaptura").classList.add("oculto");
 }
+
 function habilitarCaptura() {
   $("zonaCaptura").classList.remove("oculto");
 }
+
 function limpiarResultados() {
   registroCalculado = null;
   $("totalPersonas").textContent = "0";
@@ -238,8 +420,12 @@ function limpiarResultados() {
 
 async function cargarConfiguracion() {
   if (motorListo) return;
+
   const respuesta = await fetch(CONFIG_URL, {cache:"no-store"});
-  if (!respuesta.ok) throw new Error("No se pudo cargar " + CONFIG_URL);
+  if (!respuesta.ok) {
+    throw new Error("No se pudo cargar " + CONFIG_URL);
+  }
+
   const cfg = await respuesta.json();
 
   if (cfg.evento_id !== EVENTO_ID ||
@@ -247,6 +433,7 @@ async function cargarConfiguracion() {
       !Array.isArray(cfg.beneficios)) {
     throw new Error("La configuración de tarifas no tiene la estructura esperada.");
   }
+
   if (!window.CalculoAsistentesOXI) {
     throw new Error("No se encontró ./js/calculo-asistentes.js.");
   }
@@ -260,21 +447,28 @@ function validarDocumento(doc) {
   if (!doc || typeof doc !== "object" || Array.isArray(doc)) {
     throw new Error("El archivo no contiene un objeto JSON válido.");
   }
+
   if (doc.formato_version !== FORMATO_VERSION) {
-    throw new Error("Se esperaba formato_version: 2. Verifica que seleccionaste el JSON maestro correcto.");
+    throw new Error(
+      "Se esperaba formato_version: 2. Verifica que seleccionaste el JSON maestro correcto."
+    );
   }
+
   if (doc.evento_id !== EVENTO_ID) {
     throw new Error("El archivo no corresponde al evento OXI-2026.");
   }
+
   if (!Array.isArray(doc.reservaciones)) {
     throw new Error("No se encontró el arreglo reservaciones.");
   }
 
   const ids = new Set();
+
   for (const r of doc.reservaciones) {
     if (!r || typeof r !== "object" || !r.reservacion_id) {
       throw new Error("Hay una reservación sin reservacion_id.");
     }
+
     const id = String(r.reservacion_id);
     if (ids.has(id)) throw new Error("ID duplicado en el JSON: " + id);
     ids.add(id);
@@ -286,12 +480,14 @@ function validarDocumento(doc) {
       }
     }
   }
+
   return true;
 }
 
 function construirMesas() {
   const selector = $("mesa");
   selector.replaceChildren(new Option("Sin asignar", ""));
+
   for (let n = 1; n <= 20; n++) {
     const id = "OXI-M" + String(n).padStart(3, "0");
     selector.add(new Option("Mesa " + n, id));
@@ -301,7 +497,11 @@ function construirMesas() {
 function renderizarListaJSON() {
   const contenedor = $("listaJSON");
   contenedor.replaceChildren();
-  if (!documentoTrabajo) return;
+
+  if (!documentoTrabajo) {
+    construirSelectorPagos();
+    return;
+  }
 
   const reservaciones = documentoTrabajo.reservaciones;
   const personas = reservaciones.reduce((s, r) =>
@@ -320,17 +520,21 @@ function renderizarListaJSON() {
   const tabla = document.createElement("table");
   const thead = document.createElement("thead");
   const tr = document.createElement("tr");
+
   ["Reservación", "Personas", "Subtotal", "Mesa", "Origen"].forEach(t =>
     tr.appendChild(crear("th", t)));
+
   thead.appendChild(tr);
   tabla.appendChild(thead);
 
   const tbody = document.createElement("tbody");
+
   reservaciones.forEach(r => {
     const fila = document.createElement("tr");
     const total = r.total_asientos_excel ??
       (Number(r.adultos || 0) + Number(r.ninos || 0));
     const mesa = r.mesa_numero ? "Mesa " + r.mesa_numero : "Sin asignar";
+
     [
       r.nombre_reservacion || r.reservacion_id,
       String(total),
@@ -338,30 +542,36 @@ function renderizarListaJSON() {
       mesa,
       r.origen_registro || (r.fila_origen_excel ? "Excel" : "Histórico")
     ].forEach(t => fila.appendChild(crear("td", t)));
+
     tbody.appendChild(fila);
   });
+
   tabla.appendChild(tbody);
   contenedor.appendChild(tabla);
+
+  // Actualiza también la lista de reservaciones del control de pagos.
+  construirSelectorPagos();
 }
 
 async function importarJSON(archivo) {
-  // Primero se lee y valida en una variable temporal.
-  // El documento vigente NO se reemplaza si la lectura o validación falla.
+  // Se lee y valida primero en una variable temporal.
+  // El documento vigente no se reemplaza si la lectura o validación falla.
   const texto = await archivo.text();
   let importado;
+
   try {
     importado = JSON.parse(texto);
   } catch {
     throw new Error("El archivo no contiene JSON válido.");
   }
-  validarDocumento(importado);
 
-  // Verifica también que la página pueda calcular antes de habilitar captura.
+  validarDocumento(importado);
   await cargarConfiguracion();
 
   documentoTrabajo = importado;
   archivoMaestro = archivo.name;
   registroCalculado = null;
+
   limpiarResultados();
   renderizarListaJSON();
   habilitarCaptura();
@@ -384,13 +594,16 @@ function crearAsistente() {
 
   const cabecera = crear("div", undefined, "asistente-cabecera");
   cabecera.appendChild(crear("h3", "Asistente " + id));
+
   const eliminar = crear("button", "Eliminar", "peligro");
   eliminar.type = "button";
+
   eliminar.addEventListener("click", () => {
     tarjeta.remove();
     actualizarTitulos();
     limpiarResultados();
   });
+
   cabecera.appendChild(eliminar);
   tarjeta.appendChild(cabecera);
 
@@ -400,50 +613,59 @@ function crearAsistente() {
     const cont = crear("div", undefined, "campo");
     const label = crear("label", titulo);
     const input = document.createElement("input");
+
     input.type = tipo;
     input.dataset.campo = clave;
     input.required = Boolean(obligatorio);
+
     if (placeholder) input.placeholder = placeholder;
     if (tipo === "text") input.maxLength = 100;
+
     if (tipo === "number") {
-      input.min = "0"; input.max = "120"; input.step = "1";
+      input.min = "0";
+      input.max = "120";
+      input.step = "1";
     }
+
     input.id = clave + "-" + id;
     label.htmlFor = input.id;
     cont.append(label, input);
     return cont;
   }
 
-const campoNombre = campoTexto(
-  "Nombre del asistente *",
-  "text",
-  "nombre",
-  true,
-  "Nombre completo"
-);
+  const campoNombre = campoTexto(
+    "Nombre del asistente *",
+    "text",
+    "nombre",
+    true,
+    "Nombre completo"
+  );
 
-const campoTipo = crear("div", undefined, "campo");
-const etiquetaTipo = crear("label", "Tipo de asistente *");
-const selectorTipo = document.createElement("select");
+  const campoTipo = crear("div", undefined, "campo");
+  const etiquetaTipo = crear("label", "Tipo de asistente *");
+  const selectorTipo = document.createElement("select");
 
-selectorTipo.dataset.campo = "tipo_asistente";
-selectorTipo.required = true;
-selectorTipo.add(new Option("Selecciona una categoría", ""));
-selectorTipo.add(new Option("Adulto", "adulto"));
-selectorTipo.add(new Option("Menor", "menor"));
-selectorTipo.id = "tipo-asistente-" + id;
-etiquetaTipo.htmlFor = selectorTipo.id;
+  selectorTipo.dataset.campo = "tipo_asistente";
+  selectorTipo.required = true;
+  selectorTipo.add(new Option("Selecciona una categoría", ""));
+  selectorTipo.add(new Option("Adulto", "adulto"));
+  selectorTipo.add(new Option("Menor", "menor"));
+  selectorTipo.id = "tipo-asistente-" + id;
+  etiquetaTipo.htmlFor = selectorTipo.id;
 
-campoTipo.append(etiquetaTipo, selectorTipo);
-rejilla.append(campoNombre, campoTipo);
+  campoTipo.append(etiquetaTipo, selectorTipo);
+  rejilla.append(campoNombre, campoTipo);
 
   const campoBeneficio = crear("div", undefined, "campo completo");
   const labelBeneficio = crear("label", "Beneficio individual");
   const beneficio = document.createElement("select");
+
   beneficio.dataset.campo = "beneficio";
   beneficio.add(new Option("Sin beneficio", ""));
+
   configuracion.beneficios.forEach(b =>
     beneficio.add(new Option(b.nombre, b.id)));
+
   campoBeneficio.append(labelBeneficio, beneficio);
   rejilla.appendChild(campoBeneficio);
   tarjeta.appendChild(rejilla);
@@ -451,10 +673,14 @@ rejilla.append(campoNombre, campoTipo);
   const bloque = crear("div", undefined, "autorizacion oculto");
   const checkLinea = crear("label", undefined, "check-linea");
   const check = document.createElement("input");
+
   check.type = "checkbox";
   check.dataset.campo = "autorizado";
+
   checkLinea.append(check, document.createTextNode(
-    " Beneficio autorizado por la administración"));
+    " Beneficio autorizado por la administración"
+  ));
+
   bloque.appendChild(checkLinea);
 
   const datosAutorizacion = crear("div", undefined, "rejilla");
@@ -462,6 +688,7 @@ rejilla.append(campoNombre, campoTipo);
     campoTexto("Nombre del autorizador *", "text", "autorizador", false, "Nombre"),
     campoTexto("Motivo del beneficio *", "text", "motivo", false, "Motivo")
   );
+
   bloque.appendChild(datosAutorizacion);
   tarjeta.appendChild(bloque);
 
@@ -473,6 +700,7 @@ rejilla.append(campoNombre, campoTipo);
     tarjeta.querySelector('[data-campo="motivo"]').value = "";
     limpiarResultados();
   });
+
   tarjeta.addEventListener("input", limpiarResultados);
   tarjeta.addEventListener("change", limpiarResultados);
 
@@ -485,7 +713,6 @@ function actualizarTitulos() {
     t.querySelector("h3").textContent = "Asistente " + (i + 1);
   });
 }
-
 
 function leerAsistente(tarjeta) {
   const campo = nombre =>
@@ -503,21 +730,11 @@ function leerAsistente(tarjeta) {
   }
 
   const beneficioId = campo("beneficio").value || null;
-  const regla = configuracion.beneficios.find(
-    b => b.id === beneficioId
-  );
+  const regla = configuracion.beneficios.find(b => b.id === beneficioId);
 
-  const autorizado = beneficioId
-    ? campo("autorizado").checked
-    : false;
-
-  const autorizador = beneficioId
-    ? campo("autorizador").value.trim()
-    : "";
-
-  const motivo = beneficioId
-    ? campo("motivo").value.trim()
-    : "";
+  const autorizado = beneficioId ? campo("autorizado").checked : false;
+  const autorizador = beneficioId ? campo("autorizador").value.trim() : "";
+  const motivo = beneficioId ? campo("motivo").value.trim() : "";
 
   if (regla && regla.requiere_autorizacion && !autorizado) {
     throw new Error(
@@ -533,15 +750,14 @@ function leerAsistente(tarjeta) {
     throw new Error("Indica el motivo del beneficio.");
   }
 
-  const resultado =
-    window.CalculoAsistentesOXI.calcularAsistente({
-      nombre,
-      tipo_asistente: tipoAsistente,
-      beneficio_id: beneficioId,
-      autorizado,
-      autorizador,
-      motivo
-    });
+  const resultado = window.CalculoAsistentesOXI.calcularAsistente({
+    nombre,
+    tipo_asistente: tipoAsistente,
+    beneficio_id: beneficioId,
+    autorizado,
+    autorizador,
+    motivo
+  });
 
   return {
     nombre,
@@ -572,7 +788,8 @@ function crearRegistro() {
   const asistentes = tarjetas.map(leerAsistente);
   const totalOriginal = asistentes.reduce((s, p) => s + p.tarifa_original, 0);
   const totalFinal = Math.round(
-    asistentes.reduce((s, p) => s + p.importe_final, 0) * 100) / 100;
+    asistentes.reduce((s, p) => s + p.importe_final, 0) * 100
+  ) / 100;
 
   const mesaId = $("mesa").value || null;
   const match = mesaId ? mesaId.match(/(\d+)/) : null;
@@ -590,42 +807,36 @@ function crearRegistro() {
     "-" + Math.random().toString(36).slice(2, 7).toUpperCase();
 
   return {
-    reservacion_id:id,
-    tipo_reservacion:"grupo",
-    nombre_reservacion:nombreFamilia,
-adultos: asistentes.filter(
-  p => p.tipo_asistente === "adulto"
-).length,
+    reservacion_id: id,
+    tipo_reservacion: "grupo",
+    nombre_reservacion: nombreFamilia,
+    adultos: asistentes.filter(p => p.tipo_asistente === "adulto").length,
+    ninos: asistentes.filter(p => p.tipo_asistente === "menor").length,
+    total_asientos_excel: asistentes.length,
+    mesa_numero: mesaNumero,
+    mesa_id: mesaId,
+    costo_excel: totalOriginal,
+    subtotal_excel: totalFinal,
+    pagado_excel: 0,
+    debe_excel: totalFinal,
 
-ninos: asistentes.filter(
-  p => p.tipo_asistente === "menor"
-).length,
-    total_asientos_excel:asistentes.length,
-    mesa_numero:mesaNumero,
-    mesa_id:mesaId,
-    costo_excel:totalOriginal,
-    subtotal_excel:totalFinal,
-pagado_excel: 0,
-debe_excel: totalFinal,
+    // Control de pagos web; separado de los importes históricos de Excel.
+    historial_pagos: [],
+    total_pagado: 0,
+    saldo_pendiente: totalFinal,
 
-// Control de pagos capturados en el sistema web.
-// Se mantienen separados de los datos históricos de Excel.
-historial_pagos: [],
-total_pagado: 0,
-saldo_pendiente: totalFinal,
-    // No se marca PAGADO por el mero hecho de tener importe cero.
-    estado_pago_excel:"PENDIENTE",
-    forma_pago_excel:null,
-    beneficio_excel:beneficios.length ? beneficios.join(", ") : null,
-    cortesia_excel:importeCortesias,
-    notas_excel:null,
-    fila_origen_excel:null,
+    estado_pago_excel: "PENDIENTE",
+    forma_pago_excel: null,
+    beneficio_excel: beneficios.length ? beneficios.join(", ") : null,
+    cortesia_excel: importeCortesias,
+    notas_excel: null,
+    fila_origen_excel: null,
     responsable,
-    origen_registro:"captura_web",
-    fecha_captura:new Date().toISOString(),
-    estado_reservacion:"capturada",
-    estado_pago:"pendiente",
-    detalle_asistentes:asistentes.map(p => ({...p}))
+    origen_registro: "captura_web",
+    fecha_captura: new Date().toISOString(),
+    estado_reservacion: "capturada",
+    estado_pago: "pendiente",
+    detalle_asistentes: asistentes.map(p => ({...p}))
   };
 }
 
@@ -641,69 +852,415 @@ function renderizarResultado(asistentes, totalOriginal, totalFinal) {
   const tabla = document.createElement("table");
   const thead = document.createElement("thead");
   const th = document.createElement("tr");
-["Asistente","Tipo","Tarifa original",
- "Beneficio","Ajuste","Importe final"].forEach(t =>
-    th.appendChild(crear("th", t)));
+
+  [
+    "Asistente", "Tipo", "Tarifa original",
+    "Beneficio", "Ajuste", "Importe final"
+  ].forEach(t => th.appendChild(crear("th", t)));
+
   thead.appendChild(th);
   tabla.appendChild(thead);
 
   const tbody = document.createElement("tbody");
+
   asistentes.forEach(p => {
     const tr = document.createElement("tr");
-    const categoria =
-  p.tipo_asistente === "adulto" ? "Adulto" : "Menor";
+    const categoria = p.tipo_asistente === "adulto" ? "Adulto" : "Menor";
+
     [
-      p.nombre, categoria, pesos(p.tarifa_original),
-      p.beneficio_nombre || "Ninguno", pesos(p.importe_ajuste), pesos(p.importe_final)
+      p.nombre,
+      categoria,
+      pesos(p.tarifa_original),
+      p.beneficio_nombre || "Ninguno",
+      pesos(p.importe_ajuste),
+      pesos(p.importe_final)
     ].forEach(t => tr.appendChild(crear("td", t)));
+
     tbody.appendChild(tr);
   });
+
   tabla.appendChild(tbody);
   $("tablaResultado").replaceChildren(tabla);
 }
 
 function agregarRegistroAlDocumento() {
-  if (!documentoTrabajo) throw new Error("Primero importa el JSON maestro.");
-  if (!registroCalculado) throw new Error("Primero calcula la reservación.");
+  if (!documentoTrabajo) {
+    throw new Error("Primero importa el JSON maestro.");
+  }
+
+  if (!registroCalculado) {
+    throw new Error("Primero calcula la reservación.");
+  }
 
   const id = registroCalculado.reservacion_id;
+
   if (documentoTrabajo.reservaciones.some(r =>
       String(r.reservacion_id) === String(id))) {
     throw new Error("El folio ya existe en el JSON: " + id);
   }
 
-  // Se agrega solo la reserva nueva. No se modifica el resto del documento.
+  // Solo agrega la nueva reservación; no recalcula las anteriores.
   documentoTrabajo.reservaciones.push(
-    JSON.parse(JSON.stringify(registroCalculado)));
+    JSON.parse(JSON.stringify(registroCalculado))
+  );
+
   registroCalculado = null;
   $("agregarAlArchivo").disabled = true;
   renderizarListaJSON();
 
-  mostrarMensaje("estadoJSON",
+  mostrarMensaje(
+    "estadoJSON",
     "Reservación agregada al documento en memoria. Descarga el JSON actualizado.",
-    "ok");
+    "ok"
+  );
 }
 
 function descargarJSON() {
   if (!documentoTrabajo) throw new Error("No hay un JSON cargado.");
+
   validarDocumento(documentoTrabajo);
 
   const blob = new Blob(
     [JSON.stringify(documentoTrabajo, null, 2)],
-    {type:"application/json;charset=utf-8"});
+    {type:"application/json;charset=utf-8"}
+  );
+
   const url = URL.createObjectURL(blob);
   const enlace = document.createElement("a");
+
   enlace.href = url;
   enlace.download = "reservaciones-oxi-2026-actualizado.json";
   document.body.appendChild(enlace);
   enlace.click();
   enlace.remove();
+
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-  mostrarMensaje("estadoJSON",
+  mostrarMensaje(
+    "estadoJSON",
     "Descarga solicitada. Verifica el archivo antes de subirlo a GitHub.",
-    "ok");
+    "ok"
+  );
 }
+
+/* =========================================================
+   PASO 5: FUNCIONES DEL CONTROL DE PAGOS
+   ========================================================= */
+
+/*
+  Determina el total de la reservación sin modificar el registro.
+  Prioridad:
+  1. subtotal_excel: importe final registrado para la reservación.
+  2. costo_excel: respaldo si no existe subtotal_excel.
+  3. suma de pagado_excel + debe_excel si no existe ninguno de los anteriores.
+*/
+function obtenerTotalReserva(reserva) {
+  const valor =
+    reserva.subtotal_excel ??
+    reserva.costo_excel ??
+    ((Number(reserva.pagado_excel) || 0) +
+     (Number(reserva.debe_excel) || 0));
+
+  const total = Number(valor);
+
+  if (!Number.isFinite(total) || total < 0) {
+    throw new Error(
+      "La reservación tiene un total inválido: " + reserva.reservacion_id
+    );
+  }
+
+  return Math.round(total * 100) / 100;
+}
+
+/*
+  Para registros nuevos se usa total_pagado.
+  Para registros históricos que todavía no tienen ese campo, se usa
+  pagado_excel como punto de partida.
+*/
+function obtenerPagadoReserva(reserva) {
+  const valor = reserva.total_pagado ?? reserva.pagado_excel ?? 0;
+  const pagado = Number(valor);
+
+  if (!Number.isFinite(pagado) || pagado < 0) {
+    throw new Error(
+      "El importe pagado es inválido: " + reserva.reservacion_id
+    );
+  }
+
+  return Math.round(pagado * 100) / 100;
+}
+
+function obtenerSaldoReserva(reserva) {
+  const saldo = obtenerTotalReserva(reserva) - obtenerPagadoReserva(reserva);
+  return Math.round(Math.max(0, saldo) * 100) / 100;
+}
+
+function obtenerReservaSeleccionada() {
+  if (!documentoTrabajo) return null;
+
+  const id = $("pagoReservacion").value;
+  if (!id) return null;
+
+  return documentoTrabajo.reservaciones.find(
+    r => String(r.reservacion_id) === String(id)
+  ) || null;
+}
+
+function construirSelectorPagos() {
+  const selector = $("pagoReservacion");
+  const anterior = selector.value;
+
+  selector.replaceChildren(
+    new Option(
+      documentoTrabajo
+        ? "Selecciona una reservación"
+        : "Carga primero el JSON maestro",
+      ""
+    )
+  );
+
+  if (!documentoTrabajo) {
+    renderizarPanelPago();
+    return;
+  }
+
+  documentoTrabajo.reservaciones.forEach(reserva => {
+    const saldo = obtenerSaldoReserva(reserva);
+    const nombre = reserva.nombre_reservacion || reserva.reservacion_id;
+
+    const etiqueta = nombre + " · " +
+      reserva.reservacion_id + " · Saldo: " + pesos(saldo);
+
+    selector.add(new Option(etiqueta, reserva.reservacion_id));
+  });
+
+  if ([...selector.options].some(opcion => opcion.value === anterior)) {
+    selector.value = anterior;
+  }
+
+  renderizarPanelPago();
+}
+
+function renderizarPanelPago() {
+  const reserva = obtenerReservaSeleccionada();
+
+  $("pagoTotal").textContent = pesos(0);
+  $("pagoAcumulado").textContent = pesos(0);
+  $("pagoSaldo").textContent = pesos(0);
+  $("tablaHistorialPagos").replaceChildren();
+
+  if (!reserva) {
+    $("tablaHistorialPagos").appendChild(
+      crear("p", "Selecciona una reservación para consultar sus pagos.", "nota")
+    );
+    return;
+  }
+
+  const total = obtenerTotalReserva(reserva);
+  const pagado = obtenerPagadoReserva(reserva);
+  const saldo = obtenerSaldoReserva(reserva);
+
+  $("pagoTotal").textContent = pesos(total);
+  $("pagoAcumulado").textContent = pesos(pagado);
+  $("pagoSaldo").textContent = pesos(saldo);
+
+  const pagos = Array.isArray(reserva.historial_pagos)
+    ? reserva.historial_pagos
+    : [];
+
+  if (!pagos.length) {
+    $("tablaHistorialPagos").appendChild(
+      crear(
+        "p",
+        "No hay movimientos individuales en el historial de pagos.",
+        "nota"
+      )
+    );
+    return;
+  }
+
+  const tabla = document.createElement("table");
+  const thead = document.createElement("thead");
+  const filaCabecera = document.createElement("tr");
+
+  [
+    "Fecha",
+    "Importe",
+    "Forma de pago",
+    "Referencia",
+    "Responsable",
+    "Validación"
+  ].forEach(t => filaCabecera.appendChild(crear("th", t)));
+
+  thead.appendChild(filaCabecera);
+  tabla.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+
+  pagos.forEach(pago => {
+    const fila = document.createElement("tr");
+    const fecha = pago.fecha
+      ? new Date(pago.fecha).toLocaleString("es-MX")
+      : "";
+
+    [
+      fecha,
+      pesos(pago.importe),
+      pago.forma_pago || "",
+      pago.referencia || "",
+      pago.responsable_registro || "",
+      pago.validado_administrativamente ? "Validado" : "No validado"
+    ].forEach(valor => fila.appendChild(crear("td", valor)));
+
+    tbody.appendChild(fila);
+  });
+
+  tabla.appendChild(tbody);
+  $("tablaHistorialPagos").appendChild(tabla);
+}
+
+function registrarPago() {
+  if (!documentoTrabajo) {
+    throw new Error("Carga primero el JSON maestro.");
+  }
+
+  const reserva = obtenerReservaSeleccionada();
+
+  if (!reserva) {
+    throw new Error("Selecciona una reservación.");
+  }
+
+  const importeTexto = $("pagoImporte").value;
+  const importe = Number(importeTexto);
+
+  if (
+    importeTexto.trim() === "" ||
+    !Number.isFinite(importe) ||
+    importe <= 0
+  ) {
+    throw new Error("Captura un importe mayor que cero.");
+  }
+
+  const importeRedondeado = Math.round(importe * 100) / 100;
+
+  const forma = $("pagoForma").value;
+  if (!["efectivo", "transferencia", "deposito", "otra"].includes(forma)) {
+    throw new Error("Selecciona una forma de pago válida.");
+  }
+
+  const referencia = $("pagoReferencia").value.trim();
+  if (!referencia) {
+    throw new Error("Captura la referencia del comprobante.");
+  }
+
+  const responsable = $("pagoResponsable").value;
+
+  if (!RESPONSABLES_AUTORIZADOS.includes(responsable)) {
+    throw new Error(
+      "Selecciona un responsable autorizado. Verifica que la lista esté configurada."
+    );
+  }
+
+  if (!$("pagoValidado").checked) {
+    throw new Error(
+      "Confirma que verificaste administrativamente el pago y su comprobante."
+    );
+  }
+
+  const total = obtenerTotalReserva(reserva);
+  const pagadoActual = obtenerPagadoReserva(reserva);
+  const saldoActual = obtenerSaldoReserva(reserva);
+
+  if (saldoActual <= 0) {
+    throw new Error("La reservación ya no tiene saldo pendiente.");
+  }
+
+  if (importeRedondeado > saldoActual) {
+    throw new Error(
+      "El pago excede el saldo pendiente de " + pesos(saldoActual) + "."
+    );
+  }
+
+  const nuevoTotalPagado = Math.round(
+    (pagadoActual + importeRedondeado) * 100
+  ) / 100;
+
+  const nuevoSaldo = Math.round(
+    Math.max(0, total - nuevoTotalPagado) * 100
+  ) / 100;
+
+  const pago = {
+    pago_id: "OXI-PAGO-" +
+      new Date().toISOString().replace(/\D/g, "") +
+      "-" + Math.random().toString(36).slice(2, 7).toUpperCase(),
+    fecha: new Date().toISOString(),
+    importe: importeRedondeado,
+    forma_pago: forma,
+    referencia: referencia,
+    responsable_registro: responsable,
+    validado_administrativamente: true
+  };
+
+  /*
+    Se agrega el movimiento al historial.
+    No se cambian pagado_excel, debe_excel ni subtotal_excel.
+  */
+  if (!Array.isArray(reserva.historial_pagos)) {
+    reserva.historial_pagos = [];
+  }
+
+  reserva.historial_pagos.push(pago);
+  reserva.total_pagado = nuevoTotalPagado;
+  reserva.saldo_pendiente = nuevoSaldo;
+  reserva.estado_pago = nuevoSaldo === 0
+    ? "pagado"
+    : "parcial";
+
+  $("pagoImporte").value = "";
+  $("pagoReferencia").value = "";
+  $("pagoValidado").checked = false;
+
+  renderizarListaJSON();
+
+  // Restaura la reservación seleccionada después de actualizar la lista.
+  $("pagoReservacion").value = reserva.reservacion_id;
+  renderizarPanelPago();
+
+  mostrarMensaje(
+    "mensajePago",
+    "Pago agregado al JSON en memoria.\n" +
+      "Importe de este movimiento: " + pesos(importeRedondeado) + "\n" +
+      "Total pagado reconocido: " + pesos(nuevoTotalPagado) + "\n" +
+      "Saldo pendiente: " + pesos(nuevoSaldo) + "\n\n" +
+      "Descarga el JSON actualizado para conservar el cambio.",
+    "ok"
+  );
+}
+
+function inicializarResponsablesPago() {
+  const selector = $("pagoResponsable");
+  selector.replaceChildren(
+    new Option("Selecciona un responsable autorizado", "")
+  );
+
+  // Los nombres se incorporan desde RESPONSABLES_AUTORIZADOS.
+  RESPONSABLES_AUTORIZADOS.forEach(nombre => {
+    selector.add(new Option(nombre, nombre));
+  });
+
+  if (RESPONSABLES_AUTORIZADOS.length === 0) {
+    mostrarMensaje(
+      "mensajePago",
+      "La lista de responsables autorizados está vacía. " +
+      "Configura sus nombres en RESPONSABLES_AUTORIZADOS antes de registrar pagos.",
+      "error"
+    );
+  }
+}
+
+/* =========================================================
+   EVENTOS DE LA PÁGINA
+   ========================================================= */
 
 $("archivoJSON").addEventListener("change", async evento => {
   const archivo = evento.target.files[0];
@@ -713,13 +1270,14 @@ $("archivoJSON").addEventListener("change", async evento => {
     mostrarMensaje("estadoJSON", "Validando JSON maestro…", "");
     await importarJSON(archivo);
   } catch (error) {
-    // Si ya había un documento válido, se conserva.
-    mostrarMensaje("estadoJSON",
+    mostrarMensaje(
+      "estadoJSON",
       "No se pudo cargar el archivo seleccionado.\n" + error.message +
       (documentoTrabajo
         ? "\nSe conserva el JSON que ya estaba cargado: " + archivoMaestro
         : "\nLa captura permanece bloqueada."),
-      "error");
+      "error"
+    );
   } finally {
     evento.target.value = "";
   }
@@ -734,40 +1292,53 @@ $("calcular").addEventListener("click", () => {
   limpiarResultados();
 
   try {
-    if (!documentoTrabajo) throw new Error("Carga primero el JSON maestro.");
+    if (!documentoTrabajo) {
+      throw new Error("Carga primero el JSON maestro.");
+    }
+
     if (!$("nombreFamilia").value.trim()) {
       throw new Error("Escribe el nombre de la reservación.");
     }
 
     const tarjetas = [...listaAsistentes.querySelectorAll(".asistente")];
-    if (!tarjetas.length) throw new Error("Agrega al menos un asistente.");
+
+    if (!tarjetas.length) {
+      throw new Error("Agrega al menos un asistente.");
+    }
 
     for (const tarjeta of tarjetas) {
-     const nombre = tarjeta.querySelector('[data-campo="nombre"]');
-const tipoAsistente = tarjeta.querySelector(
-  '[data-campo="tipo_asistente"]'
-);
+      const nombre = tarjeta.querySelector('[data-campo="nombre"]');
+      const tipoAsistente =
+        tarjeta.querySelector('[data-campo="tipo_asistente"]');
 
-if (
-  !nombre ||
-  !tipoAsistente ||
-  !nombre.reportValidity() ||
-  !tipoAsistente.reportValidity()
-) {
-  return;
-}
+      if (
+        !nombre ||
+        !tipoAsistente ||
+        !nombre.reportValidity() ||
+        !tipoAsistente.reportValidity()
+      ) {
+        return;
+      }
     }
 
     registroCalculado = crearRegistro();
+
     const asistentes = registroCalculado.detalle_asistentes;
-    const original = asistentes.reduce((s, p) => s + p.tarifa_original, 0);
-    const final = asistentes.reduce((s, p) => s + p.importe_final, 0);
+    const original = asistentes.reduce(
+      (s, p) => s + p.tarifa_original, 0
+    );
+    const final = asistentes.reduce(
+      (s, p) => s + p.importe_final, 0
+    );
 
     renderizarResultado(asistentes, original, final);
     $("agregarAlArchivo").disabled = false;
-    mostrarMensaje("mensaje",
+
+    mostrarMensaje(
+      "mensaje",
       "Cálculo correcto. Aún no se ha agregado al JSON ni se ha registrado pago.",
-      "ok");
+      "ok"
+    );
   } catch (error) {
     registroCalculado = null;
     $("agregarAlArchivo").disabled = true;
@@ -791,26 +1362,53 @@ $("exportarJSON").addEventListener("click", () => {
   }
 });
 
+$("exportarJSONPagos").addEventListener("click", () => {
+  try {
+    descargarJSON();
+  } catch (error) {
+    mostrarMensaje("mensajePago", error.message, "error");
+  }
+});
+
 $("limpiar").addEventListener("click", () => {
   $("nombreFamilia").value = "";
   $("responsable").value = "";
   $("mesa").value = "";
+
   listaAsistentes.replaceChildren();
   siguienteId = 0;
   crearAsistente();
   limpiarResultados();
 });
 
-["nombreFamilia","responsable","mesa"].forEach(id => {
+["nombreFamilia", "responsable", "mesa"].forEach(id => {
   $(id).addEventListener("input", limpiarResultados);
   $(id).addEventListener("change", limpiarResultados);
 });
 
-// Al abrir, no se puede capturar nada hasta validar el JSON.
+$("pagoReservacion").addEventListener("change", () => {
+  renderizarPanelPago();
+  mostrarMensaje("mensajePago", "", "");
+});
+
+$("registrarPago").addEventListener("click", () => {
+  try {
+    registrarPago();
+  } catch (error) {
+    mostrarMensaje("mensajePago", error.message, "error");
+  }
+});
+
+// Al abrir, no se puede capturar nada hasta validar el JSON maestro.
 bloquearCaptura();
 construirMesas();
-mostrarMensaje("estadoJSON",
-  "Carga el JSON maestro para habilitar la captura.", "");
+inicializarResponsablesPago();
+
+mostrarMensaje(
+  "estadoJSON",
+  "Carga el JSON maestro para habilitar la captura.",
+  ""
+);
 </script>
 </body>
 </html>
