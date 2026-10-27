@@ -53,16 +53,28 @@
       </div>
     </section>
 
-    <!-- Navegación principal -->
-    <nav class="module-navigation" aria-label="Módulos administrativos">
-      <a class="module-link active" href="#directorio">
-        Personas y socios
-      </a>
+<!-- Navegación principal -->
+<nav class="module-navigation" aria-label="Módulos administrativos">
+  <a
+    class="module-link active"
+    href="#directorio"
+    aria-current="page"
+  >
+    Personas y socios
+  </a>
 
-      <a class="module-link" href="#configuracionCuotasPanel">
-        Configuración de cuotas
-      </a>
-    </nav>
+  <a
+    class="module-link"
+    href="#configuracionCuotasPanel"
+  >
+    Configuración de cuotas
+  </a>
+
+  <div class="module-current" aria-live="polite">
+    <span>Sección actual</span>
+    <strong id="moduloActivoTexto">Personas y socios</strong>
+  </div>
+</nav>
 
     <!-- Módulo de personas y socios -->
     <section id="directorio" class="module-section">
@@ -76,7 +88,40 @@
           </p>
         </div>
       </div>
+<!-- Estado y carga inicial del padrón -->
+<section
+  id="estadoCargaPadron"
+  class="padron-status"
+  aria-live="polite"
+  aria-atomic="true"
+>
+  <div class="padron-status-copy">
+    <span class="padron-status-label">Estado del padrón</span>
+    <h3 id="estadoCargaTitulo">Padrón pendiente de cargar</h3>
+    <p id="estadoCargaTexto">
+      Importa tu archivo JSON para recuperar los registros existentes
+      o inicia un padrón nuevo si todavía no tienes uno.
+    </p>
+  </div>
 
+  <div class="padron-status-actions">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="btnImportarPadronInicial"
+    >
+      Importar padrón JSON
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-primary"
+      id="btnCrearPadronInicial"
+    >
+      Crear padrón nuevo
+    </button>
+  </div>
+</section>
       <!-- Indicadores -->
       <section class="stats-grid" aria-label="Resumen del directorio">
 
@@ -712,7 +757,17 @@
       role="status"
       aria-live="polite"
     ></div>
-
+<button
+  type="button"
+  id="btnVolverArriba"
+  class="back-to-top"
+  aria-label="Volver al inicio de la página"
+  title="Volver arriba"
+  hidden
+>
+  ↑
+  <span>Volver arriba</span>
+</button>
   </main>
 
   <footer class="site-footer">
