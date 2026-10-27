@@ -83,7 +83,9 @@ const CAMPOS_DETALLE = [
 
 document.addEventListener("DOMContentLoaded", iniciarModulo);
 
+
 function iniciarModulo() {
+  prepararNavegacionModulos();
   prepararSelectCategoria();
   conectarEventos();
   actualizarSubcategorias();
@@ -95,6 +97,7 @@ function iniciarModulo() {
     "aviso"
   );
 }
+
 
 function conectarEventos() {
   /* Directorio */
