@@ -1131,8 +1131,12 @@ function guardarPersona(evento) {
   padronCargado = true;
   padronPendienteExportar = true;
 
-  cerrarFormulario();
-  renderizarTodo();
+cerrarFormulario();
+
+renderizarTodo();
+prepararSelectSociosPagos();
+renderizarHistoricoPagos();
+renderizarMovimientosPagos();
 }
 
 /* =========================================================
@@ -1408,6 +1412,10 @@ padronPendienteExportar = false;
     cerrarDetalle();
     renderizarTodo();
 
+    prepararSelectSociosPagos();
+renderizarHistoricoPagos();
+renderizarMovimientosPagos();
+    
     mostrarMensaje(
       `Importación correcta: ${personas.length} registro(s) cargados. ` +
       "Exporta el JSON si realizas modificaciones.",
