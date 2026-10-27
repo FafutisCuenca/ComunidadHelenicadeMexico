@@ -33,6 +33,13 @@ let personas = [];
 let personaEnEdicion = null;
 let mensajeTemporizador = null;
 
+/*
+ * Estado del padrón durante la sesión actual.
+ * No guarda información en el repositorio ni en una base de datos.
+ */
+let padronCargado = false;
+let padronPendienteExportar = false;
+
 let cuotasAnuales = crearCuotasIniciales();
 let anioCuotaEnEdicion = null;
 let cuotasImportadas = false;
@@ -86,18 +93,21 @@ document.addEventListener("DOMContentLoaded", iniciarModulo);
 
 function iniciarModulo() {
   prepararNavegacionModulos();
+  prepararBotonVolverArriba();
   prepararSelectCategoria();
   conectarEventos();
   actualizarSubcategorias();
+
   renderizarTodo();
   renderizarCuotas();
+  actualizarEstadoPadron();
 
   mostrarMensaje(
-    "Módulo listo. Los cambios se conservan mediante archivos JSON.",
+    "Módulo listo. Importa un padrón existente o crea uno nuevo. " +
+    "Los cambios se conservan mediante archivos JSON.",
     "aviso"
   );
 }
-
 
 /* =========================================================
    NAVEGACIÓN ENTRE MÓDULOS
