@@ -187,14 +187,21 @@
           </label>
 
           <label>
-            Categoría de socio
-            <select id="categoria">
-              <option value="">Sin definir</option>
-              <option value="Socio numerario">Socio numerario</option>
-              <option value="Socio amigo">Socio amigo</option>
-              <option value="Otra categoría">Otra categoría</option>
-            </select>
-          </label>
+  Categoría *
+  <select id="categoria" required>
+    <option value="">Selecciona una categoría</option>
+    <option value="Socio">Socio</option>
+    <option value="Amistad">Amistad</option>
+    <option value="Otra categoría">Otra categoría</option>
+  </select>
+</label>
+
+<label>
+  Subcategoría *
+  <select id="subcategoria" required>
+    <option value="">Selecciona una subcategoría</option>
+  </select>
+</label>
 
           <label>
             Estatus del registro *
