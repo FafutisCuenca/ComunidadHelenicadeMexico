@@ -414,10 +414,28 @@ function crearAsistente() {
     return cont;
   }
 
-  rejilla.append(
-    campoTexto("Nombre del asistente *", "text", "nombre", true, "Nombre"),
-    campoTexto("Edad en años *", "number", "edad", true, "")
-  );
+const campoNombre = campoTexto(
+  "Nombre del asistente *",
+  "text",
+  "nombre",
+  true,
+  "Nombre completo"
+);
+
+const campoTipo = crear("div", undefined, "campo");
+const etiquetaTipo = crear("label", "Tipo de asistente *");
+const selectorTipo = document.createElement("select");
+
+selectorTipo.dataset.campo = "tipo_asistente";
+selectorTipo.required = true;
+selectorTipo.add(new Option("Selecciona una categoría", ""));
+selectorTipo.add(new Option("Adulto", "adulto"));
+selectorTipo.add(new Option("Menor", "menor"));
+selectorTipo.id = "tipo-asistente-" + id;
+etiquetaTipo.htmlFor = selectorTipo.id;
+
+campoTipo.append(etiquetaTipo, selectorTipo);
+rejilla.append(campoNombre, campoTipo);
 
   const campoBeneficio = crear("div", undefined, "campo completo");
   const labelBeneficio = crear("label", "Beneficio individual");
