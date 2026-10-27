@@ -1492,12 +1492,17 @@ function exportarJSON() {
 function crearCuotasIniciales() {
   return [
     {
-      anio: 2025,
-      monto: 1500,
+      anio: 2028,
+      monto: 2000,
       moneda: MONEDA_CUOTAS
     },
     {
       anio: 2026,
+      monto: 1500,
+      moneda: MONEDA_CUOTAS
+    },
+    {
+      anio: 2025,
       monto: 1500,
       moneda: MONEDA_CUOTAS
     }
