@@ -593,8 +593,13 @@ function crearRegistro() {
     reservacion_id:id,
     tipo_reservacion:"grupo",
     nombre_reservacion:nombreFamilia,
-    adultos:asistentes.filter(p => p.categoria === "adulto").length,
-    ninos:asistentes.filter(p => p.categoria === "nino_3_a_8").length,
+adultos: asistentes.filter(
+  p => p.tipo_asistente === "adulto"
+).length,
+
+ninos: asistentes.filter(
+  p => p.tipo_asistente === "menor"
+).length,
     total_asientos_excel:asistentes.length,
     mesa_numero:mesaNumero,
     mesa_id:mesaId,
@@ -630,8 +635,8 @@ function renderizarResultado(asistentes, totalOriginal, totalFinal) {
   const tabla = document.createElement("table");
   const thead = document.createElement("thead");
   const th = document.createElement("tr");
-  ["Asistente","Edad","Categoría","Tarifa original",
-   "Beneficio","Ajuste","Importe final"].forEach(t =>
+["Asistente","Tipo","Tarifa original",
+ "Beneficio","Ajuste","Importe final"].forEach(t =>
     th.appendChild(crear("th", t)));
   thead.appendChild(th);
   tabla.appendChild(thead);
@@ -639,9 +644,10 @@ function renderizarResultado(asistentes, totalOriginal, totalFinal) {
   const tbody = document.createElement("tbody");
   asistentes.forEach(p => {
     const tr = document.createElement("tr");
-    const categoria = p.categoria === "adulto" ? "Adulto" : "Niño de 3 a 8 años";
+    const categoria =
+  p.tipo_asistente === "adulto" ? "Adulto" : "Menor";
     [
-      p.nombre, String(p.edad), categoria, pesos(p.tarifa_original),
+      p.nombre, categoria, pesos(p.tarifa_original),
       p.beneficio_nombre || "Ninguno", pesos(p.importe_ajuste), pesos(p.importe_final)
     ].forEach(t => tr.appendChild(crear("td", t)));
     tbody.appendChild(tr);
