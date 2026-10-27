@@ -1,0 +1,1034 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#174b43">
+  <title>Nueva reservación | OXI 2026</title>
+
+  <style>
+    :root {
+      --verde: #174b43;
+      --verde-claro: #eaf3ef;
+      --azul: #263c57;
+      --borde: #d9e0e5;
+      --fondo: #f5f7f8;
+      --texto: #263238;
+      --rojo: #a32929;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--fondo);
+      color: var(--texto);
+      font: 16px/1.5 Arial, sans-serif;
+    }
+
+    header {
+      background: var(--verde);
+      color: white;
+      padding: 22px 18px;
+    }
+
+    header .contenedor, main {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    h1 { margin: 0 0 5px; font-size: 25px; }
+    h2 { color: var(--verde); font-size: 20px; margin: 0 0 16px; }
+    h3 { color: var(--azul); font-size: 17px; margin: 0; }
+
+    main { padding: 22px 16px 40px; }
+
+    .aviso, .panel {
+      border-radius: 9px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .aviso {
+      background: #fff8df;
+      border: 1px solid #ead58d;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--borde);
+    }
+
+    .rejilla {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .completo { grid-column: 1 / -1; }
+
+    label { font-size: 14px; font-weight: bold; }
+
+    input, select, textarea {
+      width: 100%;
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid #b9c5cd;
+      border-radius: 6px;
+      background: white;
+      color: var(--texto);
+      font: inherit;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      min-width: auto;
+    }
+
+    .asistente {
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      padding: 15px;
+      margin: 14px 0;
+    }
+
+    .asistente-cabecera {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .autorizacion {
+      margin-top: 14px;
+      padding: 13px;
+      background: #f6f8fa;
+      border-radius: 7px;
+    }
+
+    .check-linea {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-weight: normal;
+    }
+
+    .botones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: bold;
+    }
+
+    button:disabled { opacity: .55; cursor: not-allowed; }
+
+    .primario { background: var(--verde); color: white; }
+    .secundario { background: var(--verde-claro); color: var(--verde); }
+    .peligro { background: #faeaea; color: var(--rojo); padding: 7px 10px; }
+
+    .resumen-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .indicador {
+      background: var(--verde-claro);
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .indicador span { display: block; font-size: 13px; }
+    .indicador strong { font-size: 22px; overflow-wrap: anywhere; }
+
+    .tabla-contenedor { overflow-x: auto; margin-top: 18px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--borde); }
+    th { background: #f3f6f7; }
+
+    .mensaje {
+      padding: 12px;
+      border-radius: 7px;
+      margin-top: 14px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .mensaje.error { color: #8c2020; background: #fff0f0; border: 1px solid #efc5c5; }
+    .mensaje.ok { color: #145b35; background: #eaf6ee; border: 1px solid #b8dfc5; }
+    .nota { color: #5a6870; font-size: 13px; }
+    .oculto { display: none !important; }
+
+    footer { text-align: center; color: #65727a; padding: 18px; font-size: 13px; }
+
+    .home-float {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 999;
+      padding: 12px 16px;
+      border-radius: 30px;
+      background: #17365d;
+      color: white;
+      text-decoration: none;
+      box-shadow: 0 4px 12px #0003;
+    }
+
+    @media (max-width: 650px) {
+      .rejilla, .resumen-grid { grid-template-columns: 1fr; }
+      .panel { padding: 14px; }
+      h1 { font-size: 21px; }
+      .indicador strong { font-size: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="contenedor">
+      <h1>Nueva reservación</h1>
+      <p>Comunidad Helénica de México A.C. · Día del OXI · 25 de octubre de 2026</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="aviso">
+      <strong>Importante:</strong>
+      los cambios se mantienen en la memoria de esta página hasta descargar
+      el JSON. No se modifican automáticamente los archivos de GitHub.
+      No uses datos personales reales en las pruebas.
+    </div>
+
+    <section class="panel">
+      <h2>1. Datos de la reservación</h2>
+
+      <div class="rejilla">
+        <div class="campo completo">
+          <label for="nombreFamilia">Nombre del grupo o reservación *</label>
+          <input id="nombreFamilia" maxlength="100" required
+                 placeholder="Ej. Familia de prueba">
+        </div>
+
+        <div class="campo">
+          <label for="responsable">Persona responsable</label>
+          <input id="responsable" maxlength="100"
+                 placeholder="Nombre de la persona responsable">
+        </div>
+
+        <div class="campo">
+          <label for="mesa">Mesa</label>
+          <select id="mesa">
+            <option value="">Sin asignar</option>
+          </select>
+          <p class="nota">
+            La selección no confirma disponibilidad ni capacidad.
+            La validación de ocupación se realizará en el módulo de consulta.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>2. Asistentes individuales</h2>
+      <p class="nota">
+        Adultos: 9 años o más, $700. Niños de 3 a 8 años, $350.
+        La tarifa de menores de 3 años aún no está definida.
+        Cada asistente puede tener un solo beneficio.
+      </p>
+
+      <div id="listaAsistentes"></div>
+
+      <div class="botones">
+        <button type="button" class="secundario" id="agregarAsistente">
+          + Agregar asistente
+        </button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>3. Resumen económico</h2>
+
+      <div class="resumen-grid">
+        <div class="indicador">
+          <span>Asistentes</span>
+          <strong id="totalPersonas">0</strong>
+        </div>
+        <div class="indicador">
+          <span>Importe original</span>
+          <strong id="importeOriginal">$0.00</strong>
+        </div>
+        <div class="indicador">
+          <span>Importe ajustado</span>
+          <strong id="importeFinal">$0.00</strong>
+        </div>
+      </div>
+
+      <p id="resumenAjustes" class="nota">
+        Captura los asistentes y calcula la reservación.
+      </p>
+
+      <div id="tablaResultado" class="tabla-contenedor"></div>
+
+      <div class="botones">
+        <button type="button" class="primario" id="calcular">
+          Calcular reservación
+        </button>
+        <button type="button" class="secundario" id="limpiar">
+          Limpiar formulario
+        </button>
+      </div>
+
+      <div id="mensaje" aria-live="polite"></div>
+    </section>
+
+    <section class="panel" id="panelJSON">
+      <h2>4. Archivo maestro de reservaciones JSON</h2>
+
+      <p>
+        Importa el JSON maestro existente para conservar su contenido,
+        agrega las nuevas reservaciones y descarga una copia actualizada.
+      </p>
+
+      <p class="nota">
+        Importar reemplaza la lista de trabajo en memoria. No reemplaza
+        ningún archivo del repositorio. Verifica el archivo antes de exportar.
+      </p>
+
+      <div class="campo">
+        <label for="archivoJSON">Importar JSON existente</label>
+        <input id="archivoJSON" type="file" accept=".json,application/json">
+      </div>
+
+      <div class="botones">
+        <button type="button" class="primario" id="agregarAlArchivo" disabled>
+          Agregar reservación calculada
+        </button>
+        <button type="button" class="secundario" id="exportarJSON" disabled>
+          Descargar JSON actualizado
+        </button>
+      </div>
+
+      <div id="estadoJSON" class="mensaje" aria-live="polite">
+        Importa el JSON maestro antes de agregar una reservación.
+      </div>
+
+      <div id="listaJSON" class="tabla-contenedor"></div>
+    </section>
+  </main>
+
+  <footer>
+    Comunidad Helénica de México A.C. · OXI 2026
+  </footer>
+
+  <a class="home-float" href="../index.html">⌂ HOME</a>
+
+  <!-- Verifica que estos nombres coincidan exactamente con los de GitHub. -->
+  <script src="./js/calculo_asistentes.js"></script>
+
+  <script>
+    "use strict";
+
+    const CONFIG_URL = "./config/reglas-pagos-oxi-2026.json";
+    const EVENTO_ID = "OXI-2026";
+    const FORMATO_VERSION = 2;
+    const CAPACIDAD_MESA_DEFAULT = 10;
+
+    const $ = id => document.getElementById(id);
+    const listaAsistentes = $("listaAsistentes");
+    const moneda = new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN"
+    });
+
+    let configuracion = null;
+    let motorListo = false;
+    let siguienteId = 0;
+    let registroCalculado = null;
+    let documentoTrabajo = null;
+
+    function pesos(valor) {
+      return moneda.format(Number(valor || 0));
+    }
+
+    function crear(tag, texto, clase) {
+      const nodo = document.createElement(tag);
+      if (texto !== undefined && texto !== null) nodo.textContent = texto;
+      if (clase) nodo.className = clase;
+      return nodo;
+    }
+
+    function mostrarMensaje(id, texto, tipo) {
+      const elemento = $(id);
+      elemento.className = "mensaje" + (tipo ? " " + tipo : "");
+      elemento.textContent = texto;
+    }
+
+    function limpiarResultados() {
+      registroCalculado = null;
+      $("totalPersonas").textContent = "0";
+      $("importeOriginal").textContent = pesos(0);
+      $("importeFinal").textContent = pesos(0);
+      $("resumenAjustes").textContent = "Vuelve a calcular la reservación.";
+      $("tablaResultado").replaceChildren();
+      $("agregarAlArchivo").disabled = true;
+      mostrarMensaje("mensaje", "", "");
+    }
+
+    async function cargarConfiguracion() {
+      const respuesta = await fetch(CONFIG_URL, { cache: "no-store" });
+      if (!respuesta.ok) {
+        throw new Error("No se pudo cargar " + CONFIG_URL);
+      }
+
+      configuracion = await respuesta.json();
+
+      if (
+        configuracion.evento_id !== EVENTO_ID ||
+        !configuracion.tarifas ||
+        !Array.isArray(configuracion.beneficios)
+      ) {
+        throw new Error("La configuración de tarifas no tiene la estructura esperada.");
+      }
+
+      if (!window.CalculoAsistentesOXI) {
+        throw new Error(
+          "No se encontró ./js/calculo_asistentes.js. Verifica el nombre y la ruta."
+        );
+      }
+
+      await window.CalculoAsistentesOXI.iniciar();
+      motorListo = true;
+    }
+
+    function construirMesas() {
+      const selector = $("mesa");
+      selector.replaceChildren(new Option("Sin asignar", ""));
+
+      // Permite seleccionar mesas 1 a 20; no implica que todas existan
+      // o estén disponibles. Consulta debe validar la asignación real.
+      for (let numero = 1; numero <= 20; numero++) {
+        const id = "OXI-M" + String(numero).padStart(3, "0");
+        selector.add(new Option("Mesa " + numero, id));
+      }
+    }
+
+    function crearAsistente() {
+      const id = ++siguienteId;
+      const tarjeta = crear("article", undefined, "asistente");
+      tarjeta.dataset.id = String(id);
+
+      const cabecera = crear("div", undefined, "asistente-cabecera");
+      cabecera.appendChild(crear("h3", "Asistente " + id));
+
+      const botonEliminar = crear("button", "Eliminar", "peligro");
+      botonEliminar.type = "button";
+      botonEliminar.addEventListener("click", () => {
+        tarjeta.remove();
+        actualizarTitulos();
+        limpiarResultados();
+      });
+
+      cabecera.appendChild(botonEliminar);
+      tarjeta.appendChild(cabecera);
+
+      const rejilla = crear("div", undefined, "rejilla");
+
+      const campoNombre = crear("div", undefined, "campo");
+      const labelNombre = crear("label", "Nombre del asistente *");
+      const nombre = crear("input");
+      nombre.type = "text";
+      nombre.required = true;
+      nombre.maxLength = 100;
+      nombre.placeholder = "Nombre del asistente";
+      nombre.dataset.campo = "nombre";
+      nombre.id = "nombre-" + id;
+      labelNombre.htmlFor = nombre.id;
+      campoNombre.append(labelNombre, nombre);
+
+      const campoEdad = crear("div", undefined, "campo");
+      const labelEdad = crear("label", "Edad en años *");
+      const edad = crear("input");
+      edad.type = "number";
+      edad.min = "0";
+      edad.max = "120";
+      edad.step = "1";
+      edad.required = true;
+      edad.dataset.campo = "edad";
+      edad.id = "edad-" + id;
+      labelEdad.htmlFor = edad.id;
+      campoEdad.append(labelEdad, edad);
+
+      const campoBeneficio = crear("div", undefined, "campo completo");
+      const labelBeneficio = crear("label", "Beneficio individual");
+      const beneficio = crear("select");
+      beneficio.dataset.campo = "beneficio";
+      beneficio.id = "beneficio-" + id;
+      labelBeneficio.htmlFor = beneficio.id;
+
+      beneficio.add(new Option("Sin beneficio", ""));
+
+      configuracion.beneficios.forEach(item => {
+        beneficio.add(new Option(item.nombre, item.id));
+      });
+
+      campoBeneficio.append(labelBeneficio, beneficio);
+      rejilla.append(campoNombre, campoEdad, campoBeneficio);
+      tarjeta.appendChild(rejilla);
+
+      const bloqueAutorizacion = crear("div", undefined, "autorizacion oculto");
+
+      const campoCheck = crear("div", undefined, "campo completo");
+      const labelCheck = crear("label", undefined, "check-linea");
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.dataset.campo = "autorizado";
+      labelCheck.append(
+        check,
+        document.createTextNode(" Beneficio autorizado por la administración")
+      );
+      campoCheck.appendChild(labelCheck);
+
+      const rejillaAutorizacion = crear("div", undefined, "rejilla");
+
+      const campoAutorizador = crear("div", undefined, "campo");
+      const labelAutorizador = crear("label", "Nombre del autorizador *");
+      const autorizador = crear("input");
+      autorizador.type = "text";
+      autorizador.maxLength = 100;
+      autorizador.dataset.campo = "autorizador";
+      autorizador.id = "autorizador-" + id;
+      labelAutorizador.htmlFor = autorizador.id;
+      campoAutorizador.append(labelAutorizador, autorizador);
+
+      const campoMotivo = crear("div", undefined, "campo");
+      const labelMotivo = crear("label", "Motivo del beneficio *");
+      const motivo = crear("input");
+      motivo.type = "text";
+      motivo.maxLength = 250;
+      motivo.dataset.campo = "motivo";
+      motivo.id = "motivo-" + id;
+      labelMotivo.htmlFor = motivo.id;
+      campoMotivo.append(labelMotivo, motivo);
+
+      rejillaAutorizacion.append(campoAutorizador, campoMotivo);
+      bloqueAutorizacion.append(campoCheck, rejillaAutorizacion);
+      tarjeta.appendChild(bloqueAutorizacion);
+
+      function actualizarBeneficio() {
+        const beneficioId = beneficio.value;
+        const regla = configuracion.beneficios.find(x => x.id === beneficioId);
+        const requiere = Boolean(regla);
+
+        bloqueAutorizacion.classList.toggle("oculto", !requiere);
+        check.checked = false;
+        autorizador.value = "";
+        motivo.value = "";
+
+        autorizador.required = requiere;
+        motivo.required = requiere;
+        check.required = requiere;
+
+        limpiarResultados();
+      }
+
+      beneficio.addEventListener("change", actualizarBeneficio);
+      tarjeta.addEventListener("input", limpiarResultados);
+      tarjeta.addEventListener("change", limpiarResultados);
+
+      listaAsistentes.appendChild(tarjeta);
+      actualizarTitulos();
+    }
+
+    function actualizarTitulos() {
+      [...listaAsistentes.querySelectorAll(".asistente")].forEach((tarjeta, indice) => {
+        tarjeta.querySelector("h3").textContent = "Asistente " + (indice + 1);
+      });
+    }
+
+    function leerAsistente(tarjeta) {
+      const campo = nombre => tarjeta.querySelector('[data-campo="' + nombre + '"]');
+      const nombre = campo("nombre").value.trim();
+      const edadTexto = campo("edad").value.trim();
+
+      if (!nombre) throw new Error("Escribe el nombre de cada asistente.");
+      if (!edadTexto || !Number.isInteger(Number(edadTexto))) {
+        throw new Error("Captura una edad entera para cada asistente.");
+      }
+
+      const beneficioId = campo("beneficio").value || null;
+      const regla = configuracion.beneficios.find(x => x.id === beneficioId);
+
+      const autorizado = beneficioId ? campo("autorizado").checked : false;
+      const autorizador = beneficioId ? campo("autorizador").value.trim() : "";
+      const motivo = beneficioId ? campo("motivo").value.trim() : "";
+
+      if (regla && regla.requiere_autorizacion && !autorizado) {
+        throw new Error("El beneficio " + regla.nombre + " requiere autorización.");
+      }
+
+      if (regla && regla.requiere_autorizacion && !autorizador) {
+        throw new Error("Indica quién autorizó el beneficio.");
+      }
+
+      if ((regla && regla.requiere_motivo) ||
+          beneficioId === "ITHAKI_50" ||
+          beneficioId === "EGEO_50") {
+        if (!motivo) throw new Error("Indica el motivo del beneficio.");
+      }
+
+      const datos = {
+        nombre,
+        edad: Number(edadTexto),
+        beneficio_id: beneficioId,
+        autorizado,
+        autorizador,
+        motivo
+      };
+
+      const resultado = window.CalculoAsistentesOXI.calcularAsistente(datos);
+
+      return {
+        nombre,
+        edad: resultado.edad,
+        categoria: resultado.categoria,
+        tarifa_original: resultado.tarifa_original,
+        beneficio_id: resultado.beneficio_id,
+        beneficio_nombre: resultado.beneficio_nombre,
+        autorizado: resultado.autorizado,
+        tipo_ajuste: resultado.tipo_ajuste,
+        importe_ajuste: resultado.importe_ajuste,
+        importe_final: resultado.importe_final,
+        motivo: resultado.motivo,
+        autorizador: resultado.autorizador
+      };
+    }
+
+    function renderizarResultado(asistentes, totalOriginal, totalFinal) {
+      $("totalPersonas").textContent = String(asistentes.length);
+      $("importeOriginal").textContent = pesos(totalOriginal);
+      $("importeFinal").textContent = pesos(totalFinal);
+
+      const descuento = Math.round((totalOriginal - totalFinal) * 100) / 100;
+      $("resumenAjustes").textContent =
+        "Descuentos y cortesías: " + pesos(descuento) +
+        ". Esta cifra no representa pagos recibidos.";
+
+      const tabla = document.createElement("table");
+      const thead = document.createElement("thead");
+      const filaCabecera = document.createElement("tr");
+
+      [
+        "Asistente", "Edad", "Categoría", "Tarifa original",
+        "Beneficio", "Ajuste", "Importe final"
+      ].forEach(t => filaCabecera.appendChild(crear("th", t)));
+
+      thead.appendChild(filaCabecera);
+      tabla.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      asistentes.forEach(persona => {
+        const fila = document.createElement("tr");
+        const categoria = persona.categoria === "adulto"
+          ? "Adulto"
+          : "Niño de 3 a 8 años";
+
+        [
+          persona.nombre,
+          String(persona.edad),
+          categoria,
+          pesos(persona.tarifa_original),
+          persona.beneficio_nombre || "Ninguno",
+          pesos(persona.importe_ajuste),
+          pesos(persona.importe_final)
+        ].forEach(t => fila.appendChild(crear("td", t)));
+
+        tbody.appendChild(fila);
+      });
+
+      tabla.appendChild(tbody);
+      $("tablaResultado").replaceChildren(tabla);
+    }
+
+    function crearRegistro() {
+      const nombreFamilia = $("nombreFamilia").value.trim();
+      const responsable = $("responsable").value.trim();
+      const tarjetas = [...listaAsistentes.querySelectorAll(".asistente")];
+
+      if (!nombreFamilia) throw new Error("Escribe el nombre de la reservación.");
+      if (!tarjetas.length) throw new Error("Agrega al menos un asistente.");
+
+      const asistentes = tarjetas.map(leerAsistente);
+      const totalOriginal = asistentes.reduce((s, p) => s + p.tarifa_original, 0);
+      const totalFinal = Math.round(
+        asistentes.reduce((s, p) => s + p.importe_final, 0) * 100
+      ) / 100;
+
+      const mesaId = $("mesa").value || null;
+      const coincidencia = mesaId ? mesaId.match(/(\d+)/) : null;
+      const mesaNumero = coincidencia ? Number(coincidencia[1]) : null;
+
+      const beneficios = [...new Set(
+        asistentes.filter(p => p.beneficio_nombre).map(p => p.beneficio_nombre)
+      )];
+
+      const importeCortesias = Math.round(
+        asistentes.filter(p => p.beneficio_id === "CORTESIA")
+          .reduce((s, p) => s + p.tarifa_original, 0) * 100
+      ) / 100;
+
+      // Se crea una ID nueva por cálculo. Los importes se calculan únicamente
+      // para esta reservación nueva; nunca se recorren ni recalculan históricos.
+      const id = "OXI-WEB-" + new Date().toISOString().replace(/\D/g, "") +
+        "-" + Math.random().toString(36).slice(2, 7).toUpperCase();
+
+      return {
+        reservacion_id: id,
+        tipo_reservacion: "grupo",
+        nombre_reservacion: nombreFamilia,
+
+        adultos: asistentes.filter(p => p.categoria === "adulto").length,
+        ninos: asistentes.filter(p => p.categoria === "nino_3_a_8").length,
+        total_asientos_excel: asistentes.length,
+
+        mesa_numero: mesaNumero,
+        mesa_id: mesaId,
+
+        // Campos históricos conservados como nombres del formato v2.
+        // En las reservaciones nuevas reflejan el cálculo inicial, no un pago.
+        costo_excel: totalOriginal,
+        subtotal_excel: totalFinal,
+        pagado_excel: 0,
+        debe_excel: totalFinal,
+        estado_pago_excel: totalFinal === 0 ? "PAGADO" : "PENDIENTE",
+        forma_pago_excel: null,
+        beneficio_excel: beneficios.length ? beneficios.join(", ") : null,
+        cortesia_excel: importeCortesias,
+        notas_excel: null,
+        fila_origen_excel: null,
+
+        responsable,
+        origen_registro: "captura_web",
+        fecha_captura: new Date().toISOString(),
+        estado_reservacion: "capturada",
+        estado_pago: totalFinal === 0 ? "pagado" : "pendiente",
+
+        detalle_asistentes: asistentes.map(p => ({ ...p }))
+      };
+    }
+
+    function validarDocumento(doc) {
+      if (!doc || typeof doc !== "object") {
+        throw new Error("El archivo JSON no contiene un objeto válido.");
+      }
+
+      if (doc.formato_version !== FORMATO_VERSION) {
+        throw new Error("El JSON debe tener formato_version: 2.");
+      }
+
+      if (doc.evento_id !== EVENTO_ID) {
+        throw new Error("El archivo no corresponde al evento OXI-2026.");
+      }
+
+      if (!Array.isArray(doc.reservaciones)) {
+        throw new Error("El JSON debe contener el arreglo reservaciones.");
+      }
+
+      const ids = new Set();
+
+      for (const r of doc.reservaciones) {
+        if (!r || typeof r !== "object" || !r.reservacion_id) {
+          throw new Error("Se encontró una reservación sin reservacion_id.");
+        }
+
+        const id = String(r.reservacion_id);
+
+        if (ids.has(id)) {
+          throw new Error("El JSON contiene IDs duplicadas: " + id);
+        }
+        ids.add(id);
+
+        for (const campo of ["adultos", "ninos"]) {
+          if (!Number.isInteger(Number(r[campo] ?? 0)) || Number(r[campo] ?? 0) < 0) {
+            throw new Error("Cantidad inválida en " + id + ": " + campo);
+          }
+        }
+      }
+
+      return true;
+    }
+
+    function renderizarListaJSON() {
+      const contenedor = $("listaJSON");
+      contenedor.replaceChildren();
+
+      if (!documentoTrabajo) return;
+
+      const tabla = document.createElement("table");
+      const thead = document.createElement("thead");
+      const tr = document.createElement("tr");
+
+      ["Reservación", "Asistentes", "Importe inicial", "Mesa", "Origen"].forEach(
+        t => tr.appendChild(crear("th", t))
+      );
+
+      thead.appendChild(tr);
+      tabla.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      documentoTrabajo.reservaciones.forEach(r => {
+        const fila = document.createElement("tr");
+        const total = Number(r.subtotal_excel ?? 0);
+        const mesa = r.mesa_numero ? "Mesa " + r.mesa_numero : "Sin asignar";
+
+        [
+          r.nombre_reservacion || r.reservacion_id,
+          String(r.total_asientos_excel ?? (Number(r.adultos || 0) + Number(r.ninos || 0))),
+          pesos(total),
+          mesa,
+          r.origen_registro || (r.fila_origen_excel ? "Excel" : "Histórico")
+        ].forEach(t => fila.appendChild(crear("td", t)));
+
+        tbody.appendChild(fila);
+      });
+
+      tabla.appendChild(tbody);
+      contenedor.appendChild(tabla);
+
+      mostrarMensaje(
+        "estadoJSON",
+        "JSON cargado en memoria. Reservaciones: " +
+          documentoTrabajo.reservaciones.length +
+          ". Los registros existentes no han sido recalculados.",
+        "ok"
+      );
+    }
+
+    async function importarJSON(archivo) {
+      const texto = await archivo.text();
+      const importado = JSON.parse(texto);
+      validarDocumento(importado);
+
+      // Se conserva el documento completo, incluidos metadatos y campos extra.
+      // No se transforma ni recalcula ninguna reservación existente.
+      documentoTrabajo = importado;
+      $("exportarJSON").disabled = false;
+      renderizarListaJSON();
+    }
+
+    function agregarRegistroAlDocumento() {
+      if (!documentoTrabajo) {
+        throw new Error("Primero importa el JSON maestro.");
+      }
+
+      if (!registroCalculado) {
+        throw new Error("Primero calcula la reservación.");
+      }
+
+      const id = registroCalculado.reservacion_id;
+      if (documentoTrabajo.reservaciones.some(r => r.reservacion_id === id)) {
+        throw new Error("La reservación ya existe en el JSON: " + id);
+      }
+
+      // Únicamente agrega el nuevo registro. No modifica los anteriores.
+      documentoTrabajo.reservaciones.push(
+        JSON.parse(JSON.stringify(registroCalculado))
+      );
+
+      renderizarListaJSON();
+      $("agregarAlArchivo").disabled = true;
+
+      mostrarMensaje(
+        "estadoJSON",
+        "Reservación agregada. Descarga el JSON actualizado y revisa el archivo antes de subirlo a GitHub.",
+        "ok"
+      );
+    }
+
+    function descargarJSON() {
+      if (!documentoTrabajo) {
+        throw new Error("No hay un JSON cargado para exportar.");
+      }
+
+      validarDocumento(documentoTrabajo);
+
+      const blob = new Blob(
+        [JSON.stringify(documentoTrabajo, null, 2)],
+        { type: "application/json;charset=utf-8" }
+      );
+
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = "reservaciones-oxi-2026-actualizado.json";
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      URL.revokeObjectURL(url);
+
+      mostrarMensaje(
+        "estadoJSON",
+        "Descarga solicitada. Verifica el archivo antes de reemplazar el JSON de tu repositorio.",
+        "ok"
+      );
+    }
+
+    $("agregarAsistente").addEventListener("click", () => {
+      crearAsistente();
+      limpiarResultados();
+    });
+
+    $("calcular").addEventListener("click", async () => {
+      limpiarResultados();
+
+      try {
+        if (!$("nombreFamilia").value.trim()) {
+          throw new Error("Escribe el nombre de la reservación.");
+        }
+
+        const tarjetas = [...listaAsistentes.querySelectorAll(".asistente")];
+        if (!tarjetas.length) throw new Error("Agrega al menos un asistente.");
+
+        // reportValidity de todo el formulario también valida nombres y edades.
+        for (const tarjeta of tarjetas) {
+          const nombre = tarjeta.querySelector('[data-campo="nombre"]');
+          const edad = tarjeta.querySelector('[data-campo="edad"]');
+
+          if (!nombre.reportValidity() || !edad.reportValidity()) return;
+
+          const beneficio = tarjeta.querySelector('[data-campo="beneficio"]').value;
+          if (beneficio) {
+            const autorizado = tarjeta.querySelector('[data-campo="autorizado"]');
+            const autorizador = tarjeta.querySelector('[data-campo="autorizador"]');
+            const motivo = tarjeta.querySelector('[data-campo="motivo"]');
+
+            if (!autorizado.checked) {
+              throw new Error("Marca la autorización administrativa de cada beneficio.");
+            }
+            if (!autorizador.value.trim()) {
+              throw new Error("Indica el nombre de quien autorizó cada beneficio.");
+            }
+            if (!motivo.value.trim()) {
+              throw new Error("Indica el motivo de cada beneficio.");
+            }
+          }
+        }
+
+        if (!motorListo) await cargarConfiguracion();
+
+        registroCalculado = crearRegistro();
+
+        const asistentes = registroCalculado.detalle_asistentes;
+        const totalOriginal = asistentes.reduce((s, p) => s + p.tarifa_original, 0);
+        const totalFinal = asistentes.reduce((s, p) => s + p.importe_final, 0);
+
+        renderizarResultado(asistentes, totalOriginal, totalFinal);
+        $("agregarAlArchivo").disabled = !documentoTrabajo;
+
+        mostrarMensaje(
+          "mensaje",
+          "Cálculo correcto. Aún no se ha agregado al JSON ni se ha registrado pago.",
+          "ok"
+        );
+      } catch (error) {
+        registroCalculado = null;
+        $("agregarAlArchivo").disabled = true;
+        mostrarMensaje("mensaje", error.message, "error");
+      }
+    });
+
+    $("agregarAlArchivo").addEventListener("click", () => {
+      try {
+        agregarRegistroAlDocumento();
+      } catch (error) {
+        mostrarMensaje("estadoJSON", error.message, "error");
+      }
+    });
+
+    $("exportarJSON").addEventListener("click", () => {
+      try {
+        descargarJSON();
+      } catch (error) {
+        mostrarMensaje("estadoJSON", error.message, "error");
+      }
+    });
+
+    $("archivoJSON").addEventListener("change", async evento => {
+      const archivo = evento.target.files[0];
+      if (!archivo) return;
+
+      try {
+        await importarJSON(archivo);
+        $("agregarAlArchivo").disabled = !registroCalculado;
+      } catch (error) {
+        documentoTrabajo = null;
+        $("agregarAlArchivo").disabled = true;
+        $("exportarJSON").disabled = true;
+        $("listaJSON").replaceChildren();
+        mostrarMensaje("estadoJSON", "No se pudo importar: " + error.message, "error");
+      } finally {
+        evento.target.value = "";
+      }
+    });
+
+    $("limpiar").addEventListener("click", () => {
+      $("nombreFamilia").value = "";
+      $("responsable").value = "";
+      $("mesa").value = "";
+      listaAsistentes.replaceChildren();
+      siguienteId = 0;
+      crearAsistente();
+      limpiarResultados();
+    });
+
+    // Invalidar el cálculo si cambia cualquier dato general de la reservación.
+    ["nombreFamilia", "responsable", "mesa"].forEach(id => {
+      $(id).addEventListener("input", limpiarResultados);
+      $(id).addEventListener("change", limpiarResultados);
+    });
+
+    async function iniciar() {
+      construirMesas();
+      crearAsistente();
+
+      try {
+        await cargarConfiguracion();
+        mostrarMensaje(
+          "mensaje",
+          "Configuración de tarifas y motor de cálculo cargados correctamente.",
+          "ok"
+        );
+      } catch (error) {
+        mostrarMensaje(
+          "mensaje",
+          "No se pudo iniciar el cálculo: " + error.message +
+          "\nVerifica los nombres y rutas de los archivos en GitHub.",
+          "error"
+        );
+      }
+    }
+
+    iniciar();
+  </script>
+</body>
+</html>
