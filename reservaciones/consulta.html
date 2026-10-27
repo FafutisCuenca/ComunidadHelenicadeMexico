@@ -615,6 +615,16 @@ function texto(valor) {
   return valor === null || valor === undefined ? "" : String(valor).trim();
 }
 
+function idReservacion(r) {
+  return texto(
+    r.reservacion_id ??
+    r.id ??
+    r.id_reservacion ??
+    r.folio ??
+    ""
+  );
+}
+  
 function escapar(valor) {
   return texto(valor).replace(/[&<>"']/g, c => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -754,15 +764,26 @@ function validarDocumento(doc) {
     throw new Error("El JSON debe contener un arreglo llamado reservaciones.");
   }
 
-  const ids = new Set();
-  for (const r of doc.reservaciones) {
-    if (!r || typeof r !== "object") throw new Error("Se encontró una reservación inválida.");
-    if (r.id === undefined || r.id === null || texto(r.id) === "") {
-      throw new Error("Existe una reservación sin identificador (id).");
-    }
-    const id = String(r.id);
-    if (ids.has(id)) throw new Error("Hay identificadores de reservación duplicados: " + id);
-    ids.add(id);
+const ids = new Set();
+
+for (const r of doc.reservaciones) {
+  if (!r || typeof r !== "object" || Array.isArray(r)) {
+    throw new Error("Se encontró una reservación inválida.");
+  }
+
+  const id = idReservacion(r);
+
+  if (!id) {
+    throw new Error(
+      "Existe una reservación sin identificador. Revisa los campos id y reservacion_id."
+    );
+  }
+
+  if (ids.has(id)) {
+    throw new Error("Hay identificadores de reservación duplicados: " + id);
+  }
+
+  ids.add(id);
 
     for (const campo of ["adultos", "ninos"]) {
       if (r[campo] !== undefined && r[campo] !== null && r[campo] !== "") {
