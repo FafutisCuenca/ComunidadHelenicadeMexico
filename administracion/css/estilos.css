@@ -70,17 +70,18 @@ textarea:focus-visible {
   display: none !important;
 }
 
-/* Encabezado institucional */
-
+/* =========================================
+   ENCABEZADO INSTITUCIONAL
+   ========================================= */
 
 .topbar {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  min-height: 180px;
-  padding: 38px max(24px, calc((100% - 1250px) / 2));
+  gap: 28px;
+  min-height: 205px;
+  padding: 36px max(24px, calc((100% - 1250px) / 2));
   color: var(--blanco);
   background:
     radial-gradient(
@@ -95,7 +96,7 @@ textarea:focus-visible {
 .brand {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 22px;
   min-width: 0;
 }
 
@@ -103,8 +104,9 @@ textarea:focus-visible {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 76px;
-  height: 76px;
+  width: 82px;
+  height: 82px;
+  overflow: hidden;
   border: 2px solid rgba(233, 215, 169, 0.9);
   border-radius: 15px;
   color: var(--azul);
@@ -112,7 +114,6 @@ textarea:focus-visible {
   box-shadow: 0 5px 16px rgba(0, 0, 0, 0.18);
   font-size: 23px;
   font-weight: 800;
-  letter-spacing: -1px;
 }
 
 .brand-mark img {
@@ -125,6 +126,9 @@ textarea:focus-visible {
 }
 
 .brand > div:last-child {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-width: 0;
 }
 
@@ -138,16 +142,23 @@ textarea:focus-visible {
 }
 
 .topbar .eyebrow {
+  margin: 0 0 12px;
   color: #e9d7a9;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.5;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
 }
 
 .brand h1 {
-  margin: 5px 0 0;
+  margin: 0;
   color: var(--blanco);
-  font-size: clamp(25px, 3vw, 34px);
+  font-size: clamp(27px, 3vw, 35px);
   font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.5px;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+  overflow-wrap: anywhere;
 }
 
 .back-link {
@@ -169,11 +180,14 @@ textarea:focus-visible {
 }
 
 .back-link:hover {
+  color: var(--blanco);
   background: rgba(255, 255, 255, 0.15);
   border-color: var(--dorado);
 }
 
-/* Contenido principal */
+/* =========================================
+   CONTENIDO PRINCIPAL
+   ========================================= */
 
 .page {
   width: min(1250px, calc(100% - 48px));
@@ -200,7 +214,9 @@ textarea:focus-visible {
   color: var(--azul);
 }
 
-/* Indicadores */
+/* =========================================
+   INDICADORES
+   ========================================= */
 
 .stats {
   display: grid;
@@ -236,7 +252,9 @@ textarea:focus-visible {
   overflow-wrap: anywhere;
 }
 
-/* Paneles */
+/* =========================================
+   PANELES
+   ========================================= */
 
 .panel {
   margin-bottom: 24px;
@@ -271,7 +289,9 @@ textarea:focus-visible {
   color: var(--gris);
 }
 
-/* Botones */
+/* =========================================
+   BOTONES
+   ========================================= */
 
 .button {
   display: inline-flex;
@@ -303,6 +323,7 @@ textarea:focus-visible {
 }
 
 .button-primary:hover {
+  color: var(--blanco);
   background: var(--azul-claro);
 }
 
@@ -322,7 +343,9 @@ textarea:focus-visible {
   opacity: 0.55;
 }
 
-/* Búsqueda y filtros */
+/* =========================================
+   BÚSQUEDA Y FILTROS
+   ========================================= */
 
 .toolbar {
   display: grid;
@@ -387,7 +410,9 @@ textarea:focus-visible {
   border: 0;
 }
 
-/* Tabla de personas */
+/* =========================================
+   TABLA DE PERSONAS
+   ========================================= */
 
 .table-wrap {
   width: 100%;
@@ -514,7 +539,9 @@ tbody tr:hover {
   font-size: 13px;
 }
 
-/* Formulario de alta y edición */
+/* =========================================
+   FORMULARIO DE ALTA Y EDICIÓN
+   ========================================= */
 
 .form-panel {
   scroll-margin-top: 20px;
@@ -577,7 +604,9 @@ tbody tr:hover {
   text-align: right;
 }
 
-/* Botones para cerrar formularios y detalles */
+/* =========================================
+   BOTONES DE CIERRE
+   ========================================= */
 
 .icon-button {
   display: grid;
@@ -598,7 +627,9 @@ tbody tr:hover {
   background: var(--azul-suave);
 }
 
-/* Ficha detallada */
+/* =========================================
+   FICHA DETALLADA
+   ========================================= */
 
 .detail-dialog {
   width: min(720px, calc(100% - 28px));
@@ -656,7 +687,9 @@ tbody tr:hover {
   margin-top: 22px;
 }
 
-/* Mensajes de estado */
+/* =========================================
+   MENSAJES DE ESTADO
+   ========================================= */
 
 .toast {
   position: fixed;
@@ -703,7 +736,9 @@ tbody tr:hover {
   border-left-color: var(--dorado);
 }
 
-/* Pie institucional */
+/* =========================================
+   PIE INSTITUCIONAL
+   ========================================= */
 
 footer {
   display: flex;
@@ -724,11 +759,31 @@ footer span:first-child {
   font-weight: 750;
 }
 
-/* Adaptación a tabletas */
+/* =========================================
+   ADAPTACIÓN A TABLETAS
+   ========================================= */
 
 @media (max-width: 1000px) {
   .topbar {
-    padding: 24px;
+    padding: 30px 24px;
+    gap: 20px;
+  }
+
+  .brand {
+    gap: 17px;
+  }
+
+  .brand-mark {
+    width: 72px;
+    height: 72px;
+  }
+
+  .brand h1 {
+    font-size: clamp(25px, 3vw, 32px);
+  }
+
+  .topbar .eyebrow {
+    font-size: 12px;
   }
 
   .toolbar {
@@ -752,30 +807,47 @@ footer span:first-child {
   }
 }
 
-/* Adaptación a celulares */
+/* =========================================
+   ADAPTACIÓN A CELULARES
+   ========================================= */
 
 @media (max-width: 650px) {
   .topbar {
     align-items: flex-start;
     flex-direction: column;
-    gap: 18px;
-    padding: 24px 18px;
+    gap: 20px;
+    min-height: 0;
+    padding: 28px 18px 32px;
   }
 
   .brand {
-    align-items: flex-start;
+    align-items: center;
     gap: 13px;
+    width: 100%;
   }
 
   .brand-mark {
-    width: 60px;
-    height: 60px;
+    width: 62px;
+    height: 62px;
     border-radius: 12px;
-    font-size: 20px;
+  }
+
+  .brand > div:last-child {
+    flex: 1;
+  }
+
+  .topbar .eyebrow {
+    margin-bottom: 8px;
+    font-size: 10px;
+    line-height: 1.5;
+    letter-spacing: 0.45px;
+    overflow-wrap: anywhere;
   }
 
   .brand h1 {
-    font-size: 25px;
+    font-size: 24px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
   }
 
   .back-link {
@@ -828,7 +900,7 @@ footer span:first-child {
   }
 
   .toolbar {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 10px;
   }
 
@@ -850,7 +922,7 @@ footer span:first-child {
   }
 
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 15px;
   }
 
@@ -880,7 +952,7 @@ footer span:first-child {
   }
 
   .detail-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .detail-grid dt {
@@ -904,6 +976,10 @@ footer span:first-child {
   }
 }
 
+/* =========================================
+   ACCESIBILIDAD: MOVIMIENTO REDUCIDO
+   ========================================= */
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -915,8 +991,14 @@ footer span:first-child {
   }
 }
 
+/* =========================================
+   IMPRESIÓN
+   ========================================= */
+
 @media print {
   .topbar {
+    min-height: 0;
+    padding: 20px;
     color: #000;
     background: #fff;
     border-bottom: 3px solid var(--dorado);
