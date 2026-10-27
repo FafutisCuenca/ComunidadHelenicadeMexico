@@ -708,37 +708,30 @@
       class="detail-dialog"
       aria-labelledby="detalleNombre"
     >
-
       <div class="dialog-header">
-        <div>
-          <p class="section-eyebrow">Ficha de registro</p>
+        <div class="detail-title">
+          <p class="section-eyebrow">DIRECTORIO INSTITUCIONAL</p>
           <h2 id="detalleNombre">Detalle de persona</h2>
+          <p class="detail-subtitle">Ficha de socio o persona registrada</p>
         </div>
 
         <button
           type="button"
-          class="btn btn-ghost"
+          class="detail-close"
           id="btnCerrarDetalle"
           aria-label="Cerrar ficha"
+          title="Cerrar"
         >
-          Cerrar
+          &times;
         </button>
       </div>
 
       <div
         id="detalleCampos"
-        class="detail-grid"
+        class="detail-sections"
       ></div>
 
       <div class="dialog-actions">
-        <button
-          type="button"
-          class="btn btn-ghost"
-          id="btnDetalleCerrar"
-        >
-          Cerrar
-        </button>
-
         <button
           type="button"
           class="btn btn-primary"
@@ -747,7 +740,6 @@
           Editar persona
         </button>
       </div>
-
     </dialog>
 
     <!-- Mensajes del sistema -->
