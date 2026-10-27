@@ -1,0 +1,1442 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173c35">
+  <title>Consulta de reservaciones | OXI-2026</title>
+  <style>
+    :root {
+      --verde: #173c35;
+      --verde-2: #24594e;
+      --dorado: #b89555;
+      --fondo: #f4f6f4;
+      --texto: #24332f;
+      --borde: #d9e1dc;
+      --blanco: #fff;
+      --rojo: #a93226;
+      --naranja: #9a5b0a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      line-height: 1.45;
+    }
+
+    header {
+      background: var(--verde);
+      color: white;
+      padding: 22px 18px;
+      border-bottom: 4px solid var(--dorado);
+    }
+
+    .encabezado {
+      max-width: 1400px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    header h1 { margin: 0 0 5px; font-size: 25px; }
+    header p { margin: 0; opacity: .9; }
+
+    .navegacion {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    a.enlace-cabecera {
+      display: inline-block;
+      border: 1px solid #ffffff80;
+      color: white;
+      text-decoration: none;
+      padding: 9px 12px;
+      border-radius: 8px;
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 22px auto;
+      padding: 0 16px 35px;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 7px #173c350b;
+    }
+
+    h2 { color: var(--verde); margin: 0 0 14px; font-size: 20px; }
+    h3 { color: var(--verde); margin: 0 0 10px; font-size: 16px; }
+
+    .fila {
+      display: flex;
+      align-items: end;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 150px;
+      flex: 1;
+    }
+
+    label { font-weight: 600; font-size: 13px; }
+
+    input, select, textarea {
+      font: inherit;
+      border: 1px solid #cbd6cf;
+      border-radius: 7px;
+      padding: 10px;
+      min-width: 0;
+      background: white;
+      color: var(--texto);
+      width: 100%;
+    }
+
+    textarea { min-height: 75px; resize: vertical; }
+
+    button, .boton {
+      border: 0;
+      border-radius: 7px;
+      background: var(--verde);
+      color: white;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    button:hover, .boton:hover { background: var(--verde-2); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+
+    button.secundario {
+      background: #e8eeea;
+      color: var(--verde);
+      border: 1px solid #d2ddd5;
+    }
+
+    button.secundario:hover { background: #dce6df; }
+
+    button.peligro { background: #a93226; }
+    button.dorado { background: #8c6a30; }
+
+    .acciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .estado {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 7px;
+      background: #edf3ef;
+      color: var(--verde);
+      overflow-wrap: anywhere;
+    }
+
+    .estado.error { background: #fbe9e7; color: #922b21; }
+    .estado.aviso { background: #fff3dc; color: #80520c; }
+
+    .resumen {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .tarjeta {
+      background: white;
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      padding: 15px;
+      min-width: 0;
+    }
+
+    .tarjeta .etiqueta { color: #5d6c65; font-size: 12px; }
+    .tarjeta .valor {
+      color: var(--verde);
+      font-size: 25px;
+      font-weight: 700;
+      margin-top: 5px;
+      overflow-wrap: anywhere;
+    }
+
+    .pestanas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    .pestanas button {
+      background: #e6ece7;
+      color: var(--verde);
+      border: 1px solid #d4ded6;
+    }
+
+    .pestanas button.activa { background: var(--verde); color: white; }
+    .vista[hidden] { display: none !important; }
+
+    .tabla-contenedor {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #e5ebe6;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eaf0eb;
+      color: var(--verde);
+      white-space: nowrap;
+    }
+
+    tbody tr:hover { background: #f8faf8; }
+    td.num { text-align: right; white-space: nowrap; }
+    td.acciones-celda { white-space: nowrap; }
+    td.acciones-celda button { padding: 7px 9px; font-size: 12px; }
+    tfoot { font-weight: 700; background: #f0f4f0; }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      background: #e8eeea;
+      color: var(--verde);
+    }
+
+    .badge.pagado { background: #d9f0df; color: #1d6335; }
+    .badge.parcial { background: #fff0cb; color: #855400; }
+    .badge.pendiente { background: #fbe1df; color: #922b21; }
+    .badge.cortesia { background: #e6e1f6; color: #51408a; }
+    .badge.alerta { background: #ffebcc; color: #80520c; }
+
+    .nota { color: #627169; font-size: 12px; }
+    .vacio { text-align: center; padding: 24px; color: #627169; }
+    .alinear-derecha { text-align: right; }
+    .oculto { display: none !important; }
+
+    .formulario-edicion {
+      border: 2px solid var(--dorado);
+      background: #fffdf7;
+    }
+
+    .formulario-edicion .campos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .campo-ancho { grid-column: 1 / -1; }
+
+    footer {
+      text-align: center;
+      padding: 18px;
+      color: #66736c;
+      font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 21px; }
+      main { padding-left: 10px; padding-right: 10px; }
+      .panel { padding: 13px; }
+      .tarjeta .valor { font-size: 21px; }
+    }
+
+    @media print {
+      body { background: white; }
+      header { background: white; color: black; border-bottom: 2px solid #333; }
+      .navegacion, .no-imprimir, #panelCarga, .pestanas,
+      .acciones-celda, #editor, footer { display: none !important; }
+      main { max-width: none; margin: 0; padding: 0; }
+      .panel, .tarjeta { box-shadow: none; break-inside: avoid; }
+      .vista[hidden] { display: none !important; }
+      .tabla-contenedor { overflow: visible; }
+      table { font-size: 10px; }
+      th, td { padding: 5px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="encabezado">
+    <div>
+      <h1>Comunidad Helénica de México A.C.</h1>
+      <p>Consulta y control de reservaciones · Día del OXI 2026</p>
+    </div>
+    <nav class="navegacion no-imprimir" aria-label="Navegación">
+      <a class="enlace-cabecera" href="./index.html">← Reservaciones</a>
+      <a class="enlace-cabecera" href="../index.html">Inicio</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="panel" id="panelCarga">
+    <h2>Archivo de reservaciones</h2>
+    <div class="fila no-imprimir">
+      <div class="campo">
+        <label for="archivoJson">Seleccionar archivo JSON</label>
+        <input id="archivoJson" type="file" accept=".json,application/json">
+      </div>
+      <button id="btnCargar" type="button">Cargar archivo</button>
+    </div>
+    <div id="estadoCarga" class="estado" role="status" aria-live="polite">
+      Selecciona el JSON de OXI-2026 para consultar las reservaciones.
+    </div>
+    <p class="nota">
+      Los cambios se realizan en este navegador. Para conservarlos, exporta el JSON actualizado
+      y sustituye el archivo correspondiente en el repositorio. No se utiliza una base de datos.
+    </p>
+    <div class="acciones no-imprimir">
+      <button id="btnExportarJSON" type="button" disabled>Exportar JSON actualizado</button>
+      <button id="btnExportarCSV" class="secundario" type="button" disabled>Exportar CSV de grupos</button>
+      <button id="btnExportarPadron" class="secundario" type="button" disabled>Exportar padrón CSV</button>
+      <button id="btnExportarFinanzas" class="secundario" type="button" disabled>Exportar finanzas CSV</button>
+      <button id="btnReporte" class="secundario" type="button" disabled>Generar reporte imprimible</button>
+      <button id="btnImprimir" class="secundario" type="button">Imprimir vista actual</button>
+    </div>
+  </section>
+
+  <section id="resumen" class="resumen" aria-label="Resumen de reservaciones">
+    <div class="tarjeta"><div class="etiqueta">Reservaciones</div><div id="rReservaciones" class="valor">—</div></div>
+    <div class="tarjeta"><div class="etiqueta">Asistentes</div><div id="rAsistentes" class="valor">—</div></div>
+    <div class="tarjeta"><div class="etiqueta">Adultos</div><div id="rAdultos" class="valor">—</div></div>
+    <div class="tarjeta"><div class="etiqueta">Niños</div><div id="rNinos" class="valor">—</div></div>
+    <div class="tarjeta"><div class="etiqueta">Mesas configuradas</div><div id="rMesas" class="valor">—</div></div>
+    <div class="tarjeta"><div class="etiqueta">Sin mesa asignada</div><div id="rSinMesa" class="valor">—</div></div>
+    <div class="tarjeta"><div class="etiqueta">Total registrado</div><div id="rSubtotal" class="valor">—</div></div>
+    <div class="tarjeta"><div class="etiqueta">Saldo pendiente</div><div id="rSaldo" class="valor">—</div></div>
+  </section>
+
+  <div class="pestanas no-imprimir" role="tablist" aria-label="Vistas de consulta">
+    <button type="button" class="activa" data-vista="vistaMesas">Mesas</button>
+    <button type="button" data-vista="vistaPadron">Padrón de asistentes</button>
+    <button type="button" data-vista="vistaGrupos">Grupos y finanzas</button>
+    <button type="button" data-vista="vistaSinMesa">Sin mesa</button>
+  </div>
+
+  <section id="vistaMesas" class="vista panel">
+    <div class="fila" style="justify-content:space-between;align-items:center">
+      <div>
+        <h2>Distribución por mesa</h2>
+        <p class="nota">La capacidad de 10 personas es una referencia operativa, no un límite que impida asignar asistentes.</p>
+      </div>
+      <div class="acciones no-imprimir">
+        <button id="btnAgregarMesa" type="button">+ Agregar mesa</button>
+      </div>
+    </div>
+    <div class="fila no-imprimir" style="margin-bottom:12px">
+      <div class="campo">
+        <label for="filtroMesa">Filtrar por mesa</label>
+        <select id="filtroMesa">
+          <option value="todas">Todas las mesas</option>
+        </select>
+      </div>
+    </div>
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Mesa</th>
+            <th>Reservaciones</th>
+            <th>Adultos</th>
+            <th>Niños</th>
+            <th>Total asignado</th>
+            <th>Capacidad de referencia</th>
+            <th>Disponibles (referencia)</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="tablaMesas">
+          <tr><td colspan="8" class="vacio">Carga un archivo JSON para consultar las mesas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="vistaPadron" class="vista panel" hidden>
+    <h2>Padrón de asistentes y reservaciones</h2>
+    <p class="nota">
+      Cada fila representa una reservación o grupo. El nombre individual solo se muestra si existe
+      un registro de asistentes individuales en el JSON.
+    </p>
+    <div class="fila no-imprimir" style="margin-bottom:12px">
+      <div class="campo">
+        <label for="buscarPadron">Buscar por referencia, responsable o mesa</label>
+        <input id="buscarPadron" type="search" placeholder="Escribe para buscar…">
+      </div>
+      <div class="campo">
+        <label for="filtroPadronMesa">Mesa</label>
+        <select id="filtroPadronMesa"><option value="todas">Todas las mesas</option></select>
+      </div>
+    </div>
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Referencia</th>
+            <th>Grupo / responsable</th>
+            <th>Tipo</th>
+            <th>Adultos</th>
+            <th>Niños</th>
+            <th>Total</th>
+            <th>Mesa</th>
+            <th>Estado de pago</th>
+            <th class="no-imprimir">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPadron">
+          <tr><td colspan="9" class="vacio">Carga un archivo JSON.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="vistaGrupos" class="vista panel" hidden>
+    <h2>Grupos y detalle financiero</h2>
+    <p class="nota">
+      Los importes reflejan los datos registrados. La edición no recalcula automáticamente importes,
+      descuentos ni saldos: cualquier ajuste financiero debe revisarse expresamente.
+    </p>
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Referencia</th>
+            <th>Grupo / responsable</th>
+            <th>Tipo</th>
+            <th>Adultos</th>
+            <th>Niños</th>
+            <th>Total</th>
+            <th>Mesa</th>
+            <th>Beneficio</th>
+            <th>Estado de pago</th>
+            <th>Forma de pago</th>
+            <th>Costo Excel</th>
+            <th>Cortesía</th>
+            <th>Subtotal</th>
+            <th>Pagado</th>
+            <th>Debe</th>
+            <th>Notas</th>
+            <th class="no-imprimir">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaGrupos">
+          <tr><td colspan="17" class="vacio">Carga un archivo JSON.</td></tr>
+        </tbody>
+        <tfoot id="pieGrupos"></tfoot>
+      </table>
+    </div>
+  </section>
+
+  <section id="vistaSinMesa" class="vista panel" hidden>
+    <h2>Reservaciones sin mesa asignada</h2>
+    <p class="nota">Aquí aparecen únicamente las reservaciones sin número de mesa válido. Las mesas 11 y superiores sí son válidas.</p>
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Referencia</th>
+            <th>Grupo / responsable</th>
+            <th>Adultos</th>
+            <th>Niños</th>
+            <th>Total</th>
+            <th>Estado de pago</th>
+            <th class="no-imprimir">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaSinMesa">
+          <tr><td colspan="7" class="vacio">Carga un archivo JSON.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="editor" class="panel formulario-edicion" hidden>
+    <h2>Editar reservación</h2>
+    <p id="editReferenciaTexto" class="nota"></p>
+    <form id="formEdicion">
+      <input type="hidden" id="editId">
+      <div class="campos">
+        <div class="campo">
+          <label for="editNombre">Grupo / responsable</label>
+          <input id="editNombre" required>
+        </div>
+        <div class="campo">
+          <label for="editTipo">Tipo de reservación</label>
+          <input id="editTipo" placeholder="Ej. Grupo, familia, socio">
+        </div>
+        <div class="campo">
+          <label for="editMesa">Mesa asignada</label>
+          <select id="editMesa">
+            <option value="">Sin mesa asignada</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="editAdultos">Adultos</label>
+          <input id="editAdultos" type="number" min="0" step="1" required>
+        </div>
+        <div class="campo">
+          <label for="editNinos">Niños</label>
+          <input id="editNinos" type="number" min="0" step="1" required>
+        </div>
+        <div class="campo">
+          <label for="editBeneficio">Beneficio / descuento</label>
+          <input id="editBeneficio" placeholder="Ej. ITHAKI, EGEO">
+        </div>
+        <div class="campo">
+          <label for="editEstadoPago">Estado de pago</label>
+          <select id="editEstadoPago">
+            <option value="">Sin especificar</option>
+            <option value="PAGADO">PAGADO</option>
+            <option value="PARCIAL">PARCIAL</option>
+            <option value="PENDIENTE">PENDIENTE</option>
+            <option value="NO PAGADO">NO PAGADO</option>
+            <option value="CORTESIA">CORTESIA</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="editFormaPago">Forma de pago</label>
+          <input id="editFormaPago" placeholder="Efectivo, transferencia…">
+        </div>
+        <div class="campo">
+          <label for="editCosto">Costo según Excel</label>
+          <input id="editCosto" type="number" min="0" step="1">
+        </div>
+        <div class="campo">
+          <label for="editCortesia">Importe de cortesía</label>
+          <input id="editCortesia" type="number" min="0" step="1">
+        </div>
+        <div class="campo">
+          <label for="editSubtotal">Subtotal</label>
+          <input id="editSubtotal" type="number" min="0" step="1">
+        </div>
+        <div class="campo">
+          <label for="editPagado">Importe pagado</label>
+          <input id="editPagado" type="number" min="0" step="1">
+        </div>
+        <div class="campo">
+          <label for="editDebe">Saldo pendiente</label>
+          <input id="editDebe" type="number" min="0" step="1">
+        </div>
+        <div class="campo campo-ancho">
+          <label for="editNotas">Notas</label>
+          <textarea id="editNotas"></textarea>
+        </div>
+      </div>
+      <p class="nota">Importante: los campos financieros se conservan según los valores capturados. Confirma los importes antes de guardar cualquier ajuste.</p>
+      <div class="acciones no-imprimir">
+        <button type="submit">Guardar cambios</button>
+        <button id="btnCancelarEdicion" class="secundario" type="button">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="panelReporte" class="panel" hidden>
+    <h2>Reporte para impresión</h2>
+    <div id="contenidoReporte"></div>
+    <div class="acciones no-imprimir" style="margin-top:14px">
+      <button id="btnImprimirReporte" type="button">Imprimir reporte</button>
+      <button id="btnCerrarReporte" class="secundario" type="button">Cerrar reporte</button>
+    </div>
+  </section>
+</main>
+
+<footer>Comunidad Helénica de México A.C. · Día del OXI 2026 · Consulta administrativa</footer>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+let documentoActual = null;
+let reservaciones = [];
+let padron = [];
+let mesas = [];
+let capacidadMesa = 10;
+let vistaActual = "vistaMesas";
+
+const CAMPOS_NOMBRE = [
+  "grupo", "nombre_grupo", "responsable", "nombre_responsable",
+  "nombre", "titular", "cliente", "nombre_completo"
+];
+
+function dinero(valor) {
+  const n = Number(valor);
+  if (!Number.isFinite(n)) return "$0";
+  return "$" + Math.round(n).toLocaleString("es-MX");
+}
+
+function numero(valor) {
+  if (valor === null || valor === undefined || valor === "") return 0;
+  const n = Number(String(valor).replace(/[$,\s]/g, ""));
+  return Number.isFinite(n) ? n : 0;
+}
+
+function texto(valor) {
+  return valor === null || valor === undefined ? "" : String(valor).trim();
+}
+
+function escapar(valor) {
+  return texto(valor).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[c]);
+}
+
+function referencia(r) {
+  return texto(r.folio || r.referencia || r.id_reservacion || r.id || "SIN-REF");
+}
+
+function nombreGrupo(r) {
+  for (const campo of CAMPOS_NOMBRE) {
+    if (texto(r[campo])) return texto(r[campo]);
+  }
+  return "Sin nombre registrado";
+}
+
+function adultos(r) {
+  return Math.max(0, numero(
+    r.adultos ?? r.cantidad_adultos ?? r.num_adultos ?? r.adultos_reservados
+  ));
+}
+
+function ninos(r) {
+  return Math.max(0, numero(
+    r.ninos ?? r.niños ?? r.cantidad_ninos ?? r.cantidad_niños ??
+    r.num_ninos ?? r.num_niños ?? r.ninos_reservados
+  ));
+}
+
+function totalAsientos(r) {
+  const totalExplicito = r.total_personas ?? r.total_asistentes ?? r.total_asientos;
+  return Math.max(0, adultos(r) + ninos(r)) || Math.max(0, numero(totalExplicito));
+}
+
+function mesaNumero(r) {
+  const directo = r.mesa_numero ?? r.numero_mesa ?? r.mesa;
+  if (typeof directo === "number" && Number.isFinite(directo)) return directo;
+  const cadena = texto(directo);
+  if (cadena && /^\d+$/.test(cadena)) return Number(cadena);
+  const idMesa = texto(r.mesa_id ?? r.id_mesa);
+  const encontrado = idMesa.match(/(\d+)\s*$/);
+  return encontrado ? Number(encontrado[1]) : null;
+}
+
+function tipoReservacion(r) {
+  return texto(r.tipo_reservacion || r.tipo || r.categoria || r.tipo_cliente || "Grupo");
+}
+
+function estatusPago(r) {
+  return texto(
+    r.estado_pago_excel || r.estado_pago || r.estatus_pago ||
+    r.estado_cobro || r.estatus_cobro
+  ).toUpperCase();
+}
+
+function formaPago(r) {
+  return texto(r.forma_pago || r.metodo_pago || r.medio_pago);
+}
+
+function beneficio(r) {
+  return texto(r.beneficio || r.descuento || r.tipo_beneficio || r.programa);
+}
+
+function importeSubtotal(r) {
+  const valor = r.subtotal ?? r.total ?? r.importe_total ?? r.total_reservacion;
+  return Math.max(0, numero(valor));
+}
+
+function importePagado(r) {
+  return Math.max(0, numero(
+    r.pagado ?? r.importe_pagado ?? r.monto_pagado ?? r.total_pagado
+  ));
+}
+
+function importeDebe(r) {
+  const directo = r.debe ?? r.saldo_pendiente ?? r.saldo ?? r.importe_pendiente;
+  if (directo !== undefined && directo !== null && directo !== "") {
+    return Math.max(0, numero(directo));
+  }
+  return Math.max(0, importeSubtotal(r) - importePagado(r));
+}
+
+function costoExcel(r) {
+  return Math.max(0, numero(r.costo_excel ?? r.subtotal_excel ?? r.total_excel));
+}
+
+function importeCortesia(r) {
+  return Math.max(0, numero(r.cortesia ?? r.importe_cortesia ?? r.monto_cortesia));
+}
+
+function notas(r) {
+  return texto(r.notas_excel || r.notas || r.observaciones || r.comentarios);
+}
+
+function etiquetaPago(r) {
+  const e = estatusPago(r);
+  if (e.includes("CORTES")) return "CORTESIA";
+  if (e.includes("PARCIAL")) return "PARCIAL";
+  if (e === "PAGADO" || e === "LIQUIDADO" || e === "COMPLETO") return "PAGADO";
+  if (e.includes("NO PAGADO") || e === "NO_PAGADO") return "NO PAGADO";
+  if (e.includes("PENDIENT")) return "PENDIENTE";
+  if (importeDebe(r) > 0 && importePagado(r) > 0) return "PARCIAL";
+  if (importeDebe(r) > 0) return "PENDIENTE";
+  if (importeSubtotal(r) > 0 && importeDebe(r) === 0) return "PAGADO";
+  return e || "SIN ESPECIFICAR";
+}
+
+function clasePago(r) {
+  const estado = etiquetaPago(r);
+  if (estado === "PAGADO") return "pagado";
+  if (estado === "PARCIAL") return "parcial";
+  if (estado === "CORTESIA") return "cortesia";
+  if (estado === "PENDIENTE" || estado === "NO PAGADO") return "pendiente";
+  return "";
+}
+
+function celdaPago(r) {
+  return `<span class="badge ${clasePago(r)}">${escapar(etiquetaPago(r))}</span>`;
+}
+
+function etiquetaMesa(n) {
+  return n !== null && n >= 1 ? `Mesa ${n}` : "Sin mesa";
+}
+
+function validarDocumento(doc) {
+  if (!doc || typeof doc !== "object") {
+    throw new Error("El archivo no contiene un objeto JSON válido.");
+  }
+  if (doc.formato_version !== 2) {
+    throw new Error("La versión del formato no es compatible. Se esperaba formato_version: 2.");
+  }
+  if (doc.evento_id !== "OXI-2026") {
+    throw new Error("El archivo no corresponde al evento OXI-2026.");
+  }
+  if (!Array.isArray(doc.reservaciones)) {
+    throw new Error("El JSON debe contener un arreglo llamado reservaciones.");
+  }
+
+  const ids = new Set();
+  for (const r of doc.reservaciones) {
+    if (!r || typeof r !== "object") throw new Error("Se encontró una reservación inválida.");
+    if (r.id === undefined || r.id === null || texto(r.id) === "") {
+      throw new Error("Existe una reservación sin identificador (id).");
+    }
+    const id = String(r.id);
+    if (ids.has(id)) throw new Error("Hay identificadores de reservación duplicados: " + id);
+    ids.add(id);
+
+    for (const campo of ["adultos", "ninos"]) {
+      if (r[campo] !== undefined && r[campo] !== null && r[campo] !== "") {
+        const n = Number(r[campo]);
+        if (!Number.isInteger(n) || n < 0) {
+          throw new Error(`La reservación ${id} tiene un valor inválido en ${campo}.`);
+        }
+      }
+    }
+  }
+  return true;
+}
+
+function construirPadron() {
+  padron = reservaciones.map(r => ({
+    id: String(r.id),
+    referencia: referencia(r),
+    nombre: nombreGrupo(r),
+    tipo: tipoReservacion(r),
+    adultos: adultos(r),
+    ninos: ninos(r),
+    total: totalAsientos(r),
+    mesa: mesaNumero(r),
+    pago: etiquetaPago(r),
+    original: r
+  }));
+}
+
+function construirMesas() {
+  const numeros = new Set();
+
+  for (let i = 1; i <= 10; i++) numeros.add(i);
+
+  const configuradas = documentoActual &&
+    Array.isArray(documentoActual.mesas_configuradas)
+    ? documentoActual.mesas_configuradas : [];
+
+  for (const valor of configuradas) {
+    const n = Number(valor);
+    if (Number.isInteger(n) && n >= 1) numeros.add(n);
+  }
+
+  for (const r of reservaciones) {
+    const n = mesaNumero(r);
+    if (Number.isInteger(n) && n >= 1) numeros.add(n);
+  }
+
+  mesas = [...numeros].sort((a, b) => a - b).map(n => ({
+    numero: n,
+    reservaciones: 0,
+    adultos: 0,
+    ninos: 0,
+    total: 0
+  }));
+
+  const indice = new Map(mesas.map(m => [m.numero, m]));
+
+  for (const r of reservaciones) {
+    const n = mesaNumero(r);
+    if (!Number.isInteger(n) || n < 1) continue;
+    const m = indice.get(n);
+    if (!m) continue;
+    m.reservaciones++;
+    m.adultos += adultos(r);
+    m.ninos += ninos(r);
+    m.total += totalAsientos(r);
+  }
+
+  if (documentoActual) {
+    documentoActual.mesas_configuradas = mesas.map(m => m.numero);
+  }
+}
+
+function crearTarjeta(etiqueta, valor) {
+  return `<div class="tarjeta"><div class="etiqueta">${escapar(etiqueta)}</div><div class="valor">${escapar(valor)}</div></div>`;
+}
+
+function renderizarResumen() {
+  const totalAdultos = reservaciones.reduce((s, r) => s + adultos(r), 0);
+  const totalNinos = reservaciones.reduce((s, r) => s + ninos(r), 0);
+  const totalPersonas = reservaciones.reduce((s, r) => s + totalAsientos(r), 0);
+  const sinMesa = reservaciones.filter(r => {
+    const m = mesaNumero(r);
+    return m === null || m < 1;
+  }).length;
+  const subtotal = reservaciones.reduce((s, r) => s + importeSubtotal(r), 0);
+  const saldo = reservaciones.reduce((s, r) => s + importeDebe(r), 0);
+
+  $("rReservaciones").textContent = reservaciones.length.toLocaleString("es-MX");
+  $("rAsistentes").textContent = totalPersonas.toLocaleString("es-MX");
+  $("rAdultos").textContent = totalAdultos.toLocaleString("es-MX");
+  $("rNinos").textContent = totalNinos.toLocaleString("es-MX");
+  $("rMesas").textContent = mesas.length.toLocaleString("es-MX");
+  $("rSinMesa").textContent = sinMesa.toLocaleString("es-MX");
+  $("rSubtotal").textContent = dinero(subtotal);
+  $("rSaldo").textContent = dinero(saldo);
+}
+
+function renderizarMesas() {
+  const filtro = $("filtroMesa").value || "todas";
+  let lista = mesas;
+  if (filtro !== "todas") {
+    if (filtro === "sin-mesa") lista = [];
+    else lista = mesas.filter(m => String(m.numero) === filtro);
+  }
+
+  if (!lista.length) {
+    $("tablaMesas").innerHTML = `<tr><td colspan="8" class="vacio">No hay mesas para mostrar con este filtro.</td></tr>`;
+    return;
+  }
+
+  $("tablaMesas").innerHTML = lista.map(m => {
+    const disponibles = Math.max(0, capacidadMesa - m.total);
+    let estado = "Sin asignaciones";
+    let clase = "";
+    if (m.total > capacidadMesa) {
+      estado = `Excede capacidad (referencia ${capacidadMesa})`;
+      clase = "alerta";
+    } else if (m.total === capacidadMesa) {
+      estado = "Completa según referencia";
+      clase = "parcial";
+    } else if (m.total > 0) {
+      estado = "Con asignaciones";
+      clase = "pagado";
+    }
+
+    return `<tr>
+      <td><strong>${m.numero}</strong></td>
+      <td>${m.reservaciones}</td>
+      <td>${m.adultos}</td>
+      <td>${m.ninos}</td>
+      <td><strong>${m.total}</strong></td>
+      <td>${capacidadMesa}</td>
+      <td>${disponibles}</td>
+      <td><span class="badge ${clase}">${escapar(estado)}</span></td>
+    </tr>`;
+  }).join("");
+}
+
+function actualizarSelectorMesa() {
+  const actual = $("editMesa").value;
+  $("editMesa").innerHTML =
+    `<option value="">Sin mesa asignada</option>` +
+    mesas.map(m => `<option value="${m.numero}">Mesa ${m.numero}</option>`).join("");
+  if ([...$("editMesa").options].some(o => o.value === actual)) {
+    $("editMesa").value = actual;
+  }
+}
+
+function actualizarFiltroMesas() {
+  const filtro = $("filtroMesa");
+  const valorAnterior = filtro.value;
+  filtro.innerHTML = `<option value="todas">Todas las mesas</option>` +
+    mesas.map(m => `<option value="${m.numero}">Mesa ${m.numero}</option>`).join("");
+  filtro.innerHTML += `<option value="sin-mesa">Sin mesa asignada</option>`;
+  if ([...filtro.options].some(o => o.value === valorAnterior)) {
+    filtro.value = valorAnterior;
+  }
+
+  const filtroPadron = $("filtroPadronMesa");
+  const valorPadron = filtroPadron.value;
+  filtroPadron.innerHTML = `<option value="todas">Todas las mesas</option>` +
+    mesas.map(m => `<option value="${m.numero}">Mesa ${m.numero}</option>`).join("") +
+    `<option value="sin-mesa">Sin mesa asignada</option>`;
+  if ([...filtroPadron.options].some(o => o.value === valorPadron)) {
+    filtroPadron.value = valorPadron;
+  }
+}
+
+function renderizarPadron() {
+  const busqueda = texto($("buscarPadron").value).toLocaleLowerCase("es-MX");
+  const filtro = $("filtroPadronMesa").value || "todas";
+
+  const lista = padron.filter(p => {
+    const contenido = `${p.referencia} ${p.nombre} ${p.tipo} ${p.mesa ?? ""}`.toLocaleLowerCase("es-MX");
+    if (busqueda && !contenido.includes(busqueda)) return false;
+    if (filtro === "sin-mesa" && !(p.mesa === null || p.mesa < 1)) return false;
+    if (filtro !== "todas" && filtro !== "sin-mesa" && String(p.mesa) !== filtro) return false;
+    return true;
+  });
+
+  if (!lista.length) {
+    $("tablaPadron").innerHTML = `<tr><td colspan="9" class="vacio">No hay reservaciones que coincidan con la búsqueda.</td></tr>`;
+    return;
+  }
+
+  $("tablaPadron").innerHTML = lista.map(p => `<tr>
+    <td>${escapar(p.referencia)}</td>
+    <td>${escapar(p.nombre)}</td>
+    <td>${escapar(p.tipo)}</td>
+    <td class="num">${p.adultos}</td>
+    <td class="num">${p.ninos}</td>
+    <td class="num"><strong>${p.total}</strong></td>
+    <td>${escapar(p.mesa !== null && p.mesa >= 1 ? etiquetaMesa(p.mesa) : "Sin mesa")}</td>
+    <td>${celdaPago(p.original)}</td>
+    <td class="acciones-celda no-imprimir">
+      <button class="secundario btn-editar-reservacion" type="button" data-id="${escapar(p.id)}">Editar</button>
+    </td>
+  </tr>`).join("");
+}
+
+function renderizarGrupos() {
+  if (!reservaciones.length) {
+    $("tablaGrupos").innerHTML = `<tr><td colspan="17" class="vacio">No hay reservaciones.</td></tr>`;
+    $("pieGrupos").innerHTML = "";
+    return;
+  }
+
+  $("tablaGrupos").innerHTML = reservaciones.map(r => {
+    const m = mesaNumero(r);
+    const debe = importeDebe(r);
+    return `<tr>
+      <td>${escapar(referencia(r))}</td>
+      <td>${escapar(nombreGrupo(r))}</td>
+      <td>${escapar(tipoReservacion(r))}</td>
+      <td class="num">${adultos(r)}</td>
+      <td class="num">${ninos(r)}</td>
+      <td class="num">${totalAsientos(r)}</td>
+      <td>${m !== null && m >= 1 ? m : "Sin mesa"}</td>
+      <td>${escapar(beneficio(r) || "—")}</td>
+      <td>${celdaPago(r)}</td>
+      <td>${escapar(formaPago(r) || "—")}</td>
+      <td class="num">${dinero(costoExcel(r))}</td>
+      <td class="num">${dinero(importeCortesia(r))}</td>
+      <td class="num">${dinero(importeSubtotal(r))}</td>
+      <td class="num">${dinero(importePagado(r))}</td>
+      <td class="num">${debe > 0 ? `<span class="badge pendiente">${dinero(debe)}</span>` : dinero(0)}</td>
+      <td>${escapar(notas(r) || "—")}</td>
+      <td class="acciones-celda no-imprimir">
+        <button class="secundario btn-editar-reservacion" type="button" data-id="${escapar(String(r.id))}">Editar</button>
+      </td>
+    </tr>`;
+  }).join("");
+
+  const totalAdultos = reservaciones.reduce((s, r) => s + adultos(r), 0);
+  const totalNinos = reservaciones.reduce((s, r) => s + ninos(r), 0);
+  const totalAsientosGeneral = reservaciones.reduce((s, r) => s + totalAsientos(r), 0);
+  const totalCosto = reservaciones.reduce((s, r) => s + costoExcel(r), 0);
+  const totalCortesia = reservaciones.reduce((s, r) => s + importeCortesia(r), 0);
+  const totalSubtotal = reservaciones.reduce((s, r) => s + importeSubtotal(r), 0);
+  const totalPagado = reservaciones.reduce((s, r) => s + importePagado(r), 0);
+  const totalDebe = reservaciones.reduce((s, r) => s + importeDebe(r), 0);
+
+  $("pieGrupos").innerHTML = `<tr>
+    <td colspan="3">Totales</td>
+    <td class="num">${totalAdultos}</td>
+    <td class="num">${totalNinos}</td>
+    <td class="num">${totalAsientosGeneral}</td>
+    <td colspan="4"></td>
+    <td class="num">${dinero(totalCosto)}</td>
+    <td class="num">${dinero(totalCortesia)}</td>
+    <td class="num">${dinero(totalSubtotal)}</td>
+    <td class="num">${dinero(totalPagado)}</td>
+    <td class="num">${dinero(totalDebe)}</td>
+    <td colspan="2"></td>
+  </tr>`;
+}
+
+function renderizarSinMesa() {
+  const lista = reservaciones.filter(r => {
+    const m = mesaNumero(r);
+    return m === null || m < 1;
+  });
+
+  if (!lista.length) {
+    $("tablaSinMesa").innerHTML = `<tr><td colspan="7" class="vacio">Todas las reservaciones tienen mesa asignada.</td></tr>`;
+    return;
+  }
+
+  $("tablaSinMesa").innerHTML = lista.map(r => `<tr>
+    <td>${escapar(referencia(r))}</td>
+    <td>${escapar(nombreGrupo(r))}</td>
+    <td class="num">${adultos(r)}</td>
+    <td class="num">${ninos(r)}</td>
+    <td class="num">${totalAsientos(r)}</td>
+    <td>${celdaPago(r)}</td>
+    <td class="acciones-celda no-imprimir">
+      <button class="secundario btn-editar-reservacion" type="button" data-id="${escapar(String(r.id))}">Editar / asignar mesa</button>
+    </td>
+  </tr>`).join("");
+}
+
+function renderizarTodo() {
+  construirPadron();
+  construirMesas();
+  actualizarSelectorMesa();
+  renderizarResumen();
+  actualizarFiltroMesas();
+  renderizarMesas();
+  renderizarPadron();
+  renderizarGrupos();
+  renderizarSinMesa();
+
+  [
+    "btnExportarJSON", "btnExportarCSV", "btnExportarPadron",
+    "btnExportarFinanzas", "btnReporte"
+  ].forEach(id => $(id).disabled = false);
+}
+
+function mostrarEstado(mensaje, tipo = "normal") {
+  const elemento = $("estadoCarga");
+  elemento.textContent = mensaje;
+  elemento.className = "estado" + (tipo === "error" ? " error" : tipo === "aviso" ? " aviso" : "");
+}
+
+async function cargarArchivo() {
+  const archivo = $("archivoJson").files[0];
+  if (!archivo) {
+    mostrarEstado("Selecciona primero un archivo JSON.", "aviso");
+    return;
+  }
+
+  try {
+    const contenido = await archivo.text();
+    const doc = JSON.parse(contenido);
+    validarDocumento(doc);
+
+    documentoActual = doc;
+    reservaciones = doc.reservaciones;
+    capacidadMesa = Math.max(1, numero(doc.capacidad_mesa_personas) || 10);
+
+    cancelarEdicion();
+    renderizarTodo();
+    mostrarEstado(`Archivo cargado correctamente: ${archivo.name}. Reservaciones: ${reservaciones.length}.`);
+  } catch (error) {
+    mostrarEstado(error.message || "No fue posible cargar el archivo JSON.", "error");
+  }
+}
+
+function valorCampoNumerico(id, nombre) {
+  const campo = $(id);
+  if (campo.value.trim() === "") return 0;
+  const n = Number(campo.value);
+  if (!Number.isFinite(n) || n < 0) {
+    throw new Error(`El campo "${nombre}" debe ser un importe o cantidad no negativa.`);
+  }
+  return n;
+}
+
+function iniciarEdicion(id) {
+  const r = reservaciones.find(x => String(x.id) === String(id));
+  if (!r) {
+    mostrarEstado("No se encontró la reservación que intentas editar.", "error");
+    return;
+  }
+
+  actualizarSelectorMesa();
+  $("editId").value = String(r.id);
+  $("editReferenciaTexto").textContent = `Referencia: ${referencia(r)} · ID: ${r.id}`;
+  $("editNombre").value = nombreGrupo(r) === "Sin nombre registrado" ? "" : nombreGrupo(r);
+  $("editTipo").value = tipoReservacion(r);
+  const m = mesaNumero(r);
+  $("editMesa").value = m !== null && m >= 1 ? String(m) : "";
+  $("editAdultos").value = adultos(r);
+  $("editNinos").value = ninos(r);
+  $("editBeneficio").value = beneficio(r);
+  $("editEstadoPago").value = estatusPago(r);
+  $("editFormaPago").value = formaPago(r);
+  $("editCosto").value = costoExcel(r);
+  $("editCortesia").value = importeCortesia(r);
+  $("editSubtotal").value = importeSubtotal(r);
+  $("editPagado").value = importePagado(r);
+  $("editDebe").value = importeDebe(r);
+  $("editNotas").value = notas(r);
+
+  $("editor").hidden = false;
+  $("editor").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function cancelarEdicion() {
+  $("formEdicion").reset();
+  $("editId").value = "";
+  $("editor").hidden = true;
+}
+
+function guardarEdicion(evento) {
+  evento.preventDefault();
+
+  const id = $("editId").value;
+  const indice = reservaciones.findIndex(r => String(r.id) === String(id));
+  if (indice < 0) {
+    mostrarEstado("No se encontró la reservación para guardar.", "error");
+    return;
+  }
+
+  try {
+    const adultosNuevos = valorCampoNumerico("editAdultos", "Adultos");
+    const ninosNuevos = valorCampoNumerico("editNinos", "Niños");
+    if (!Number.isInteger(adultosNuevos) || !Number.isInteger(ninosNuevos)) {
+      throw new Error("Adultos y niños deben ser números enteros.");
+    }
+
+    const mesaValor = $("editMesa").value;
+    const mesaNueva = mesaValor === "" ? null : Number(mesaValor);
+    if (mesaNueva !== null && (!Number.isInteger(mesaNueva) || mesaNueva < 1)) {
+      throw new Error("La mesa debe ser un número entero positivo o quedar sin asignar.");
+    }
+
+    const costo = valorCampoNumerico("editCosto", "Costo según Excel");
+    const cortesia = valorCampoNumerico("editCortesia", "Cortesía");
+    const subtotal = valorCampoNumerico("editSubtotal", "Subtotal");
+    const pagado = valorCampoNumerico("editPagado", "Pagado");
+    const debe = valorCampoNumerico("editDebe", "Saldo pendiente");
+
+    const anterior = reservaciones[indice];
+    const nombreNuevo = texto($("editNombre").value);
+    if (!nombreNuevo) throw new Error("El grupo o responsable es obligatorio.");
+
+    const actualizado = { ...anterior };
+
+    // Actualiza el campo de nombre que ya utilizaba el registro.
+    const campoNombre = CAMPOS_NOMBRE.find(c => Object.prototype.hasOwnProperty.call(anterior, c)) || "grupo";
+    actualizado[campoNombre] = nombreNuevo;
+
+    actualizado.tipo_reservacion = texto($("editTipo").value);
+    actualizado.adultos = adultosNuevos;
+    actualizado.ninos = ninosNuevos;
+    actualizado.mesa_numero = mesaNueva;
+    actualizado.mesa_id = mesaNueva === null ? null : `OXI-M${String(mesaNueva).padStart(3, "0")}`;
+    actualizado.beneficio = texto($("editBeneficio").value);
+    actualizado.estado_pago = texto($("editEstadoPago").value);
+    actualizado.estado_pago_excel = texto($("editEstadoPago").value);
+    actualizado.forma_pago = texto($("editFormaPago").value);
+    actualizado.costo_excel = costo;
+    actualizado.cortesia = cortesia;
+    actualizado.subtotal = subtotal;
+    actualizado.pagado = pagado;
+    actualizado.debe = debe;
+    actualizado.notas = texto($("editNotas").value);
+
+    reservaciones[indice] = actualizado;
+    documentoActual.reservaciones = reservaciones;
+
+    const mesasConfiguradas = new Set(
+      Array.isArray(documentoActual.mesas_configuradas) ? documentoActual.mesas_configuradas : []
+    );
+    for (let i = 1; i <= 10; i++) mesasConfiguradas.add(i);
+    if (mesaNueva !== null) mesasConfiguradas.add(mesaNueva);
+    documentoActual.mesas_configuradas = [...mesasConfiguradas]
+      .map(Number).filter(n => Number.isInteger(n) && n >= 1)
+      .sort((a, b) => a - b);
+
+    cancelarEdicion();
+    renderizarTodo();
+    mostrarEstado(`Se guardaron los cambios de la reservación ${referencia(actualizado)}. Exporta el JSON actualizado para conservarlos.`);
+  } catch (error) {
+    mostrarEstado(error.message || "No fue posible guardar los cambios.", "error");
+  }
+}
+
+function agregarMesa() {
+  if (!documentoActual) {
+    mostrarEstado("Carga primero el archivo JSON antes de agregar mesas.", "aviso");
+    return;
+  }
+
+  const existentes = mesas.map(m => m.numero);
+  const nueva = Math.max(10, ...existentes) + 1;
+
+  const configuradas = new Set(
+    Array.isArray(documentoActual.mesas_configuradas) ? documentoActual.mesas_configuradas : []
+  );
+  configuradas.add(nueva);
+  documentoActual.mesas_configuradas = [...configuradas].sort((a, b) => a - b);
+
+  renderizarTodo();
+  $("filtroMesa").value = String(nueva);
+  renderizarMesas();
+  mostrarEstado(`Se agregó la Mesa ${nueva}. Recuerda exportar el JSON actualizado para conservar el catálogo.`);
+}
+
+function descargarArchivo(nombre, contenido, tipo) {
+  const blob = new Blob([contenido], { type: tipo });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement("a");
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportarJSONActualizado() {
+  if (!documentoActual) return;
+  documentoActual.reservaciones = reservaciones;
+  documentoActual.capacidad_mesa_personas = capacidadMesa;
+  documentoActual.mesas_configuradas = mesas.map(m => m.numero);
+  documentoActual.fecha_exportacion = new Date().toISOString();
+
+  descargarArchivo(
+    "OXI-2026-reservaciones-actualizado.json",
+    JSON.stringify(documentoActual, null, 2),
+    "application/json;charset=utf-8"
+  );
+  mostrarEstado("Se generó el JSON actualizado. Guarda el archivo exportado en el repositorio para conservar los cambios.");
+}
+
+function csvSeguro(valor) {
+  let s = texto(valor);
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return `"${s.replace(/"/g, '""')}"`;
+}
+
+function descargarCSV(nombre, filas) {
+  const csv = "\uFEFF" + filas.map(f => f.map(csvSeguro).join(",")).join("\r\n");
+  descargarArchivo(nombre, csv, "text/csv;charset=utf-8");
+}
+
+function exportarCSV() {
+  const filas = [[
+    "Referencia", "ID", "Grupo / responsable", "Tipo", "Adultos", "Niños",
+    "Total personas", "Mesa", "Beneficio", "Estado de pago", "Forma de pago",
+    "Costo Excel", "Cortesía", "Subtotal", "Pagado", "Saldo pendiente", "Notas"
+  ]];
+
+  reservaciones.forEach(r => filas.push([
+    referencia(r), r.id, nombreGrupo(r), tipoReservacion(r), adultos(r), ninos(r),
+    totalAsientos(r), mesaNumero(r) ?? "", beneficio(r), etiquetaPago(r), formaPago(r),
+    costoExcel(r), importeCortesia(r), importeSubtotal(r), importePagado(r),
+    importeDebe(r), notas(r)
+  ]));
+
+  descargarCSV("OXI-2026-grupos.csv", filas);
+}
+
+function exportarPadronCSV() {
+  const filas = [[
+    "Referencia", "ID", "Grupo / responsable", "Tipo", "Adultos", "Niños",
+    "Total personas", "Mesa asignada", "Estado de pago"
+  ]];
+
+  padron.forEach(p => filas.push([
+    p.referencia, p.id, p.nombre, p.tipo, p.adultos, p.ninos, p.total,
+    p.mesa !== null && p.mesa >= 1 ? p.mesa : "Sin mesa", p.pago
+  ]));
+
+  descargarCSV("OXI-2026-padron.csv", filas);
+}
+
+function exportarFinanzasCSV() {
+  const filas = [[
+    "Referencia", "ID", "Grupo / responsable", "Estado de pago", "Forma de pago",
+    "Costo Excel", "Cortesía", "Subtotal", "Pagado", "Saldo pendiente", "Notas"
+  ]];
+
+  reservaciones.forEach(r => filas.push([
+    referencia(r), r.id, nombreGrupo(r), etiquetaPago(r), formaPago(r),
+    costoExcel(r), importeCortesia(r), importeSubtotal(r), importePagado(r),
+    importeDebe(r), notas(r)
+  ]));
+
+  descargarCSV("OXI-2026-finanzas.csv", filas);
+}
+
+function saldoPendiente(r) {
+  return importeDebe(r);
+}
+
+function estadoCobro(r) {
+  return etiquetaPago(r);
+}
+
+function crearReporteMesas() {
+  const filas = mesas.map(m => {
+    const disponibles = Math.max(0, capacidadMesa - m.total);
+    const estado = m.total > capacidadMesa
+      ? `Excede capacidad de referencia (${capacidadMesa})`
+      : m.total === capacidadMesa
+        ? "Completa según referencia"
+        : m.total > 0 ? "Con asignaciones" : "Sin asignaciones";
+
+    return `<tr>
+      <td>${m.numero}</td><td>${m.reservaciones}</td><td>${m.adultos}</td>
+      <td>${m.ninos}</td><td>${m.total}</td><td>${capacidadMesa}</td>
+      <td>${disponibles}</td><td>${escapar(estado)}</td>
+    </tr>`;
+  }).join("");
+
+  return `<h3>Distribución por mesa</h3>
+    <table><thead><tr><th>Mesa</th><th>Reservaciones</th><th>Adultos</th><th>Niños</th><th>Total</th><th>Referencia</th><th>Disponibles</th><th>Estado</th></tr></thead>
+    <tbody>${filas}</tbody></table>`;
+}
+
+function crearReporteAlfabetico() {
+  const lista = [...reservaciones].sort((a, b) =>
+    nombreGrupo(a).localeCompare(nombreGrupo(b), "es", { sensitivity: "base" })
+  );
+
+  const filas = lista.map(r => {
+    const m = mesaNumero(r);
+    return `<tr>
+      <td>${escapar(nombreGrupo(r))}</td>
+      <td>${escapar(m !== null && m >= 1 ? String(m) : "Sin mesa")}</td>
+      <td>${escapar(estadoCobro(r))}</td>
+      <td>${dinero(saldoPendiente(r))}</td>
+      <td>${escapar(String(r.id))}</td>
+    </tr>`;
+  }).join("");
+
+  return `<h3>Listado alfabético de reservaciones</h3>
+    <table><thead><tr><th>Nombre</th><th>Mesa asignada</th><th>Estado de cobro</th><th>Saldo pendiente</th><th>ID</th></tr></thead>
+    <tbody>${filas}</tbody></table>`;
+}
+
+function abrirReporte() {
+  if (!documentoActual) return;
+
+  const totalPersonas = reservaciones.reduce((s, r) => s + totalAsientos(r), 0);
+  const totalSubtotal = reservaciones.reduce((s, r) => s + importeSubtotal(r), 0);
+  const totalPagado = reservaciones.reduce((s, r) => s + importePagado(r), 0);
+  const totalDebe = reservaciones.reduce((s, r) => s + importeDebe(r), 0);
+
+  $("contenidoReporte").innerHTML = `
+    <div style="text-align:center;margin-bottom:18px">
+      <h2>Comunidad Helénica de México A.C.</h2>
+      <h3>Reporte de reservaciones · Día del OXI 2026</h3>
+      <p>Fecha de generación: ${new Date().toLocaleString("es-MX")}</p>
+    </div>
+    <p><strong>Reservaciones:</strong> ${reservaciones.length}
+      &nbsp; <strong>Asistentes:</strong> ${totalPersonas}
+      &nbsp; <strong>Mesas configuradas:</strong> ${mesas.length}</p>
+    <p><strong>Subtotal registrado:</strong> ${dinero(totalSubtotal)}
+      &nbsp; <strong>Pagado:</strong> ${dinero(totalPagado)}
+      &nbsp; <strong>Saldo pendiente:</strong> ${dinero(totalDebe)}</p>
+    ${crearReporteMesas()}
+    <div style="margin-top:24px">${crearReporteAlfabetico()}</div>
+    <p class="nota" style="margin-top:18px">La capacidad de mesa es una referencia operativa; las asignaciones superiores a dicha capacidad se conservan y se identifican.</p>
+  `;
+
+  $("panelReporte").hidden = false;
+  $("panelReporte").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function activarVista(id) {
+  vistaActual = id;
+  document.querySelectorAll(".vista").forEach(v => v.hidden = v.id !== id);
+  document.querySelectorAll("[data-vista]").forEach(b => {
+    b.classList.toggle("activa", b.dataset.vista === id);
+    b.setAttribute("aria-selected", b.dataset.vista === id ? "true" : "false");
+  });
+}
+
+function manejarClickEditar(evento) {
+  const boton = evento.target.closest(".btn-editar-reservacion");
+  if (!boton) return;
+  iniciarEdicion(boton.dataset.id);
+  activarVista("vistaGrupos");
+}
+
+$("btnCargar").addEventListener("click", cargarArchivo);
+$("btnExportarJSON").addEventListener("click", exportarJSONActualizado);
+$("btnExportarCSV").addEventListener("click", exportarCSV);
+$("btnExportarPadron").addEventListener("click", exportarPadronCSV);
+$("btnExportarFinanzas").addEventListener("click", exportarFinanzasCSV);
+$("btnReporte").addEventListener("click", abrirReporte);
+$("btnImprimir").addEventListener("click", () => window.print());
+$("btnImprimirReporte").addEventListener("click", () => window.print());
+$("btnCerrarReporte").addEventListener("click", () => $("panelReporte").hidden = true);
+$("btnAgregarMesa").addEventListener("click", agregarMesa);
+$("formEdicion").addEventListener("submit", guardarEdicion);
+$("btnCancelarEdicion").addEventListener("click", cancelarEdicion);
+
+$("tablaGrupos").addEventListener("click", manejarClickEditar);
+$("tablaPadron").addEventListener("click", manejarClickEditar);
+$("tablaSinMesa").addEventListener("click", manejarClickEditar);
+
+$("filtroMesa").addEventListener("change", renderizarMesas);
+$("buscarPadron").addEventListener("input", renderizarPadron);
+$("filtroPadronMesa").addEventListener("change", renderizarPadron);
+
+document.querySelectorAll("[data-vista]").forEach(boton => {
+  boton.addEventListener("click", () => activarVista(boton.dataset.vista));
+});
+</script>
+</body>
+</html>
