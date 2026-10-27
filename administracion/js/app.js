@@ -29,6 +29,15 @@ const VERSION_FORMATO_CUOTAS = 1;
 
 const MONEDA_CUOTAS = "MXN";
 
+const FORMATO_HISTORICO_PAGOS = "comunidad-helenica-historico-pagos";
+const VERSION_FORMATO_HISTORICO_PAGOS = 1;
+
+let cuotasSocioAnuales = [];
+let movimientosPago = [];
+
+let historicoPagosImportado = false;
+let historicoPagosPendienteExportar = false;
+
 let personas = [];
 let personaEnEdicion = null;
 let mensajeTemporizador = null;
@@ -102,6 +111,11 @@ function iniciarModulo() {
   renderizarCuotas();
   actualizarEstadoPadron();
 
+    prepararSelectSociosPagos();
+  prepararEjercicioConsultaPagos();
+  renderizarHistoricoPagos();
+  renderizarMovimientosPagos();
+  
   mostrarMensaje(
     "Módulo listo. Importa un padrón existente o crea uno nuevo. " +
     "Los cambios se conservan mediante archivos JSON.",
@@ -427,6 +441,37 @@ $("btnCrearPadronInicial")?.addEventListener(
       editarCuotaAnual(boton.dataset.anio);
     }
   });
+
+  /* Histórico de pagos */
+
+  $("pagoPersonaId")?.addEventListener("change", actualizarCuotaSugerida);
+  $("pagoAnio")?.addEventListener("change", actualizarCuotaSugerida);
+
+  $("btnAsignarCuotaSocio")?.addEventListener(
+    "click",
+    asignarCuotaIndividual
+  );
+
+  $("formMovimientoPago")?.addEventListener(
+    "submit",
+    registrarMovimientoPago
+  );
+
+  $("pagosVista")?.addEventListener("change", renderizarHistoricoPagos);
+  $("pagosAnioConsulta")?.addEventListener("input", renderizarHistoricoPagos);
+  $("buscarSocioPagos")?.addEventListener("input", renderizarHistoricoPagos);
+
+  $("tablaMovimientosPagos")?.addEventListener("click", manejarAccionPago);
+
+  $("btnExportarPagos")?.addEventListener("click", exportarHistoricoPagos);
+  $("btnImportarPagos")?.addEventListener("click", () => {
+    $("archivoPagosJson")?.click();
+  });
+
+  $("archivoPagosJson")?.addEventListener(
+    "change",
+    importarHistoricoPagos
+  );
 }
 
 /* =========================================================
@@ -1906,3 +1951,513 @@ function descargarJSON(documento, nombreArchivo) {
 
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+/* =========================================================
+   HISTÓRICO DE CUOTAS Y PAGOS DE SOCIOS
+   ========================================================= */
+
+function esSocioParaPagos(persona) {
+  return persona &&
+    (
+      textoSeguro(persona.tipoRegistro) === "Socio" ||
+      textoSeguro(persona.categoria) === "Socio"
+    );
+}
+
+function obtenerSociosParaPagos() {
+  return personas
+    .filter(esSocioParaPagos)
+    .sort((a, b) =>
+      nombreCompleto(a).localeCompare(nombreCompleto(b), "es-MX")
+    );
+}
+
+function prepararSelectSociosPagos() {
+  const select = $("pagoPersonaId");
+  if (!select) return;
+
+  const seleccionado = select.value;
+  const socios = obtenerSociosParaPagos();
+
+  select.innerHTML =
+    '<option value="">Selecciona un socio</option>' +
+    socios.map(persona => `
+      <option value="${escaparHTML(persona.id)}">
+        ${escaparHTML(nombreCompleto(persona))}
+      </option>
+    `).join("");
+
+  if (socios.some(persona => persona.id === seleccionado)) {
+    select.value = seleccionado;
+  }
+}
+
+function prepararEjercicioConsultaPagos() {
+  const anioActual = new Date().getFullYear();
+
+  if ($("pagoAnio") && !$("pagoAnio").value) {
+    $("pagoAnio").value = anioActual;
+  }
+
+  if ($("pagosAnioConsulta") && !$("pagosAnioConsulta").value) {
+    $("pagosAnioConsulta").value = anioActual;
+  }
+
+  if ($("pagoFecha") && !$("pagoFecha").value) {
+    $("pagoFecha").value = fechaLocalISO();
+  }
+}
+
+function obtenerClaveCuotaSocio(personaId, anio) {
+  return cuotasSocioAnuales.find(cuota =>
+    cuota.personaId === personaId &&
+    cuota.anio === Number(anio)
+  ) || null;
+}
+
+function obtenerCuotaGeneralParaAnio(anio) {
+  return obtenerCuotaPorAnio(Number(anio));
+}
+
+function actualizarCuotaSugerida() {
+  const personaId = valorCampo("pagoPersonaId");
+  const anio = Number(valorCampo("pagoAnio"));
+
+  if (!personaId || !Number.isInteger(anio)) return;
+
+  const cuotaIndividual = obtenerClaveCuotaSocio(personaId, anio);
+
+  if (cuotaIndividual) {
+    asignarValor("pagoCuotaMonto", cuotaIndividual.monto);
+    return;
+  }
+
+  const cuotaGeneral = obtenerCuotaGeneralParaAnio(anio);
+
+  if (cuotaGeneral) {
+    asignarValor("pagoCuotaMonto", cuotaGeneral.monto);
+  } else {
+    asignarValor("pagoCuotaMonto", "");
+  }
+}
+
+function validarDatosCuotaIndividual(personaId, anio, monto) {
+  if (!obtenerPersonaPorId(personaId) ||
+      !esSocioParaPagos(obtenerPersonaPorId(personaId))) {
+    throw new Error("Selecciona una persona registrada como socio.");
+  }
+
+  if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
+    throw new Error("El ejercicio debe ser un año entre 2000 y 2100.");
+  }
+
+  if (!Number.isFinite(monto) || monto <= 0 || monto > 10000000) {
+    throw new Error("La cuota individual debe ser mayor que cero.");
+  }
+}
+
+function asignarCuotaIndividual() {
+  const personaId = valorCampo("pagoPersonaId");
+  const anio = Number(valorCampo("pagoAnio"));
+  const monto = Number(valorCampo("pagoCuotaMonto"));
+
+  try {
+    validarDatosCuotaIndividual(personaId, anio, monto);
+
+    const existente = obtenerClaveCuotaSocio(personaId, anio);
+    const persona = obtenerPersonaPorId(personaId);
+
+    if (existente) {
+      const confirmar = window.confirm(
+        `Ya existe una cuota individual para ${nombreCompleto(persona)} ` +
+        `en ${anio} por ${formatoMoneda(existente.monto)}.\n\n` +
+        `El nuevo importe será ${formatoMoneda(monto)}.\n\n` +
+        "Esta operación cambia la cuota asignada, pero no borra los pagos. " +
+        "¿Deseas continuar?"
+      );
+
+      if (!confirmar) return;
+
+      existente.monto = Math.round((monto + Number.EPSILON) * 100) / 100;
+      existente.actualizadoEn = new Date().toISOString();
+    } else {
+      cuotasSocioAnuales.push({
+        id: crearId().replace(/^PER-/, "CUO-"),
+        personaId,
+        anio,
+        monto: Math.round((monto + Number.EPSILON) * 100) / 100,
+        moneda: MONEDA_CUOTAS,
+        creadoEn: new Date().toISOString(),
+        actualizadoEn: new Date().toISOString()
+      });
+    }
+
+    historicoPagosPendienteExportar = true;
+    renderizarHistoricoPagos();
+    renderizarMovimientosPagos();
+
+    mostrarMensaje(
+      `Cuota individual registrada para el ejercicio ${anio}.`,
+      "exito"
+    );
+  } catch (error) {
+    mostrarMensaje(error.message, "error");
+  }
+}
+
+function obtenerPagosAplicados(personaId, anio) {
+  return movimientosPago.filter(pago =>
+    pago.personaId === personaId &&
+    pago.anio === Number(anio) &&
+    pago.estado === "Aplicado"
+  );
+}
+
+function obtenerTotalPagado(personaId, anio) {
+  return obtenerPagosAplicados(personaId, anio)
+    .reduce((total, pago) => total + pago.importe, 0);
+}
+
+function redondearImporte(monto) {
+  return Math.round((monto + Number.EPSILON) * 100) / 100;
+}
+
+function obtenerSaldo(montoCuota, totalPagado) {
+  return redondearImporte(Math.max(0, montoCuota - totalPagado));
+}
+
+function obtenerEstadoCuota(montoCuota, totalPagado) {
+  if (totalPagado <= 0) return "Pendiente";
+  if (totalPagado < montoCuota) return "Pago parcial";
+  return "Liquidada";
+}
+
+function registrarMovimientoPago(evento) {
+  evento.preventDefault();
+
+  const personaId = valorCampo("pagoPersonaId");
+  const anio = Number(valorCampo("pagoAnio"));
+  const montoCuota = Number(valorCampo("pagoCuotaMonto"));
+  const importe = Number(valorCampo("pagoImporte"));
+
+  try {
+    validarDatosCuotaIndividual(personaId, anio, montoCuota);
+
+    if (!Number.isFinite(importe) || importe <= 0 || importe > 10000000) {
+      throw new Error("El importe del pago debe ser mayor que cero.");
+    }
+
+    const persona = obtenerPersonaPorId(personaId);
+    let cuota = obtenerClaveCuotaSocio(personaId, anio);
+
+    if (!cuota) {
+      const confirmar = window.confirm(
+        `No existe una cuota individual asignada para ${nombreCompleto(persona)} ` +
+        `en ${anio}.\n\n` +
+        `Se asignará una cuota de ${formatoMoneda(montoCuota)} ` +
+        "y después se registrará el pago. ¿Deseas continuar?"
+      );
+
+      if (!confirmar) return;
+
+      cuota = {
+        id: crearId().replace(/^PER-/, "CUO-"),
+        personaId,
+        anio,
+        monto: redondearImporte(montoCuota),
+        moneda: MONEDA_CUOTAS,
+        creadoEn: new Date().toISOString(),
+        actualizadoEn: new Date().toISOString()
+      };
+
+      cuotasSocioAnuales.push(cuota);
+    } else if (redondearImporte(cuota.monto) !== redondearImporte(montoCuota)) {
+      throw new Error(
+        "El importe capturado no coincide con la cuota ya asignada. " +
+        "Usa «Asignar o actualizar cuota» si existe una autorización para cambiarla."
+      );
+    }
+
+    const fecha = valorCampo("pagoFecha") || fechaLocalISO();
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+      throw new Error("La fecha del pago no es válida.");
+    }
+
+    const nuevoPago = {
+      id: crearId().replace(/^PER-/, "PAG-"),
+      personaId,
+      anio,
+      fecha,
+      importe: redondearImporte(importe),
+      formaPago: valorCampo("pagoForma"),
+      referencia: valorCampo("pagoReferencia"),
+      observaciones: valorCampo("pagoObservaciones"),
+      estado: "Aplicado",
+      creadoEn: new Date().toISOString()
+    };
+
+    movimientosPago.push(nuevoPago);
+    historicoPagosPendienteExportar = true;
+
+    const totalPagado = obtenerTotalPagado(personaId, anio);
+    const saldo = obtenerSaldo(cuota.monto, totalPagado);
+
+    renderizarHistoricoPagos();
+    renderizarMovimientosPagos();
+
+    asignarValor("pagoImporte", "");
+    asignarValor("pagoReferencia", "");
+    asignarValor("pagoObservaciones", "");
+
+    mostrarMensaje(
+      `Pago registrado. Total pagado: ${formatoMoneda(totalPagado)}. ` +
+      `Saldo pendiente: ${formatoMoneda(saldo)}.`,
+      "exito"
+    );
+  } catch (error) {
+    mostrarMensaje(error.message, "error");
+  }
+}
+
+function obtenerResumenHistorico() {
+  const resumenPorSocio = new Map();
+
+  cuotasSocioAnuales.forEach(cuota => {
+    const persona = obtenerPersonaPorId(cuota.personaId);
+    if (!persona) return;
+
+    if (!resumenPorSocio.has(cuota.personaId)) {
+      resumenPorSocio.set(cuota.personaId, {
+        persona,
+        ejercicios: [],
+        totalCuotas: 0,
+        totalPagado: 0,
+        totalSaldo: 0
+      });
+    }
+
+    const resumen = resumenPorSocio.get(cuota.personaId);
+    const pagado = obtenerTotalPagado(cuota.personaId, cuota.anio);
+
+    resumen.ejercicios.push(cuota.anio);
+    resumen.totalCuotas += cuota.monto;
+    resumen.totalPagado += pagado;
+    resumen.totalSaldo += obtenerSaldo(cuota.monto, pagado);
+  });
+
+  return [...resumenPorSocio.values()]
+    .map(resumen => ({
+      ...resumen,
+      primerEjercicio: Math.min(...resumen.ejercicios),
+      ultimoEjercicio: Math.max(...resumen.ejercicios),
+      totalCuotas: redondearImporte(resumen.totalCuotas),
+      totalPagado: redondearImporte(resumen.totalPagado),
+      totalSaldo: redondearImporte(resumen.totalSaldo)
+    }))
+    .sort((a, b) =>
+      nombreCompleto(a.persona).localeCompare(
+        nombreCompleto(b.persona),
+        "es-MX"
+      )
+    );
+}
+
+function renderizarHistoricoPagos() {
+  const tabla = $("tablaHistoricoPagos");
+  const encabezado = $("encabezadoHistoricoPagos");
+  if (!tabla || !encabezado) return;
+
+  const vista = valorCampo("pagosVista") || "anio";
+  const anio = Number(valorCampo("pagosAnioConsulta"));
+  const busqueda = valorCampo("buscarSocioPagos").toLocaleLowerCase("es-MX");
+
+  const coincideBusqueda = persona =>
+    nombreCompleto(persona).toLocaleLowerCase("es-MX").includes(busqueda);
+
+  let filas = [];
+  let totalCuotas = 0;
+  let totalPagado = 0;
+  let totalSaldo = 0;
+
+  if (vista === "anio") {
+    if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
+      tabla.innerHTML = `
+        <tr><td colspan="6" class="empty-state">
+          Introduce un ejercicio válido para consultar.
+        </td></tr>`;
+      return;
+    }
+
+    const cuotasDelAnio = cuotasSocioAnuales
+      .filter(cuota => cuota.anio === anio)
+      .filter(cuota => {
+        const persona = obtenerPersonaPorId(cuota.personaId);
+        return persona && coincideBusqueda(persona);
+      });
+
+    encabezado.innerHTML = `
+      <tr>
+        <th>Socio</th>
+        <th>Ejercicio</th>
+        <th>Cuota asignada</th>
+        <th>Total pagado</th>
+        <th>Saldo</th>
+        <th>Estado</th>
+      </tr>`;
+
+    filas = cuotasDelAnio.map(cuota => {
+      const persona = obtenerPersonaPorId(cuota.personaId);
+      const pagado = obtenerTotalPagado(cuota.personaId, anio);
+      const saldo = obtenerSaldo(cuota.monto, pagado);
+
+      totalCuotas += cuota.monto;
+      totalPagado += pagado;
+      totalSaldo += saldo;
+
+      return `
+        <tr>
+          <td>${escaparHTML(nombreCompleto(persona))}</td>
+          <td>${anio}</td>
+          <td>${formatoMoneda(cuota.monto)}</td>
+          <td>${formatoMoneda(pagado)}</td>
+          <td>${formatoMoneda(saldo)}</td>
+          <td>${escaparHTML(obtenerEstadoCuota(cuota.monto, pagado))}</td>
+        </tr>`;
+    });
+
+    $("resultadoHistoricoPagos").textContent =
+      `Ejercicio ${anio}: se muestran únicamente los socios con cuota individual registrada.`;
+  } else {
+    const resumenes = obtenerResumenHistorico()
+      .filter(resumen => coincideBusqueda(resumen.persona));
+
+    encabezado.innerHTML = `
+      <tr>
+        <th>Socio</th>
+        <th>Primer ejercicio</th>
+        <th>Último ejercicio</th>
+        <th>Total cuotas</th>
+        <th>Total pagado</th>
+        <th>Saldo acumulado</th>
+      </tr>`;
+
+    filas = resumenes.map(resumen => {
+      totalCuotas += resumen.totalCuotas;
+      totalPagado += resumen.totalPagado;
+      totalSaldo += resumen.totalSaldo;
+
+      return `
+        <tr>
+          <td>${escaparHTML(nombreCompleto(resumen.persona))}</td>
+          <td>${resumen.primerEjercicio}</td>
+          <td>${resumen.ultimoEjercicio}</td>
+          <td>${formatoMoneda(resumen.totalCuotas)}</td>
+          <td>${formatoMoneda(resumen.totalPagado)}</td>
+          <td>${formatoMoneda(resumen.totalSaldo)}</td>
+        </tr>`;
+    });
+
+    $("resultadoHistoricoPagos").textContent =
+      "Histórico acumulado de los ejercicios con cuotas individuales registradas.";
+  }
+
+  tabla.innerHTML = filas.length
+    ? filas.join("")
+    : `<tr><td colspan="6" class="empty-state">
+        No hay cuotas registradas para los filtros seleccionados.
+      </td></tr>`;
+
+  $("filtroAnioPagos").hidden = vista !== "anio";
+
+  $("pagosTotalCuotas").textContent = formatoMoneda(totalCuotas);
+  $("pagosTotalPagado").textContent = formatoMoneda(totalPagado);
+  $("pagosTotalSaldo").textContent = formatoMoneda(totalSaldo);
+
+  const sociosConRegistro = vista === "anio"
+    ? new Set(
+        cuotasSocioAnuales
+          .filter(cuota => cuota.anio === anio)
+          .map(cuota => cuota.personaId)
+      ).size
+    : filas.length;
+
+  $("pagosTotalSocios").textContent = String(sociosConRegistro);
+}
+
+function renderizarMovimientosPagos() {
+  const tabla = $("tablaMovimientosPagos");
+  if (!tabla) return;
+
+  const ordenados = [...movimientosPago].sort((a, b) =>
+    b.fecha.localeCompare(a.fecha)
+  );
+
+  tabla.innerHTML = ordenados.length
+    ? ordenados.map(pago => {
+        const persona = obtenerPersonaPorId(pago.personaId);
+        const nombre = persona
+          ? nombreCompleto(persona)
+          : "Socio no encontrado";
+
+        return `
+          <tr>
+            <td>${escaparHTML(pago.fecha)}</td>
+            <td>${escaparHTML(nombre)}</td>
+            <td>${pago.anio}</td>
+            <td>${formatoMoneda(pago.importe)}</td>
+            <td>${escaparHTML(pago.formaPago || "No especificada")}</td>
+            <td>${escaparHTML(
+              [pago.referencia, pago.observaciones].filter(Boolean).join(" · ")
+            )}</td>
+            <td>${escaparHTML(pago.estado)}</td>
+            <td>
+              ${pago.estado === "Aplicado" ? `
+                <button
+                  type="button"
+                  class="boton-tabla"
+                  data-accion="cancelar-pago"
+                  data-id="${escaparHTML(pago.id)}"
+                >Cancelar</button>
+              ` : "Sin acciones"}
+            </td>
+          </tr>`;
+      }).join("")
+    : `<tr><td colspan="8" class="empty-state">
+        No hay movimientos registrados.
+      </td></tr>`;
+}
+
+function manejarAccionPago(evento) {
+  const boton = evento.target.closest("button[data-accion]");
+  if (!boton) return;
+
+  if (boton.dataset.accion !== "cancelar-pago") return;
+
+  const pago = movimientosPago.find(item => item.id === boton.dataset.id);
+  if (!pago || pago.estado !== "Aplicado") return;
+
+  const confirmar = window.confirm(
+    `Se cancelará el pago de ${formatoMoneda(pago.importe)} ` +
+    `del ejercicio ${pago.anio}.\n\n` +
+    "El movimiento se conservará en el histórico, pero dejará de contar " +
+    "como pago aplicado. ¿Deseas continuar?"
+  );
+
+  if (!confirmar) return;
+
+  pago.estado = "Cancelado";
+  pago.canceladoEn = new Date().toISOString();
+
+  historicoPagosPendienteExportar = true;
+
+  renderizarHistoricoPagos();
+  renderizarMovimientosPagos();
+
+  mostrarMensaje(
+    "Movimiento cancelado. El registro se conservó en el histórico.",
+    "aviso"
+  );
+}
+
+
