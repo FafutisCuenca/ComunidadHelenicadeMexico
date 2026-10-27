@@ -605,8 +605,14 @@ ninos: asistentes.filter(
     mesa_id:mesaId,
     costo_excel:totalOriginal,
     subtotal_excel:totalFinal,
-    pagado_excel:0,
-    debe_excel:totalFinal,
+pagado_excel: 0,
+debe_excel: totalFinal,
+
+// Control de pagos capturados en el sistema web.
+// Se mantienen separados de los datos históricos de Excel.
+historial_pagos: [],
+total_pagado: 0,
+saldo_pendiente: totalFinal,
     // No se marca PAGADO por el mero hecho de tener importe cero.
     estado_pago_excel:"PENDIENTE",
     forma_pago_excel:null,
