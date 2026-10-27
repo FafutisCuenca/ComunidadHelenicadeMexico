@@ -99,6 +99,112 @@ function iniciarModulo() {
 }
 
 
+/* =========================================================
+   NAVEGACIÓN ENTRE MÓDULOS
+   ========================================================= */
+
+function prepararNavegacionModulos() {
+  const navegacion = document.querySelector(".module-navigation");
+
+  if (!navegacion) {
+    return;
+  }
+
+  const enlaces = Array.from(
+    navegacion.querySelectorAll(".module-link")
+  );
+
+  const secciones = Array.from(
+    document.querySelectorAll(".module-section")
+  );
+
+  function mostrarModulo(id, actualizarDireccion = false) {
+    const seccionActiva = secciones.find(
+      (seccion) => seccion.id === id
+    );
+
+    if (!seccionActiva) {
+      return;
+    }
+
+    // Mostrar únicamente la sección seleccionada.
+    secciones.forEach((seccion) => {
+      const activa = seccion === seccionActiva;
+
+      seccion.classList.toggle("is-hidden", !activa);
+      seccion.setAttribute("aria-hidden", String(!activa));
+    });
+
+    // Actualizar el estado visual y accesible del menú.
+    enlaces.forEach((enlace) => {
+      const activa = enlace.getAttribute("href") === `#${id}`;
+
+      enlace.classList.toggle("active", activa);
+
+      if (activa) {
+        enlace.setAttribute("aria-current", "page");
+      } else {
+        enlace.removeAttribute("aria-current");
+      }
+    });
+
+    // Mantener visible el módulo elegido en la dirección del navegador.
+    if (actualizarDireccion) {
+      history.replaceState(null, "", `#${id}`);
+    }
+  }
+
+  // Cambiar de módulo al seleccionar una opción del menú.
+  navegacion.addEventListener("click", (evento) => {
+    const enlace = evento.target.closest(".module-link");
+
+    if (!enlace || !navegacion.contains(enlace)) {
+      return;
+    }
+
+    const destino = enlace.getAttribute("href");
+
+    if (!destino || !destino.startsWith("#")) {
+      return;
+    }
+
+    const id = destino.slice(1);
+
+    if (!secciones.some((seccion) => seccion.id === id)) {
+      return;
+    }
+
+    evento.preventDefault();
+    mostrarModulo(id, true);
+  });
+
+  // Al abrir el portal, respetar el módulo indicado en la dirección.
+  const idInicial = window.location.hash.slice(1);
+
+  const moduloInicialExiste = secciones.some(
+    (seccion) => seccion.id === idInicial
+  );
+
+  const primerDestino = enlaces
+    .map((enlace) => enlace.getAttribute("href"))
+    .find((destino) =>
+      destino &&
+      destino.startsWith("#") &&
+      secciones.some(
+        (seccion) => seccion.id === destino.slice(1)
+      )
+    );
+
+  const moduloInicial = moduloInicialExiste
+    ? idInicial
+    : primerDestino?.slice(1);
+
+  if (moduloInicial) {
+    mostrarModulo(moduloInicial);
+  }
+}
+
+
 function conectarEventos() {
   /* Directorio */
 
