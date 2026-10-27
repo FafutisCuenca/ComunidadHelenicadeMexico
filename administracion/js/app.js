@@ -1973,6 +1973,383 @@ function exportarCuotasJSON() {
   );
 }
 
+
+/* =========================================================
+   JSON MAESTRO: VALIDACIÓN, IMPORTACIÓN Y EXPORTACIÓN
+   ========================================================= */
+
+function abrirSelectorMaestro() {
+  const selector = $("archivoMaestroJson");
+
+  if (selector) {
+    selector.value = "";
+    selector.click();
+  }
+}
+
+function validarIdentificadoresUnicos(registros, etiqueta) {
+  const ids = registros.map((registro) => registro.id);
+
+  if (ids.some((id) => !id)) {
+    throw new Error(
+      `${etiqueta}: todos los registros deben tener identificador.`
+    );
+  }
+
+  if (new Set(ids).size !== ids.length) {
+    throw new Error(
+      `${etiqueta}: existen identificadores duplicados.`
+    );
+  }
+}
+
+function normalizarCuotaSocio(datos, personasValidas) {
+  if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
+    throw new Error("Una cuota individual tiene formato incorrecto.");
+  }
+
+  const id = textoSeguro(datos.id);
+  const personaId = textoSeguro(datos.personaId);
+  const anio = Number(datos.anio);
+  const monto = Number(datos.monto);
+  const moneda = textoSeguro(datos.moneda || MONEDA_CUOTAS);
+
+  if (!id.startsWith("CUO-")) {
+    throw new Error("Una cuota individual tiene un ID CUO- inválido.");
+  }
+
+  if (!personasValidas.has(personaId)) {
+    throw new Error(
+      `La cuota ${id} hace referencia a una persona inexistente: ${personaId}.`
+    );
+  }
+
+  if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
+    throw new Error(`La cuota ${id} tiene un año inválido.`);
+  }
+
+  if (!Number.isFinite(monto) || monto <= 0 || monto > 10000000) {
+    throw new Error(`La cuota ${id} tiene un importe inválido.`);
+  }
+
+  if (moneda !== MONEDA_CUOTAS) {
+    throw new Error(`La cuota ${id} debe estar expresada en MXN.`);
+  }
+
+  return {
+    id,
+    personaId,
+    anio,
+    monto: Math.round((monto + Number.EPSILON) * 100) / 100,
+    moneda,
+    creadoEn: textoSeguro(datos.creadoEn),
+    actualizadoEn: textoSeguro(datos.actualizadoEn)
+  };
+}
+
+function normalizarMovimientoPago(datos, personasValidas) {
+  if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
+    throw new Error("Un movimiento de pago tiene formato incorrecto.");
+  }
+
+  const id = textoSeguro(datos.id);
+  const personaId = textoSeguro(datos.personaId);
+  const anio = Number(datos.anio);
+  const importe = Number(datos.importe);
+  const fecha = textoSeguro(datos.fecha);
+  const formaPago = textoSeguro(datos.formaPago);
+  const estado = textoSeguro(datos.estado);
+
+  if (!id.startsWith("PAG-")) {
+    throw new Error("Un movimiento tiene un ID PAG- inválido.");
+  }
+
+  if (!personasValidas.has(personaId)) {
+    throw new Error(
+      `El movimiento ${id} hace referencia a una persona inexistente: ${personaId}.`
+    );
+  }
+
+  if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
+    throw new Error(`El movimiento ${id} tiene un año inválido.`);
+  }
+
+  if (!Number.isFinite(importe) || importe <= 0 || importe > 10000000) {
+    throw new Error(`El movimiento ${id} tiene un importe inválido.`);
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) ||
+      Number.isNaN(Date.parse(`${fecha}T00:00:00`))) {
+    throw new Error(`El movimiento ${id} tiene una fecha inválida.`);
+  }
+
+  if (!formaPago || !estado) {
+    throw new Error(
+      `El movimiento ${id} debe incluir forma de pago y estado.`
+    );
+  }
+
+  return {
+    id,
+    personaId,
+    anio,
+    fecha,
+    importe: Math.round((importe + Number.EPSILON) * 100) / 100,
+    formaPago,
+    referencia: textoSeguro(datos.referencia),
+    observaciones: textoSeguro(datos.observaciones),
+    estado,
+    creadoEn: textoSeguro(datos.creadoEn)
+  };
+}
+
+function validarMaestro(datos) {
+  if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
+    throw new Error("El contenido JSON no es un objeto válido.");
+  }
+
+  if (datos.formato !== FORMATO_MAESTRO) {
+    throw new Error(
+      `Formato incorrecto. Se esperaba "${FORMATO_MAESTRO}".`
+    );
+  }
+
+  if (datos.version_formato !== VERSION_FORMATO_MAESTRO) {
+    throw new Error(
+      "La versión del formato maestro no es compatible con este módulo."
+    );
+  }
+
+  const colecciones = [
+    "personas",
+    "cuotas_anuales",
+    "cuotas_socio_anuales",
+    "movimientos_pago"
+  ];
+
+  for (const nombre of colecciones) {
+    if (!Array.isArray(datos[nombre])) {
+      throw new Error(
+        `El maestro debe contener la colección "${nombre}" como arreglo.`
+      );
+    }
+  }
+
+if (datos.personas.some(
+  (persona) =>
+    !persona ||
+    typeof persona !== "object" ||
+    Array.isArray(persona) ||
+    !textoSeguro(persona.id) ||
+    !textoSeguro(persona.nombres) ||
+    !textoSeguro(persona.apellidos)
+)) {
+  throw new Error(
+    "Todas las personas deben tener ID, nombres y apellidos."
+  );
+}
+
+const personasValidadas = datos.personas.map(normalizarPersona);
+
+  validarIdentificadoresUnicos(personasValidadas, "Personas");
+
+  const personasValidas = new Set(
+    personasValidadas.map((persona) => persona.id)
+  );
+
+  const cuotasAnualesValidadas =
+    validarListaCuotas(datos.cuotas_anuales);
+
+  const cuotasSocioValidadas = datos.cuotas_socio_anuales.map(
+    (cuota) => normalizarCuotaSocio(cuota, personasValidas)
+  );
+
+  validarIdentificadoresUnicos(
+    cuotasSocioValidadas,
+    "Cuotas individuales"
+  );
+
+  const movimientosValidados = datos.movimientos_pago.map(
+    (movimiento) => normalizarMovimientoPago(
+      movimiento,
+      personasValidas
+    )
+  );
+
+  validarIdentificadoresUnicos(
+    movimientosValidados,
+    "Movimientos de pago"
+  );
+
+  const reglas = datos.reglas;
+
+  if (!reglas || typeof reglas !== "object" || Array.isArray(reglas)) {
+    throw new Error("El maestro no contiene reglas de cuotas válidas.");
+  }
+
+  const camposReglas = [
+    "cuota_general_habilitada",
+    "cuotas_por_categoria_habilitadas",
+    "excepciones_individuales_habilitadas"
+  ];
+
+  for (const campo of camposReglas) {
+    if (typeof reglas[campo] !== "boolean") {
+      throw new Error(
+        `La regla "${campo}" debe ser true o false.`
+      );
+    }
+  }
+
+  /*
+   * Se devuelve un conjunto temporal validado.
+   * Hasta aquí no se ha cambiado ningún dato en memoria.
+   */
+  return {
+    personas: personasValidadas,
+    cuotas_anuales: cuotasAnualesValidadas,
+    cuotas_socio_anuales: cuotasSocioValidadas,
+    movimientos_pago: movimientosValidados,
+    reglas: {
+      cuota_general_habilitada: reglas.cuota_general_habilitada,
+      cuotas_por_categoria_habilitadas:
+        reglas.cuotas_por_categoria_habilitadas,
+      excepciones_individuales_habilitadas:
+        reglas.excepciones_individuales_habilitadas
+    }
+  };
+}
+
+async function importarMaestroJSON(evento) {
+  const archivo = evento.target.files?.[0];
+
+  if (!archivo) return;
+
+  try {
+    const contenido = await archivo.text();
+    const datos = JSON.parse(contenido);
+
+    // Validar todas las colecciones antes de modificar el estado.
+    const validado = validarMaestro(datos);
+
+    const confirmar = window.confirm(
+      "El archivo maestro pasó las validaciones.\n\n" +
+      `Personas: ${validado.personas.length}\n` +
+      `Cuotas anuales: ${validado.cuotas_anuales.length}\n` +
+      `Cuotas individuales: ${validado.cuotas_socio_anuales.length}\n` +
+      `Movimientos de pago: ${validado.movimientos_pago.length}\n\n` +
+      "La importación reemplazará todos los datos en memoria. " +
+      "Los cambios no exportados se perderán.\n\n" +
+      "¿Deseas continuar?"
+    );
+
+    if (!confirmar) return;
+
+    // Reemplazo atómico: todos los datos ya fueron validados.
+    personas = validado.personas;
+    cuotasAnuales = validado.cuotas_anuales;
+    cuotasSocioAnuales = validado.cuotas_socio_anuales;
+    movimientosPago = validado.movimientos_pago;
+    reglasCuotas = validado.reglas;
+
+    maestroImportado = true;
+    maestroPendienteExportar = false;
+    cuotasImportadas = true;
+    cuotasPendientesExportar = false;
+
+    cerrarFormulario();
+    cerrarDetalle();
+    limpiarFormularioCuota();
+
+    renderizarTodo();
+    renderizarCuotas();
+
+    const estado = $("estadoMaestro");
+    if (estado) {
+      estado.textContent =
+        `Maestro cargado: ${personas.length} personas, ` +
+        `${cuotasAnuales.length} cuotas generales, ` +
+        `${cuotasSocioAnuales.length} cuotas individuales y ` +
+        `${movimientosPago.length} movimientos de pago.`;
+    }
+
+    mostrarMensaje(
+      "JSON maestro importado y validado correctamente.",
+      "exito"
+    );
+  } catch (error) {
+    mostrarMensaje(
+      "No se importó el maestro: " + error.message,
+      "error"
+    );
+  } finally {
+    evento.target.value = "";
+  }
+}
+
+function exportarMaestroJSON() {
+  try {
+    // Validar también antes de generar el respaldo.
+    const documentoActual = {
+      formato: FORMATO_MAESTRO,
+      version_formato: VERSION_FORMATO_MAESTRO,
+      version_modulo: VERSION_MODULO,
+      moneda: MONEDA_CUOTAS,
+      fecha_actualizacion: new Date().toISOString(),
+      reglas: { ...reglasCuotas },
+      personas: personas.map((persona) => ({ ...persona })),
+      cuotas_anuales: cuotasAnuales.map((cuota) => ({ ...cuota })),
+      cuotas_socio_anuales:
+        cuotasSocioAnuales.map((cuota) => ({ ...cuota })),
+      movimientos_pago:
+        movimientosPago.map((movimiento) => ({ ...movimiento }))
+    };
+
+    const validado = validarMaestro(documentoActual);
+
+    const documento = {
+      formato: FORMATO_MAESTRO,
+      version_formato: VERSION_FORMATO_MAESTRO,
+      version_modulo: VERSION_MODULO,
+      moneda: MONEDA_CUOTAS,
+      fecha_actualizacion: new Date().toISOString(),
+      reglas: validado.reglas,
+      personas: validado.personas,
+      cuotas_anuales: validado.cuotas_anuales,
+      cuotas_socio_anuales: validado.cuotas_socio_anuales,
+      movimientos_pago: validado.movimientos_pago
+    };
+
+    descargarJSON(
+      documento,
+      `comunidad-helenica-maestro-${fechaLocalISO()}.json`
+    );
+
+    maestroPendienteExportar = false;
+    cuotasPendientesExportar = false;
+
+    const estado = $("estadoMaestro");
+    if (estado) {
+      estado.textContent =
+        "Se generó el respaldo maestro. Verifica que el archivo " +
+        "se haya guardado en tu carpeta privada.";
+    }
+
+    renderizarCuotas();
+
+    mostrarMensaje(
+      "Se generó el JSON maestro. Verifica que quedó guardado.",
+      "exito"
+    );
+  } catch (error) {
+    mostrarMensaje(
+      "No se pudo exportar el maestro: " + error.message,
+      "error"
+    );
+  }
+}
+
+
 /* =========================================================
    DESCARGA COMÚN DE ARCHIVOS JSON
    ========================================================= */
