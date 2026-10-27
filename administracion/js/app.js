@@ -4,34 +4,22 @@
 /*
  * Comunidad Helénica de México, A.C.
  * Módulo de administración: Personas y Socios
- * Versión: 0.1.0
+ * Versión: 0.2.0
  *
- * Los datos se conservan en memoria durante la sesión.
- * Para guardar los cambios, exporta el archivo JSON.
- *
- * Este módulo no modifica el módulo de reservaciones OXI.
+ * Datos en memoria durante la sesión.
+ * Exportar JSON para conservar los cambios.
+ * Independiente del módulo de reservaciones OXI.
  */
 
-const VERSION_MODULO = "0.1.0";
+const VERSION_MODULO = "0.2.0";
 const FORMATO_DATOS = "comunidad-helenica-personas";
-const VERSION_FORMATO = 1;
+const VERSION_FORMATO = 2;
 
 let personas = [];
 let personaEnEdicion = null;
 let mensajeTemporizador = null;
 
 const $ = (id) => document.getElementById(id);
-
-const CAMPOS_DETALLE = [
-  ["tipoRegistro", "Tipo de registro"],
-  ["categoria", "Categoría"],
-  ["estatus", "Estatus"],
-  ["fechaIngreso", "Fecha de ingreso"],
-  ["correo", "Correo electrónico"],
-  ["telefono", "Teléfono"],
-  ["domicilio", "Domicilio"],
-  ["notas", "Notas"]
-];
 
 const ESTATUS_VALIDOS = [
   "Por revisar",
@@ -47,9 +35,27 @@ const TIPOS_VALIDOS = [
 ];
 
 const CATEGORIAS_VALIDAS = [
-  "Socio numerario",
-  "Socio amigo",
+  "Socio",
+  "Amistad",
   "Otra categoría"
+];
+
+const SUBCATEGORIAS = {
+  "Socio": ["Numerario", "Honorario"],
+  "Amistad": ["Filoheleno"],
+  "Otra categoría": []
+};
+
+const CAMPOS_DETALLE = [
+  ["tipoRegistro", "Tipo de registro"],
+  ["categoria", "Categoría"],
+  ["subcategoria", "Subcategoría"],
+  ["estatus", "Estatus"],
+  ["fechaIngreso", "Fecha de ingreso"],
+  ["correo", "Correo electrónico"],
+  ["telefono", "Teléfono"],
+  ["domicilio", "Domicilio"],
+  ["notas", "Notas"]
 ];
 
 /* =========================================================
@@ -59,12 +65,14 @@ const CATEGORIAS_VALIDAS = [
 document.addEventListener("DOMContentLoaded", iniciarModulo);
 
 function iniciarModulo() {
+  prepararSelectCategoria();
   conectarEventos();
+  actualizarSubcategorias();
   renderizarTodo();
 
   mostrarMensaje(
-    "Módulo listo. Importa un JSON existente o registra una persona. " +
-    "Los cambios deberán exportarse para conservarlos.",
+    "Módulo listo. Importa un JSON o registra una persona. " +
+    "Exporta los cambios para conservarlos.",
     "aviso"
   );
 }
@@ -79,6 +87,12 @@ function conectarEventos() {
   $("buscar")?.addEventListener("input", renderizarTabla);
   $("filtroEstatus")?.addEventListener("change", renderizarTabla);
 
+  $("categoria")?.addEventListener("change", actualizarSubcategorias);
+
+  $("tipoRegistro")?.addEventListener("change", () => {
+    ajustarCategoriaPorTipo();
+  });
+
   $("personaForm")?.addEventListener("submit", guardarPersona);
 
   $("btnCerrarForm")?.addEventListener("click", cerrarFormulario);
@@ -86,7 +100,10 @@ function conectarEventos() {
 
   $("btnCerrarDetalle")?.addEventListener("click", cerrarDetalle);
   $("btnDetalleCerrar")?.addEventListener("click", cerrarDetalle);
-  $("btnDetalleEditar")?.addEventListener("click", editarPersonaDesdeDetalle);
+  $("btnDetalleEditar")?.addEventListener(
+    "click",
+    editarPersonaDesdeDetalle
+  );
 
   $("detalleDialog")?.addEventListener("click", (evento) => {
     if (evento.target === $("detalleDialog")) {
@@ -129,28 +146,64 @@ function escaparHTML(valor) {
     .replace(/'/g, "&#039;");
 }
 
-function normalizarEstatus(valor) {
-  const recibido = textoSeguro(valor);
+function buscarOpcion(valor, opciones) {
+  const recibido = textoSeguro(valor).toLocaleLowerCase("es-MX");
 
-  return ESTATUS_VALIDOS.find(
-    (estatus) => estatus.toLowerCase() === recibido.toLowerCase()
-  ) || "Por revisar";
+  return opciones.find(
+    (opcion) => opcion.toLocaleLowerCase("es-MX") === recibido
+  ) || "";
+}
+
+function normalizarEstatus(valor) {
+  return buscarOpcion(valor, ESTATUS_VALIDOS) || "Por revisar";
 }
 
 function normalizarTipo(valor) {
-  const recibido = textoSeguro(valor);
-
-  return TIPOS_VALIDOS.find(
-    (tipo) => tipo.toLowerCase() === recibido.toLowerCase()
-  ) || "Persona relacionada";
+  return buscarOpcion(valor, TIPOS_VALIDOS) || "Persona relacionada";
 }
 
 function normalizarCategoria(valor) {
-  const recibido = textoSeguro(valor);
+  const recibida = textoSeguro(valor);
 
-  return CATEGORIAS_VALIDAS.find(
-    (categoria) => categoria.toLowerCase() === recibido.toLowerCase()
-  ) || "Otra categoría";
+  // Compatibilidad con categorías del formato anterior.
+  if (/^socio numerario$/i.test(recibida)) {
+    return "Socio";
+  }
+
+  if (/^socio honorario$/i.test(recibida)) {
+    return "Socio";
+  }
+
+  if (/^socio amigo$/i.test(recibida)) {
+    return "Amistad";
+  }
+
+  if (/^amigo$/i.test(recibida)) {
+    return "Amistad";
+  }
+
+  return buscarOpcion(recibida, CATEGORIAS_VALIDAS) ||
+    "Otra categoría";
+}
+
+function normalizarSubcategoria(categoria, valor, categoriaOriginal) {
+  const recibida = textoSeguro(valor);
+
+  // Recuperar la subcategoría cuando el JSON antiguo
+  // guardaba "Socio numerario" o "Socio honorario" en categoría.
+  if (/^socio numerario$/i.test(textoSeguro(categoriaOriginal))) {
+    return "Numerario";
+  }
+
+  if (/^socio honorario$/i.test(textoSeguro(categoriaOriginal))) {
+    return "Honorario";
+  }
+
+  if (/^filoheleno$/i.test(recibida)) {
+    return categoria === "Amistad" ? "Filoheleno" : "";
+  }
+
+  return buscarOpcion(recibida, SUBCATEGORIAS[categoria] || []);
 }
 
 function nombreCompleto(persona) {
@@ -184,21 +237,125 @@ function fechaLocalISO() {
 }
 
 function normalizarPersona(datos) {
-  const persona = datos && typeof datos === "object" ? datos : {};
+  const original = datos && typeof datos === "object" ? datos : {};
+
+  const tipoRegistro = normalizarTipo(original.tipoRegistro);
+  const categoria = normalizarCategoria(original.categoria);
+  const subcategoria = normalizarSubcategoria(
+    categoria,
+    original.subcategoria,
+    original.categoria
+  );
 
   return {
-    id: textoSeguro(persona.id) || crearId(),
-    nombres: textoSeguro(persona.nombres),
-    apellidos: textoSeguro(persona.apellidos),
-    tipoRegistro: normalizarTipo(persona.tipoRegistro),
-    categoria: normalizarCategoria(persona.categoria),
-    estatus: normalizarEstatus(persona.estatus),
-    fechaIngreso: textoSeguro(persona.fechaIngreso),
-    correo: textoSeguro(persona.correo),
-    telefono: textoSeguro(persona.telefono),
-    domicilio: textoSeguro(persona.domicilio),
-    notas: textoSeguro(persona.notas)
+    id: textoSeguro(original.id) || crearId(),
+    nombres: textoSeguro(original.nombres),
+    apellidos: textoSeguro(original.apellidos),
+    tipoRegistro,
+    categoria,
+    subcategoria,
+    estatus: normalizarEstatus(original.estatus),
+    fechaIngreso: textoSeguro(original.fechaIngreso),
+    correo: textoSeguro(original.correo),
+    telefono: textoSeguro(original.telefono),
+    domicilio: textoSeguro(original.domicilio),
+    notas: textoSeguro(original.notas)
   };
+}
+
+/* =========================================================
+   CATEGORÍAS Y SUBCATEGORÍAS
+   ========================================================= */
+
+function prepararSelectCategoria() {
+  const select = $("categoria");
+
+  if (!select) {
+    return;
+  }
+
+  const valorAnterior = select.value;
+
+  select.replaceChildren();
+
+  const opcionVacia = document.createElement("option");
+  opcionVacia.value = "";
+  opcionVacia.textContent = "Selecciona una categoría";
+  select.appendChild(opcionVacia);
+
+  CATEGORIAS_VALIDAS.forEach((categoria) => {
+    const opcion = document.createElement("option");
+    opcion.value = categoria;
+    opcion.textContent = categoria;
+    select.appendChild(opcion);
+  });
+
+  if (CATEGORIAS_VALIDAS.includes(valorAnterior)) {
+    select.value = valorAnterior;
+  }
+}
+
+function actualizarSubcategorias(valorPreferido = "") {
+  const selectCategoria = $("categoria");
+  const selectSubcategoria = $("subcategoria");
+
+  if (!selectSubcategoria) {
+    return;
+  }
+
+  const categoria = selectCategoria?.value || "";
+  const opciones = SUBCATEGORIAS[categoria] || [];
+
+  selectSubcategoria.replaceChildren();
+
+  const opcionVacia = document.createElement("option");
+  opcionVacia.value = "";
+  opcionVacia.textContent = opciones.length
+    ? "Selecciona una subcategoría"
+    : "Sin subcategoría";
+  selectSubcategoria.appendChild(opcionVacia);
+
+  opciones.forEach((subcategoria) => {
+    const opcion = document.createElement("option");
+    opcion.value = subcategoria;
+    opcion.textContent = subcategoria;
+    selectSubcategoria.appendChild(opcion);
+  });
+
+  selectSubcategoria.disabled = opciones.length === 0;
+
+  if (opciones.includes(valorPreferido)) {
+    selectSubcategoria.value = valorPreferido;
+  } else {
+    selectSubcategoria.value = "";
+  }
+}
+
+function ajustarCategoriaPorTipo() {
+  const tipo = valorCampo("tipoRegistro");
+  const categoria = $("categoria");
+
+  if (!categoria) {
+    return;
+  }
+
+  // Proponer una categoría inicial según el tipo.
+  // El usuario puede seleccionar otra si corresponde.
+  if (tipo === "Socio") {
+    if (!categoria.value || categoria.value === "Amistad") {
+      categoria.value = "Socio";
+    }
+  } else if (tipo === "Persona relacionada") {
+    if (!categoria.value || categoria.value === "Socio") {
+      categoria.value = "Amistad";
+    }
+  } else if (tipo === "Participante externo") {
+    if (!categoria.value || categoria.value === "Socio") {
+      categoria.value = "Otra categoría";
+    }
+  }
+
+  actualizarSubcategorias();
 }
 
 /* =========================================================
@@ -218,13 +375,15 @@ function mostrarMensaje(texto, tipo = "aviso") {
   }
 
   elemento.textContent = texto;
-  elemento.className = "mensaje visible " + tipo;
+  elemento.className = "toast visible " + tipo;
   elemento.setAttribute("role", tipo === "error" ? "alert" : "status");
+  elemento.hidden = false;
 
   if (tipo === "exito") {
     mensajeTemporizador = setTimeout(() => {
-      elemento.className = "mensaje";
+      elemento.className = "toast";
       elemento.textContent = "";
+      elemento.hidden = true;
     }, 6000);
   }
 }
@@ -245,8 +404,6 @@ function renderizarIndicadores() {
     (persona) => persona.estatus === "Vigente"
   ).length;
 
-  const otros = total - vigentes;
-
   if ($("totalRegistros")) {
     $("totalRegistros").textContent = total;
   }
@@ -256,7 +413,7 @@ function renderizarIndicadores() {
   }
 
   if ($("totalOtros")) {
-    $("totalOtros").textContent = otros;
+    $("totalOtros").textContent = total - vigentes;
   }
 }
 
@@ -266,15 +423,21 @@ function obtenerPersonasFiltradas() {
 
   return personas.filter((persona) => {
     const textoBusqueda = [
+      persona.id,
       persona.nombres,
       persona.apellidos,
+      persona.tipoRegistro,
+      persona.categoria,
+      persona.subcategoria,
       persona.correo,
-      persona.telefono,
-      persona.id
+      persona.telefono
     ].join(" ").toLocaleLowerCase("es-MX");
 
-    const coincideBusqueda = !busqueda || textoBusqueda.includes(busqueda);
-    const coincideEstatus = !estatus || persona.estatus === estatus;
+    const coincideBusqueda =
+      !busqueda || textoBusqueda.includes(busqueda);
+
+    const coincideEstatus =
+      !estatus || persona.estatus === estatus;
 
     return coincideBusqueda && coincideEstatus;
   }).sort((a, b) =>
@@ -311,7 +474,7 @@ function renderizarTabla() {
 
     tabla.innerHTML = `
       <tr>
-        <td colspan="6" class="estado-vacio">
+        <td colspan="6" class="empty">
           ${escaparHTML(mensajeVacio)}
         </td>
       </tr>
@@ -322,9 +485,12 @@ function renderizarTabla() {
       const nombre = escaparHTML(nombreCompleto(persona));
       const tipo = escaparHTML(persona.tipoRegistro);
       const categoria = escaparHTML(persona.categoria);
+      const subcategoria = escaparHTML(persona.subcategoria);
       const estatus = escaparHTML(persona.estatus);
       const clase = claseEstatus(persona.estatus);
-      const contacto = escaparHTML(persona.correo || persona.telefono || "—");
+      const contacto = escaparHTML(
+        persona.correo || persona.telefono || "—"
+      );
 
       return `
         <tr>
@@ -333,7 +499,12 @@ function renderizarTabla() {
             <div class="texto-secundario">${idSeguro}</div>
           </td>
           <td>${tipo}</td>
-          <td>${categoria}</td>
+          <td>
+            <div>${categoria}</div>
+            ${subcategoria
+              ? `<div class="texto-secundario">${subcategoria}</div>`
+              : ""}
+          </td>
           <td>
             <span class="etiqueta-estatus ${clase}">
               ${estatus}
@@ -389,14 +560,16 @@ function renderizarTabla() {
 function abrirFormularioNuevo() {
   personaEnEdicion = null;
 
-  if ($("personaForm")) {
-    $("personaForm").reset();
-  }
+  $("personaForm")?.reset();
 
   asignarValor("personaId", "");
   asignarValor("estatus", "Por revisar");
   asignarValor("tipoRegistro", "Socio");
-  asignarValor("categoria", "Socio numerario");
+  asignarValor("categoria", "Socio");
+
+  actualizarSubcategorias();
+  asignarValor("subcategoria", "");
+
   asignarValor("fechaIngreso", fechaLocalISO());
 
   if ($("formEyebrow")) {
@@ -425,6 +598,9 @@ function abrirFormularioEdicion(id) {
   asignarValor("apellidos", persona.apellidos);
   asignarValor("tipoRegistro", persona.tipoRegistro);
   asignarValor("categoria", persona.categoria);
+
+  actualizarSubcategorias(persona.subcategoria);
+
   asignarValor("estatus", persona.estatus);
   asignarValor("fechaIngreso", persona.fechaIngreso);
   asignarValor("correo", persona.correo);
@@ -451,6 +627,7 @@ function mostrarFormulario() {
     return;
   }
 
+  panel.hidden = false;
   panel.classList.add("visible");
   panel.scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -462,7 +639,13 @@ function mostrarFormulario() {
 }
 
 function cerrarFormulario() {
-  $("formPanel")?.classList.remove("visible");
+  const panel = $("formPanel");
+
+  if (panel) {
+    panel.classList.remove("visible");
+    panel.hidden = true;
+  }
+
   personaEnEdicion = null;
 }
 
@@ -480,12 +663,32 @@ function guardarPersona(evento) {
     return;
   }
 
+  const categoria = valorCampo("categoria");
+  const subcategoria = valorCampo("subcategoria");
+
+  if (!categoria) {
+    mostrarMensaje("Selecciona una categoría.", "error");
+    return;
+  }
+
+  if (
+    (SUBCATEGORIAS[categoria] || []).length > 0 &&
+    !subcategoria
+  ) {
+    mostrarMensaje(
+      "Selecciona una subcategoría para la categoría elegida.",
+      "error"
+    );
+    return;
+  }
+
   const persona = normalizarPersona({
     id: personaEnEdicion || crearId(),
     nombres,
     apellidos,
     tipoRegistro: valorCampo("tipoRegistro"),
-    categoria: valorCampo("categoria"),
+    categoria,
+    subcategoria,
     estatus: valorCampo("estatus"),
     fechaIngreso: valorCampo("fechaIngreso"),
     correo: valorCampo("correo"),
@@ -539,18 +742,15 @@ function mostrarDetalle(id) {
       ["Identificador", persona.id],
       ["Nombres", persona.nombres],
       ["Apellidos", persona.apellidos],
-      ...CAMPOS_DETALLE
-        .map(([clave, etiqueta]) => [etiqueta, persona[clave]])
+      ...CAMPOS_DETALLE.map(
+        ([clave, etiqueta]) => [etiqueta, persona[clave]]
+      )
     ];
 
-    campos.innerHTML = `
-      <dl class="detalle-lista">
-        ${todosLosCampos.map(([etiqueta, valor]) => `
-          <dt>${escaparHTML(etiqueta)}</dt>
-          <dd>${escaparHTML(valor) || "—"}</dd>
-        `).join("")}
-      </dl>
-    `;
+    campos.innerHTML = todosLosCampos.map(([etiqueta, valor]) => `
+      <dt>${escaparHTML(etiqueta)}</dt>
+      <dd>${escaparHTML(valor) || "—"}</dd>
+    `).join("");
   }
 
   const botonEditar = $("btnDetalleEditar");
@@ -567,7 +767,7 @@ function mostrarDetalle(id) {
     }
   } else {
     mostrarMensaje(
-      "Este navegador no permite abrir el detalle en una ventana. Revisa la compatibilidad del navegador.",
+      "Este navegador no permite abrir el detalle en una ventana.",
       "error"
     );
   }
@@ -629,10 +829,14 @@ async function importarJSON(evento) {
     }
 
     if (!registros.every(
-      (registro) => registro && typeof registro === "object" &&
-      !Array.isArray(registro)
+      (registro) =>
+        registro &&
+        typeof registro === "object" &&
+        !Array.isArray(registro)
     )) {
-      throw new Error("El archivo contiene registros con formato incorrecto.");
+      throw new Error(
+        "El archivo contiene registros con formato incorrecto."
+      );
     }
 
     const normalizadas = registros.map(normalizarPersona);
@@ -644,11 +848,9 @@ async function importarJSON(evento) {
       );
     }
 
-    const sinNombre = normalizadas.some(
+    if (normalizadas.some(
       (persona) => !persona.nombres || !persona.apellidos
-    );
-
-    if (sinNombre) {
+    )) {
       throw new Error(
         "Todos los registros deben tener nombres y apellidos. No se importó el archivo."
       );
@@ -656,7 +858,7 @@ async function importarJSON(evento) {
 
     const confirmar = window.confirm(
       `El archivo contiene ${normalizadas.length} registro(s).\n\n` +
-      "La importación reemplazará los registros que actualmente están en memoria. " +
+      "La importación reemplazará los registros que están en memoria. " +
       "Si tienes cambios sin exportar, se perderán.\n\n" +
       "¿Deseas continuar?"
     );
@@ -671,8 +873,8 @@ async function importarJSON(evento) {
     renderizarTodo();
 
     mostrarMensaje(
-      `Importación correcta: ${personas.length} registro(s) cargados en memoria. ` +
-      "Exporta el JSON cuando termines tus cambios.",
+      `Importación correcta: ${personas.length} registro(s) cargados. ` +
+      "Revisa las categorías y exporta el JSON actualizado.",
       "exito"
     );
   } catch (error) {
@@ -700,6 +902,7 @@ function exportarJSON() {
   };
 
   const contenido = JSON.stringify(documento, null, 2);
+
   const archivo = new Blob(
     [contenido],
     { type: "application/json;charset=utf-8" }
