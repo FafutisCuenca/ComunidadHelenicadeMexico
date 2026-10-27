@@ -4,20 +4,39 @@
 /*
  * Comunidad Helénica de México, A.C.
  * Módulo de administración: Personas y Socios
- * Versión: 0.2.0
+ * Versión: 0.3.0
  *
- * Datos en memoria durante la sesión.
- * Exportar JSON para conservar los cambios.
+ * Directorio de personas:
+ * - Datos en memoria durante la sesión.
+ * - Importación y exportación independiente del padrón JSON.
+ *
+ * Configuración de cuotas:
+ * - Cuota general por ejercicio anual.
+ * - Configuración independiente del padrón.
+ * - Importación y exportación de JSON.
+ * - Sin base de datos ni persistencia automática.
+ *
  * Independiente del módulo de reservaciones OXI.
  */
 
-const VERSION_MODULO = "0.2.0";
+const VERSION_MODULO = "0.3.0";
+
 const FORMATO_DATOS = "comunidad-helenica-personas";
 const VERSION_FORMATO = 2;
+
+const FORMATO_CUOTAS = "comunidad-helenica-cuotas";
+const VERSION_FORMATO_CUOTAS = 1;
+
+const MONEDA_CUOTAS = "MXN";
 
 let personas = [];
 let personaEnEdicion = null;
 let mensajeTemporizador = null;
+
+let cuotasAnuales = crearCuotasIniciales();
+let anioCuotaEnEdicion = null;
+let cuotasImportadas = false;
+let cuotasPendientesExportar = true;
 
 const $ = (id) => document.getElementById(id);
 
@@ -69,15 +88,17 @@ function iniciarModulo() {
   conectarEventos();
   actualizarSubcategorias();
   renderizarTodo();
+  renderizarCuotas();
 
   mostrarMensaje(
-    "Módulo listo. Importa un JSON o registra una persona. " +
-    "Exporta los cambios para conservarlos.",
+    "Módulo listo. Los cambios se conservan mediante archivos JSON.",
     "aviso"
   );
 }
 
 function conectarEventos() {
+  /* Directorio */
+
   $("btnNuevo")?.addEventListener("click", abrirFormularioNuevo);
   $("btnImportar")?.addEventListener("click", abrirSelectorArchivo);
   $("btnExportar")?.addEventListener("click", exportarJSON);
@@ -89,9 +110,7 @@ function conectarEventos() {
 
   $("categoria")?.addEventListener("change", actualizarSubcategorias);
 
-  $("tipoRegistro")?.addEventListener("change", () => {
-    ajustarCategoriaPorTipo();
-  });
+  $("tipoRegistro")?.addEventListener("change", ajustarCategoriaPorTipo);
 
   $("personaForm")?.addEventListener("submit", guardarPersona);
 
@@ -100,6 +119,7 @@ function conectarEventos() {
 
   $("btnCerrarDetalle")?.addEventListener("click", cerrarDetalle);
   $("btnDetalleCerrar")?.addEventListener("click", cerrarDetalle);
+
   $("btnDetalleEditar")?.addEventListener(
     "click",
     editarPersonaDesdeDetalle
@@ -110,10 +130,46 @@ function conectarEventos() {
       cerrarDetalle();
     }
   });
+
+  /* Configuración de cuotas */
+
+  $("cuotaForm")?.addEventListener("submit", guardarCuotaAnual);
+
+  $("btnCancelarEdicionCuota")?.addEventListener(
+    "click",
+    limpiarFormularioCuota
+  );
+
+  $("btnImportarCuotas")?.addEventListener(
+    "click",
+    abrirSelectorCuotas
+  );
+
+  $("btnExportarCuotas")?.addEventListener(
+    "click",
+    exportarCuotasJSON
+  );
+
+  $("archivoCuotasJson")?.addEventListener(
+    "change",
+    importarCuotasJSON
+  );
+
+  $("tablaCuotasAnuales")?.addEventListener("click", (evento) => {
+    const boton = evento.target.closest("button[data-accion]");
+
+    if (!boton) {
+      return;
+    }
+
+    if (boton.dataset.accion === "editar-cuota") {
+      editarCuotaAnual(boton.dataset.anio);
+    }
+  });
 }
 
 /* =========================================================
-   UTILIDADES
+   UTILIDADES GENERALES
    ========================================================= */
 
 function crearId() {
@@ -165,7 +221,6 @@ function normalizarTipo(valor) {
 function normalizarCategoria(valor) {
   const recibida = textoSeguro(valor);
 
-  // Compatibilidad con categorías del formato anterior.
   if (/^socio numerario$/i.test(recibida)) {
     return "Socio";
   }
@@ -189,8 +244,6 @@ function normalizarCategoria(valor) {
 function normalizarSubcategoria(categoria, valor, categoriaOriginal) {
   const recibida = textoSeguro(valor);
 
-  // Recuperar la subcategoría cuando el JSON antiguo
-  // guardaba "Socio numerario" o "Socio honorario" en categoría.
   if (/^socio numerario$/i.test(textoSeguro(categoriaOriginal))) {
     return "Numerario";
   }
@@ -241,6 +294,7 @@ function normalizarPersona(datos) {
 
   const tipoRegistro = normalizarTipo(original.tipoRegistro);
   const categoria = normalizarCategoria(original.categoria);
+
   const subcategoria = normalizarSubcategoria(
     categoria,
     original.subcategoria,
@@ -313,6 +367,7 @@ function actualizarSubcategorias(valorPreferido = "") {
   opcionVacia.textContent = opciones.length
     ? "Selecciona una subcategoría"
     : "Sin subcategoría";
+
   selectSubcategoria.appendChild(opcionVacia);
 
   opciones.forEach((subcategoria) => {
@@ -339,8 +394,6 @@ function ajustarCategoriaPorTipo() {
     return;
   }
 
-  // Proponer una categoría inicial según el tipo.
-  // El usuario puede seleccionar otra si corresponde.
   if (tipo === "Socio") {
     if (!categoria.value || categoria.value === "Amistad") {
       categoria.value = "Socio";
@@ -389,7 +442,7 @@ function mostrarMensaje(texto, tipo = "aviso") {
 }
 
 /* =========================================================
-   INDICADORES Y TABLA
+   INDICADORES Y TABLA DEL DIRECTORIO
    ========================================================= */
 
 function renderizarTodo() {
@@ -474,7 +527,7 @@ function renderizarTabla() {
 
     tabla.innerHTML = `
       <tr>
-        <td colspan="6" class="empty">
+        <td colspan="6" class="empty-state">
           ${escaparHTML(mensajeVacio)}
         </td>
       </tr>
@@ -554,7 +607,7 @@ function renderizarTabla() {
 }
 
 /* =========================================================
-   FORMULARIO
+   FORMULARIO DE PERSONAS
    ========================================================= */
 
 function abrirFormularioNuevo() {
@@ -569,7 +622,6 @@ function abrirFormularioNuevo() {
 
   actualizarSubcategorias();
   asignarValor("subcategoria", "");
-
   asignarValor("fechaIngreso", fechaLocalISO());
 
   if ($("formEyebrow")) {
@@ -703,12 +755,14 @@ function guardarPersona(evento) {
 
   if (indice >= 0) {
     personas[indice] = persona;
+
     mostrarMensaje(
       "Registro actualizado en memoria. Exporta el JSON para conservar el cambio.",
       "exito"
     );
   } else {
     personas.push(persona);
+
     mostrarMensaje(
       "Persona registrada en memoria. Exporta el JSON para conservar el cambio.",
       "exito"
@@ -720,7 +774,7 @@ function guardarPersona(evento) {
 }
 
 /* =========================================================
-   DETALLE
+   DETALLE DE PERSONAS
    ========================================================= */
 
 function mostrarDetalle(id) {
@@ -793,7 +847,7 @@ function editarPersonaDesdeDetalle() {
 }
 
 /* =========================================================
-   IMPORTACIÓN JSON
+   IMPORTACIÓN DEL PADRÓN JSON
    ========================================================= */
 
 function abrirSelectorArchivo() {
@@ -821,6 +875,15 @@ async function importarJSON(evento) {
     if (Array.isArray(datos)) {
       registros = datos;
     } else if (datos && Array.isArray(datos.personas)) {
+      if (
+        datos.formato &&
+        datos.formato !== FORMATO_DATOS
+      ) {
+        throw new Error(
+          "El archivo no corresponde al formato del padrón de personas."
+        );
+      }
+
       registros = datos.personas;
     } else {
       throw new Error(
@@ -868,13 +931,14 @@ async function importarJSON(evento) {
     }
 
     personas = normalizadas;
+
     cerrarFormulario();
     cerrarDetalle();
     renderizarTodo();
 
     mostrarMensaje(
       `Importación correcta: ${personas.length} registro(s) cargados. ` +
-      "Revisa las categorías y exporta el JSON actualizado.",
+      "Exporta el JSON si realizas modificaciones.",
       "exito"
     );
   } catch (error) {
@@ -888,7 +952,7 @@ async function importarJSON(evento) {
 }
 
 /* =========================================================
-   EXPORTACIÓN JSON
+   EXPORTACIÓN DEL PADRÓN JSON
    ========================================================= */
 
 function exportarJSON() {
@@ -901,6 +965,496 @@ function exportarJSON() {
     personas: personas.map((persona) => ({ ...persona }))
   };
 
+  descargarJSON(
+    documento,
+    `personas-socios-${fechaLocalISO()}.json`
+  );
+
+  mostrarMensaje(
+    "Se generó la descarga del padrón. Verifica que el archivo quedó guardado en tu ubicación privada.",
+    "exito"
+  );
+}
+
+/* =========================================================
+   CONFIGURACIÓN DE CUOTAS ANUALES
+   ========================================================= */
+
+/*
+ * Esta configuración inicial solo vive en memoria.
+ * Para conservarla después de cerrar el navegador,
+ * utiliza Exportar configuración JSON.
+ */
+
+function crearCuotasIniciales() {
+  return [
+    {
+      anio: 2025,
+      monto: 1500,
+      moneda: MONEDA_CUOTAS
+    },
+    {
+      anio: 2026,
+      monto: 1500,
+      moneda: MONEDA_CUOTAS
+    }
+  ];
+}
+
+function normalizarCuota(datos) {
+  if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
+    throw new Error("Una cuota contiene un formato incorrecto.");
+  }
+
+  const anio = Number(datos.anio);
+  const monto = Number(datos.monto);
+  const moneda = textoSeguro(datos.moneda || MONEDA_CUOTAS);
+
+  if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
+    throw new Error(
+      "Cada cuota debe tener un ejercicio entero entre 2000 y 2100."
+    );
+  }
+
+  if (!Number.isFinite(monto) || monto <= 0 || monto > 10000000) {
+    throw new Error(
+      `El importe de la cuota del ejercicio ${anio} debe ser mayor que cero y no exceder $10,000,000.`
+    );
+  }
+
+  if (moneda !== MONEDA_CUOTAS) {
+    throw new Error(
+      `La moneda de la cuota ${anio} debe ser MXN.`
+    );
+  }
+
+  return {
+    anio,
+    monto: Math.round((monto + Number.EPSILON) * 100) / 100,
+    moneda: MONEDA_CUOTAS
+  };
+}
+
+function validarListaCuotas(registros) {
+  if (!Array.isArray(registros)) {
+    throw new Error("La configuración debe contener una lista de cuotas.");
+  }
+
+  if (registros.length === 0) {
+    throw new Error(
+      "La configuración no contiene cuotas. No se reemplazaron los datos actuales."
+    );
+  }
+
+  const normalizadas = registros.map(normalizarCuota);
+  const ejercicios = normalizadas.map((cuota) => cuota.anio);
+
+  if (new Set(ejercicios).size !== ejercicios.length) {
+    throw new Error(
+      "La configuración contiene más de una cuota para el mismo año."
+    );
+  }
+
+  return normalizadas.sort((a, b) => b.anio - a.anio);
+}
+
+function obtenerCuotaPorAnio(anio) {
+  return cuotasAnuales.find(
+    (cuota) => cuota.anio === Number(anio)
+  ) || null;
+}
+
+function formatoMoneda(monto) {
+  return new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: MONEDA_CUOTAS,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(monto);
+}
+
+function marcarCuotasModificadas() {
+  cuotasPendientesExportar = true;
+  renderizarCuotas();
+}
+
+function textoEstadoCuotas() {
+  if (cuotasPendientesExportar) {
+    return cuotasImportadas
+      ? "Hay cambios pendientes de exportación. La configuración importada no se ha actualizado en el archivo original."
+      : "Configuración en memoria. Exporta el JSON para conservar los cambios.";
+  }
+
+  if (cuotasImportadas) {
+    return "Configuración cargada desde un archivo JSON. No hay cambios pendientes de exportación.";
+  }
+
+  return "Se generó la descarga de la configuración inicial. Verifica que el archivo quedó guardado.";
+}
+
+function renderizarCuotas() {
+  const tabla = $("tablaCuotasAnuales");
+
+  if (!tabla) {
+    return;
+  }
+
+  const ordenadas = [...cuotasAnuales].sort(
+    (a, b) => b.anio - a.anio
+  );
+
+  if (ordenadas.length === 0) {
+    tabla.innerHTML = `
+      <tr>
+        <td colspan="4" class="empty-state">
+          No hay cuotas configuradas.
+        </td>
+      </tr>
+    `;
+  } else {
+    tabla.innerHTML = ordenadas.map((cuota) => `
+      <tr>
+        <td>${cuota.anio}</td>
+        <td>${escaparHTML(formatoMoneda(cuota.monto))}</td>
+        <td>${escaparHTML(cuota.moneda)}</td>
+        <td>
+          <div class="acciones-fila">
+            <button
+              type="button"
+              class="boton-tabla"
+              data-accion="editar-cuota"
+              data-anio="${cuota.anio}"
+              aria-label="Editar cuota del ejercicio ${cuota.anio}"
+            >Editar</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  const resultado = $("resultadoCuotas");
+
+  if (resultado) {
+    resultado.textContent = textoEstadoCuotas();
+  }
+}
+
+/* =========================================================
+   ALTA Y MODIFICACIÓN DE CUOTAS
+   ========================================================= */
+
+function guardarCuotaAnual(evento) {
+  evento.preventDefault();
+
+  const anioTexto = valorCampo("configCuotaAnio");
+  const montoTexto = valorCampo("configCuotaMonto");
+
+  if (!anioTexto || !montoTexto) {
+    mostrarMensaje(
+      "Captura el ejercicio y el importe de la cuota.",
+      "error"
+    );
+    return;
+  }
+
+  const cuotaRecibida = {
+    anio: Number(anioTexto),
+    monto: Number(montoTexto),
+    moneda: MONEDA_CUOTAS
+  };
+
+  let cuota;
+
+  try {
+    cuota = normalizarCuota(cuotaRecibida);
+  } catch (error) {
+    mostrarMensaje(error.message, "error");
+    return;
+  }
+
+  const cuotaExistente = obtenerCuotaPorAnio(cuota.anio);
+
+  /*
+   * Si estamos editando una cuota, localizamos el ejercicio original.
+   * Esto permite corregir también el año sin duplicar ejercicios.
+   */
+
+  const cuotaOriginal = anioCuotaEnEdicion !== null
+    ? obtenerCuotaPorAnio(anioCuotaEnEdicion)
+    : null;
+
+  if (
+    anioCuotaEnEdicion !== null &&
+    !cuotaOriginal
+  ) {
+    mostrarMensaje(
+      "La cuota que intentas modificar ya no existe. Actualiza la tabla.",
+      "error"
+    );
+    limpiarFormularioCuota();
+    return;
+  }
+
+  if (
+    cuotaExistente &&
+    (!cuotaOriginal || cuotaExistente.anio !== cuotaOriginal.anio)
+  ) {
+    mostrarMensaje(
+      `Ya existe una cuota para el ejercicio ${cuota.anio}. Edita la cuota existente.`,
+      "error"
+    );
+    return;
+  }
+
+  if (cuotaOriginal) {
+    const confirmar = window.confirm(
+      `Se actualizará la cuota del ejercicio ${cuotaOriginal.anio}` +
+      (cuotaOriginal.anio !== cuota.anio
+        ? ` al ejercicio ${cuota.anio}`
+        : "") +
+      `.\n\nImporte anterior: ${formatoMoneda(cuotaOriginal.monto)}` +
+      `\nImporte nuevo: ${formatoMoneda(cuota.monto)}` +
+      "\n\nEste cambio solo modifica la configuración en memoria. " +
+      "No modifica pagos ni saldos históricos.\n\n¿Deseas continuar?"
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    cuotasAnuales = cuotasAnuales.filter(
+      (elemento) => elemento.anio !== cuotaOriginal.anio
+    );
+
+    cuotasAnuales.push(cuota);
+
+    mostrarMensaje(
+      "Cuota actualizada en memoria. Exporta la configuración JSON para conservar el cambio.",
+      "exito"
+    );
+  } else {
+    cuotasAnuales.push(cuota);
+
+    mostrarMensaje(
+      `Cuota del ejercicio ${cuota.anio} agregada en memoria. Exporta el JSON para conservarla.`,
+      "exito"
+    );
+  }
+
+  cuotasAnuales.sort((a, b) => b.anio - a.anio);
+
+  marcarCuotasModificadas();
+  limpiarFormularioCuota();
+}
+
+function editarCuotaAnual(anioTexto) {
+  const anio = Number(anioTexto);
+  const cuota = obtenerCuotaPorAnio(anio);
+
+  if (!cuota) {
+    mostrarMensaje(
+      "No se encontró la cuota del ejercicio seleccionado.",
+      "error"
+    );
+    return;
+  }
+
+  anioCuotaEnEdicion = cuota.anio;
+
+  asignarValor("configCuotaAnio", cuota.anio);
+  asignarValor("configCuotaMonto", cuota.monto);
+
+  if ($("btnGuardarCuota")) {
+    $("btnGuardarCuota").textContent = "Actualizar cuota";
+  }
+
+  if ($("cuotaForm")) {
+    $("cuotaForm").scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+
+  mostrarMensaje(
+    `Editando la cuota del ejercicio ${cuota.anio}.`,
+    "aviso"
+  );
+
+  $("configCuotaMonto")?.focus();
+}
+
+function limpiarFormularioCuota() {
+  anioCuotaEnEdicion = null;
+
+  $("cuotaForm")?.reset();
+
+  if ($("btnGuardarCuota")) {
+    $("btnGuardarCuota").textContent = "Guardar cuota anual";
+  }
+}
+
+/* =========================================================
+   IMPORTACIÓN DE CONFIGURACIÓN DE CUOTAS
+   ========================================================= */
+
+function abrirSelectorCuotas() {
+  const selector = $("archivoCuotasJson");
+
+  if (selector) {
+    selector.value = "";
+    selector.click();
+  }
+}
+
+function leerConfiguracionCuotas(datos) {
+  let registros;
+
+  if (Array.isArray(datos)) {
+    registros = datos;
+  } else if (datos && typeof datos === "object") {
+    if (
+      datos.formato &&
+      datos.formato !== FORMATO_CUOTAS
+    ) {
+      throw new Error(
+        "El archivo no corresponde al formato de configuración de cuotas."
+      );
+    }
+
+    if (
+      Number.isInteger(datos.version_formato) &&
+      datos.version_formato > VERSION_FORMATO_CUOTAS
+    ) {
+      throw new Error(
+        "El archivo fue creado con una versión más reciente del formato. No se importó."
+      );
+    }
+
+    if (Array.isArray(datos.cuotas_anuales)) {
+      registros = datos.cuotas_anuales;
+    } else if (Array.isArray(datos.cuotas)) {
+      registros = datos.cuotas;
+    } else {
+      throw new Error(
+        "El JSON debe contener una propiedad «cuotas_anuales» con una lista de cuotas."
+      );
+    }
+  } else {
+    throw new Error(
+      "La estructura del archivo de configuración no es válida."
+    );
+  }
+
+  return validarListaCuotas(registros);
+}
+
+async function importarCuotasJSON(evento) {
+  const archivo = evento.target.files?.[0];
+
+  if (!archivo) {
+    return;
+  }
+
+  try {
+    const contenido = await archivo.text();
+    const datos = JSON.parse(contenido);
+
+    /*
+     * Se valida todo antes de modificar cuotasAnuales.
+     * Si la validación falla, se conserva la configuración actual.
+     */
+
+    const cuotasValidadas = leerConfiguracionCuotas(datos);
+
+    const confirmar = window.confirm(
+      `El archivo contiene ${cuotasValidadas.length} cuota(s) anual(es).\n\n` +
+      "La importación reemplazará la configuración de cuotas que está en memoria. " +
+      "No modificará el padrón de personas.\n\n" +
+      "Si tienes cambios de cuotas sin exportar, se perderán.\n\n" +
+      "¿Deseas continuar?"
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    cuotasAnuales = cuotasValidadas;
+    cuotasImportadas = true;
+    cuotasPendientesExportar = false;
+
+    limpiarFormularioCuota();
+    renderizarCuotas();
+
+    mostrarMensaje(
+      `Configuración importada correctamente: ${cuotasAnuales.length} cuota(s) anual(es).`,
+      "exito"
+    );
+  } catch (error) {
+    mostrarMensaje(
+      "No se pudo importar la configuración de cuotas: " + error.message,
+      "error"
+    );
+  } finally {
+    evento.target.value = "";
+  }
+}
+
+/* =========================================================
+   EXPORTACIÓN DE CONFIGURACIÓN DE CUOTAS
+   ========================================================= */
+
+function exportarCuotasJSON() {
+  let cuotasValidadas;
+
+  try {
+    cuotasValidadas = validarListaCuotas(cuotasAnuales);
+  } catch (error) {
+    mostrarMensaje(
+      "No se pudo exportar la configuración: " + error.message,
+      "error"
+    );
+    return;
+  }
+
+  const documento = {
+    formato: FORMATO_CUOTAS,
+    version_formato: VERSION_FORMATO_CUOTAS,
+    version_modulo: VERSION_MODULO,
+    moneda: MONEDA_CUOTAS,
+    exportado_en: new Date().toISOString(),
+
+    reglas: {
+      cuota_general_habilitada: true,
+      cuotas_por_categoria_habilitadas: false,
+      excepciones_individuales_habilitadas: false
+    },
+
+    cuotas_anuales: cuotasValidadas.map((cuota) => ({
+      anio: cuota.anio,
+      monto: cuota.monto,
+      moneda: cuota.moneda
+    }))
+  };
+
+  descargarJSON(
+    documento,
+    `configuracion-cuotas-${fechaLocalISO()}.json`
+  );
+
+  cuotasPendientesExportar = false;
+  renderizarCuotas();
+
+  mostrarMensaje(
+    "Se generó la descarga de la configuración de cuotas. Verifica que el archivo quedó guardado en tu carpeta privada.",
+    "exito"
+  );
+}
+
+/* =========================================================
+   DESCARGA COMÚN DE ARCHIVOS JSON
+   ========================================================= */
+
+function descargarJSON(documento, nombreArchivo) {
   const contenido = JSON.stringify(documento, null, 2);
 
   const archivo = new Blob(
@@ -912,16 +1466,11 @@ function exportarJSON() {
   const enlace = document.createElement("a");
 
   enlace.href = url;
-  enlace.download = `personas-socios-${fechaLocalISO()}.json`;
+  enlace.download = nombreArchivo;
 
   document.body.appendChild(enlace);
   enlace.click();
   enlace.remove();
 
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-  mostrarMensaje(
-    "Se generó la descarga del JSON. Guarda el archivo en una ubicación privada y segura.",
-    "exito"
-  );
 }
