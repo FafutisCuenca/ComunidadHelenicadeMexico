@@ -2140,6 +2140,7 @@ function obtenerEstadoCuota(montoCuota, totalPagado) {
   return "Liquidada";
 }
 
+
 function registrarMovimientoPago(evento) {
   evento.preventDefault();
 
@@ -2147,18 +2148,81 @@ function registrarMovimientoPago(evento) {
   const anio = Number(valorCampo("pagoAnio"));
   const montoCuota = Number(valorCampo("pagoCuotaMonto"));
   const importe = Number(valorCampo("pagoImporte"));
+  const fecha = valorCampo("pagoFecha") || fechaLocalISO();
 
   try {
+    // 1. Validar los datos de la cuota y del socio.
     validarDatosCuotaIndividual(personaId, anio, montoCuota);
 
+    // 2. Validar el importe antes de modificar cualquier dato.
     if (!Number.isFinite(importe) || importe <= 0 || importe > 10000000) {
-      throw new Error("El importe del pago debe ser mayor que cero.");
+      throw new Error(
+        "El importe del pago debe ser mayor que cero y no exceder $10,000,000."
+      );
     }
 
-    const persona = obtenerPersonaPorId(personaId);
-    let cuota = obtenerClaveCuotaSocio(personaId, anio);
+    const importeValidado = redondearImporte(importe);
 
-    if (!cuota) {
+    if (importeValidado <= 0) {
+      throw new Error(
+        "El importe del pago debe ser mayor que cero después del redondeo."
+      );
+    }
+
+    // 3. Validar que la fecha exista realmente en el calendario.
+    const coincidenciaFecha = /^(\d{4})-(\d{2})-(\d{2})$/.exec(fecha);
+
+    if (!coincidenciaFecha) {
+      throw new Error("La fecha del pago no tiene un formato válido.");
+    }
+
+    const anioFecha = Number(coincidenciaFecha[1]);
+    const mesFecha = Number(coincidenciaFecha[2]);
+    const diaFecha = Number(coincidenciaFecha[3]);
+
+    const esBisiesto =
+      anioFecha % 4 === 0 &&
+      (anioFecha % 100 !== 0 || anioFecha % 400 === 0);
+
+    const diasPorMes = [
+      31,
+      esBisiesto ? 29 : 28,
+      31,
+      30,
+      31,
+      30,
+      31,
+      31,
+      30,
+      31,
+      30,
+      31
+    ];
+
+    if (
+      anioFecha < 1 ||
+      mesFecha < 1 ||
+      mesFecha > 12 ||
+      diaFecha < 1 ||
+      diaFecha > diasPorMes[mesFecha - 1]
+    ) {
+      throw new Error(
+        "La fecha del pago no existe en el calendario. Verifica el día, mes y año."
+      );
+    }
+
+    // 4. Consultar la cuota existente sin modificar los datos.
+    const persona = obtenerPersonaPorId(personaId);
+
+    if (!persona) {
+      throw new Error("No se encontró al socio seleccionado.");
+    }
+
+    const cuotaExistente = obtenerClaveCuotaSocio(personaId, anio);
+    let cuota = cuotaExistente;
+    let nuevaCuota = null;
+
+    if (!cuotaExistente) {
       const confirmar = window.confirm(
         `No existe una cuota individual asignada para ${nombreCompleto(persona)} ` +
         `en ${anio}.\n\n` +
@@ -2168,36 +2232,37 @@ function registrarMovimientoPago(evento) {
 
       if (!confirmar) return;
 
-      cuota = {
+      // Preparar la cuota, pero todavía no agregarla al histórico.
+      const ahora = new Date().toISOString();
+
+      nuevaCuota = {
         id: crearId().replace(/^PER-/, "CUO-"),
         personaId,
         anio,
         monto: redondearImporte(montoCuota),
         moneda: MONEDA_CUOTAS,
-        creadoEn: new Date().toISOString(),
-        actualizadoEn: new Date().toISOString()
+        creadoEn: ahora,
+        actualizadoEn: ahora
       };
 
-      cuotasSocioAnuales.push(cuota);
-    } else if (redondearImporte(cuota.monto) !== redondearImporte(montoCuota)) {
+      cuota = nuevaCuota;
+    } else if (
+      redondearImporte(cuotaExistente.monto) !==
+      redondearImporte(montoCuota)
+    ) {
       throw new Error(
         "El importe capturado no coincide con la cuota ya asignada. " +
         "Usa «Asignar o actualizar cuota» si existe una autorización para cambiarla."
       );
     }
 
-    const fecha = valorCampo("pagoFecha") || fechaLocalISO();
-
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
-      throw new Error("La fecha del pago no es válida.");
-    }
-
+    // 5. Preparar el pago antes de modificar los arreglos.
     const nuevoPago = {
       id: crearId().replace(/^PER-/, "PAG-"),
       personaId,
       anio,
       fecha,
-      importe: redondearImporte(importe),
+      importe: importeValidado,
       formaPago: valorCampo("pagoForma"),
       referencia: valorCampo("pagoReferencia"),
       observaciones: valorCampo("pagoObservaciones"),
@@ -2205,9 +2270,15 @@ function registrarMovimientoPago(evento) {
       creadoEn: new Date().toISOString()
     };
 
+    // 6. Aplicar los cambios solo después de validar todo.
+    if (nuevaCuota) {
+      cuotasSocioAnuales.push(nuevaCuota);
+    }
+
     movimientosPago.push(nuevoPago);
     historicoPagosPendienteExportar = true;
 
+    // 7. Actualizar el histórico y calcular el saldo.
     const totalPagado = obtenerTotalPagado(personaId, anio);
     const saldo = obtenerSaldo(cuota.monto, totalPagado);
 
