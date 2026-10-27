@@ -2460,4 +2460,175 @@ function manejarAccionPago(evento) {
   );
 }
 
+function exportarHistoricoPagos() {
+  const documento = {
+    formato: FORMATO_HISTORICO_PAGOS,
+    version_formato: VERSION_FORMATO_HISTORICO_PAGOS,
+    version_modulo: VERSION_MODULO,
+    moneda: MONEDA_CUOTAS,
+    exportado_en: new Date().toISOString(),
+    cuotas_socio_anuales: cuotasSocioAnuales,
+    movimientos_pago: movimientosPago
+  };
+
+  descargarJSON(
+    documento,
+    `historico-pagos-socios-${fechaLocalISO()}.json`
+  );
+
+  historicoPagosPendienteExportar = false;
+
+  mostrarMensaje(
+    "Se generó el respaldo del histórico. Verifica que el archivo se haya guardado.",
+    "exito"
+  );
+}
+
+function importarHistoricoPagos(evento) {
+  const archivo = evento.target.files?.[0];
+  if (!archivo) return;
+
+  const lector = new FileReader();
+
+  lector.onload = () => {
+    try {
+      const documento = JSON.parse(lector.result);
+
+      if (
+        documento.formato !== FORMATO_HISTORICO_PAGOS ||
+        documento.version_formato !== VERSION_FORMATO_HISTORICO_PAGOS
+      ) {
+        throw new Error(
+          "El archivo no corresponde a este formato de histórico de pagos."
+        );
+      }
+
+      if (
+        !Array.isArray(documento.cuotas_socio_anuales) ||
+        !Array.isArray(documento.movimientos_pago)
+      ) {
+        throw new Error(
+          "El archivo debe contener cuotas_socio_anuales y movimientos_pago."
+        );
+      }
+
+      const cuotasValidadas = documento.cuotas_socio_anuales.map(cuota => {
+        const persona = obtenerPersonaPorId(cuota.personaId);
+        const anio = Number(cuota.anio);
+        const monto = Number(cuota.monto);
+
+        if (!persona || !esSocioParaPagos(persona)) {
+          throw new Error(
+            `No se encontró un socio válido para la cuota ${cuota.id || ""}.`
+          );
+        }
+
+        if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
+          throw new Error("Se encontró un ejercicio inválido en las cuotas.");
+        }
+
+        if (!Number.isFinite(monto) || monto <= 0 || monto > 10000000) {
+          throw new Error("Se encontró un importe de cuota inválido.");
+        }
+
+        if (cuota.moneda !== MONEDA_CUOTAS) {
+          throw new Error("Todas las cuotas deben estar expresadas en MXN.");
+        }
+
+        return {
+          ...cuota,
+          anio,
+          monto: redondearImporte(monto)
+        };
+      });
+
+      const clavesCuotas = cuotasValidadas.map(
+        cuota => `${cuota.personaId}|${cuota.anio}`
+      );
+
+      if (new Set(clavesCuotas).size !== clavesCuotas.length) {
+        throw new Error(
+          "El archivo contiene cuotas duplicadas para un mismo socio y ejercicio."
+        );
+      }
+
+      const movimientosValidados = documento.movimientos_pago.map(pago => {
+        const persona = obtenerPersonaPorId(pago.personaId);
+        const anio = Number(pago.anio);
+        const importe = Number(pago.importe);
+
+        if (!persona || !esSocioParaPagos(persona)) {
+          throw new Error(
+            `No se encontró un socio válido para el pago ${pago.id || ""}.`
+          );
+        }
+
+        if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
+          throw new Error("Se encontró un ejercicio inválido en los pagos.");
+        }
+
+        if (!Number.isFinite(importe) || importe <= 0 || importe > 10000000) {
+          throw new Error("Se encontró un importe de pago inválido.");
+        }
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(textoSeguro(pago.fecha))) {
+          throw new Error("Se encontró una fecha inválida en los pagos.");
+        }
+
+        if (!["Aplicado", "Cancelado"].includes(pago.estado)) {
+          throw new Error("Se encontró un estado de pago inválido.");
+        }
+
+        return {
+          ...pago,
+          anio,
+          importe: redondearImporte(importe)
+        };
+      });
+
+      const idsPagos = movimientosValidados.map(pago => pago.id);
+
+      if (new Set(idsPagos).size !== idsPagos.length) {
+        throw new Error("El archivo contiene identificadores de pago duplicados.");
+      }
+
+      const confirmar = window.confirm(
+        `El archivo contiene ${cuotasValidadas.length} cuota(s) individual(es) ` +
+        `y ${movimientosValidados.length} movimiento(s).\n\n` +
+        "La importación reemplazará el histórico que está en memoria. " +
+        "No modificará el padrón ni la configuración general de cuotas.\n\n" +
+        "¿Deseas continuar?"
+      );
+
+      if (!confirmar) return;
+
+      cuotasSocioAnuales = cuotasValidadas;
+      movimientosPago = movimientosValidados;
+      historicoPagosImportado = true;
+      historicoPagosPendienteExportar = false;
+
+      renderizarHistoricoPagos();
+      renderizarMovimientosPagos();
+
+      mostrarMensaje(
+        "Histórico de cuotas y pagos importado correctamente.",
+        "exito"
+      );
+    } catch (error) {
+      mostrarMensaje(
+        "No se pudo importar el histórico: " + error.message,
+        "error"
+      );
+    } finally {
+      evento.target.value = "";
+    }
+  };
+
+  lector.onerror = () => {
+    mostrarMensaje("No se pudo leer el archivo JSON.", "error");
+    evento.target.value = "";
+  };
+
+  lector.readAsText(archivo, "UTF-8");
+}
 
