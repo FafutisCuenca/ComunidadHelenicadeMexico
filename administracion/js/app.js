@@ -2271,38 +2271,55 @@ function obtenerResumenHistorico() {
     );
 }
 
+
 function renderizarHistoricoPagos() {
   const tabla = $("tablaHistoricoPagos");
   const encabezado = $("encabezadoHistoricoPagos");
+
   if (!tabla || !encabezado) return;
 
   const vista = valorCampo("pagosVista") || "anio";
   const anio = Number(valorCampo("pagosAnioConsulta"));
-  const busqueda = valorCampo("buscarSocioPagos").toLocaleLowerCase("es-MX");
+  const busqueda = valorCampo("buscarSocioPagos")
+    .toLocaleLowerCase("es-MX");
 
-  const coincideBusqueda = persona =>
-    nombreCompleto(persona).toLocaleLowerCase("es-MX").includes(busqueda);
+  const coincideBusqueda = (persona) =>
+    nombreCompleto(persona)
+      .toLocaleLowerCase("es-MX")
+      .includes(busqueda);
+
+  const dinero = (importe) => formatoMoneda(importe);
+  const guion = "—";
 
   let filas = [];
   let totalCuotas = 0;
   let totalPagado = 0;
   let totalSaldo = 0;
+  let sociosConRegistro = 0;
 
+  /*
+   * VISTA ANUAL
+   * Incluye socios con cuota individual o movimientos de pago
+   * en el ejercicio seleccionado.
+   */
   if (vista === "anio") {
     if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
+      encabezado.innerHTML = "";
       tabla.innerHTML = `
-        <tr><td colspan="6" class="empty-state">
-          Introduce un ejercicio válido para consultar.
-        </td></tr>`;
+        <tr>
+          <td class="empty-state">
+            Introduce un ejercicio válido para consultar.
+          </td>
+        </tr>`;
+      $("resultadoHistoricoPagos").textContent =
+        "Selecciona un ejercicio válido.";
+      $("pagosTotalCuotas").textContent = dinero(0);
+      $("pagosTotalPagado").textContent = dinero(0);
+      $("pagosTotalSaldo").textContent = dinero(0);
+      $("pagosTotalSocios").textContent = "0";
+      $("filtroAnioPagos").hidden = false;
       return;
     }
-
-    const cuotasDelAnio = cuotasSocioAnuales
-      .filter(cuota => cuota.anio === anio)
-      .filter(cuota => {
-        const persona = obtenerPersonaPorId(cuota.personaId);
-        return persona && coincideBusqueda(persona);
-      });
 
     encabezado.innerHTML = `
       <tr>
@@ -2314,81 +2331,190 @@ function renderizarHistoricoPagos() {
         <th>Estado</th>
       </tr>`;
 
-    filas = cuotasDelAnio.map(cuota => {
-      const persona = obtenerPersonaPorId(cuota.personaId);
-      const pagado = obtenerTotalPagado(cuota.personaId, anio);
-      const saldo = obtenerSaldo(cuota.monto, pagado);
+    const claves = new Set();
 
-      totalCuotas += cuota.monto;
+    cuotasSocioAnuales
+      .filter(cuota => cuota.anio === anio)
+      .forEach(cuota => claves.add(cuota.personaId));
+
+    movimientosPago
+      .filter(pago =>
+        pago.anio === anio &&
+        pago.estado === "Aplicado"
+      )
+      .forEach(pago => claves.add(pago.personaId));
+
+    const socios = [...claves]
+      .map(obtenerPersonaPorId)
+      .filter(persona => persona && coincideBusqueda(persona))
+      .sort((a, b) =>
+        nombreCompleto(a).localeCompare(nombreCompleto(b), "es-MX")
+      );
+
+    filas = socios.map(persona => {
+      const cuota = obtenerClaveCuotaSocio(persona.id, anio);
+      const pagado = obtenerTotalPagado(persona.id, anio);
+      const saldo = cuota
+        ? obtenerSaldo(cuota.monto, pagado)
+        : null;
+
+      if (cuota) {
+        totalCuotas += cuota.monto;
+        totalSaldo += saldo;
+      }
+
       totalPagado += pagado;
-      totalSaldo += saldo;
+
+      const estado = cuota
+        ? obtenerEstadoCuota(cuota.monto, pagado)
+        : "Sin cuota asignada";
 
       return `
         <tr>
           <td>${escaparHTML(nombreCompleto(persona))}</td>
           <td>${anio}</td>
-          <td>${formatoMoneda(cuota.monto)}</td>
-          <td>${formatoMoneda(pagado)}</td>
-          <td>${formatoMoneda(saldo)}</td>
-          <td>${escaparHTML(obtenerEstadoCuota(cuota.monto, pagado))}</td>
+          <td>${cuota ? dinero(cuota.monto) : guion}</td>
+          <td>${dinero(pagado)}</td>
+          <td>${cuota ? dinero(saldo) : guion}</td>
+          <td>${escaparHTML(estado)}</td>
         </tr>`;
     });
 
+    sociosConRegistro = socios.length;
+
     $("resultadoHistoricoPagos").textContent =
-      `Ejercicio ${anio}: se muestran únicamente los socios con cuota individual registrada.`;
+      `Ejercicio ${anio}: ${socios.length} socio(s) con cuota o pago registrado. ` +
+      "Un guion en la cuota indica que no existe una cuota individual registrada.";
+
   } else {
-    const resumenes = obtenerResumenHistorico()
-      .filter(resumen => coincideBusqueda(resumen.persona));
+    /*
+     * VISTA ACUMULADA
+     * Genera tres columnas por cada ejercicio con registros:
+     * cuota, pago aplicado y saldo.
+     */
+    const anios = [...new Set([
+      ...cuotasSocioAnuales.map(cuota => Number(cuota.anio)),
+      ...movimientosPago.map(pago => Number(pago.anio))
+    ])]
+      .filter(ejercicio =>
+        Number.isInteger(ejercicio) &&
+        ejercicio >= 2000 &&
+        ejercicio <= 2100
+      )
+      .sort((a, b) => a - b);
+
+    const idsSocios = new Set([
+      ...cuotasSocioAnuales.map(cuota => cuota.personaId),
+      ...movimientosPago.map(pago => pago.personaId)
+    ]);
+
+    const socios = [...idsSocios]
+      .map(obtenerPersonaPorId)
+      .filter(persona => persona && coincideBusqueda(persona))
+      .sort((a, b) =>
+        nombreCompleto(a).localeCompare(nombreCompleto(b), "es-MX")
+      );
 
     encabezado.innerHTML = `
       <tr>
-        <th>Socio</th>
-        <th>Primer ejercicio</th>
-        <th>Último ejercicio</th>
-        <th>Total cuotas</th>
-        <th>Total pagado</th>
-        <th>Saldo acumulado</th>
+        <th rowspan="2">Socio</th>
+        ${anios.map(ejercicio => `
+          <th colspan="3">${ejercicio}</th>
+        `).join("")}
+        <th colspan="3">Totales registrados</th>
+      </tr>
+      <tr>
+        ${anios.map(() => `
+          <th>Cuota</th>
+          <th>Pagado</th>
+          <th>Saldo</th>
+        `).join("")}
+        <th>Cuotas</th>
+        <th>Pagado</th>
+        <th>Saldo</th>
       </tr>`;
 
-    filas = resumenes.map(resumen => {
-      totalCuotas += resumen.totalCuotas;
-      totalPagado += resumen.totalPagado;
-      totalSaldo += resumen.totalSaldo;
+    filas = socios.map(persona => {
+      let cuotasSocio = 0;
+      let pagosSocio = 0;
+      let saldoSocio = 0;
+
+      const celdasAnuales = anios.map(ejercicio => {
+        const cuota = obtenerClaveCuotaSocio(
+          persona.id,
+          ejercicio
+        );
+
+        const pagado = obtenerTotalPagado(
+          persona.id,
+          ejercicio
+        );
+
+        const saldo = cuota
+          ? obtenerSaldo(cuota.monto, pagado)
+          : null;
+
+        if (cuota) {
+          cuotasSocio += cuota.monto;
+          saldoSocio += saldo;
+        }
+
+        pagosSocio += pagado;
+
+        return `
+          <td>${cuota ? dinero(cuota.monto) : guion}</td>
+          <td>${dinero(pagado)}</td>
+          <td>${cuota ? dinero(saldo) : guion}</td>`;
+      }).join("");
+
+      cuotasSocio = redondearImporte(cuotasSocio);
+      pagosSocio = redondearImporte(pagosSocio);
+      saldoSocio = redondearImporte(saldoSocio);
+
+      totalCuotas += cuotasSocio;
+      totalPagado += pagosSocio;
+      totalSaldo += saldoSocio;
 
       return `
         <tr>
-          <td>${escaparHTML(nombreCompleto(resumen.persona))}</td>
-          <td>${resumen.primerEjercicio}</td>
-          <td>${resumen.ultimoEjercicio}</td>
-          <td>${formatoMoneda(resumen.totalCuotas)}</td>
-          <td>${formatoMoneda(resumen.totalPagado)}</td>
-          <td>${formatoMoneda(resumen.totalSaldo)}</td>
+          <td>${escaparHTML(nombreCompleto(persona))}</td>
+          ${celdasAnuales}
+          <td>${dinero(cuotasSocio)}</td>
+          <td>${dinero(pagosSocio)}</td>
+          <td>${dinero(saldoSocio)}</td>
         </tr>`;
     });
 
-    $("resultadoHistoricoPagos").textContent =
-      "Histórico acumulado de los ejercicios con cuotas individuales registradas.";
+    sociosConRegistro = socios.length;
+
+    $("resultadoHistoricoPagos").textContent = anios.length
+      ? `Histórico acumulado: ${anios.length} ejercicio(s) con registros. ` +
+        "Los guiones indican que no hay una cuota individual registrada para ese año."
+      : "Todavía no existen cuotas ni movimientos de pago registrados.";
   }
 
   tabla.innerHTML = filas.length
     ? filas.join("")
-    : `<tr><td colspan="6" class="empty-state">
-        No hay cuotas registradas para los filtros seleccionados.
-      </td></tr>`;
+    : `<tr>
+        <td colspan="${vista === "anio" ? 6 : 4}"
+            class="empty-state">
+          No hay cuotas ni pagos para los filtros seleccionados.
+        </td>
+      </tr>`;
 
   $("filtroAnioPagos").hidden = vista !== "anio";
 
-  $("pagosTotalCuotas").textContent = formatoMoneda(totalCuotas);
-  $("pagosTotalPagado").textContent = formatoMoneda(totalPagado);
-  $("pagosTotalSaldo").textContent = formatoMoneda(totalSaldo);
+  $("pagosTotalCuotas").textContent = dinero(
+    redondearImporte(totalCuotas)
+  );
 
-  const sociosConRegistro = vista === "anio"
-    ? new Set(
-        cuotasSocioAnuales
-          .filter(cuota => cuota.anio === anio)
-          .map(cuota => cuota.personaId)
-      ).size
-    : filas.length;
+  $("pagosTotalPagado").textContent = dinero(
+    redondearImporte(totalPagado)
+  );
+
+  $("pagosTotalSaldo").textContent = dinero(
+    redondearImporte(totalSaldo)
+  );
 
   $("pagosTotalSocios").textContent = String(sociosConRegistro);
 }
