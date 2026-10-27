@@ -1,0 +1,732 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#12345a">
+
+  <title>Administración | Comunidad Helénica de México</title>
+
+  <link rel="stylesheet" href="./css/estilos.css">
+  <script src="./js/app.js" defer></script>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">
+        <img
+          src="../images/Logo%20COMHELMEX.jpg"
+          alt="Logo de la Comunidad Helénica de México"
+        >
+      </div>
+
+      <div class="brand-copy">
+        <p class="brand-eyebrow">Sistema administrativo</p>
+        <h1>Comunidad Helénica de México, A.C.</h1>
+        <p class="brand-subtitle">
+          Fundada el 13 de marzo de 1956
+        </p>
+      </div>
+    </div>
+
+    <div class="topbar-label">
+      <span class="status-dot"></span>
+      Administración institucional
+    </div>
+  </header>
+
+  <main class="page-container">
+
+    <!-- Aviso de privacidad y funcionamiento -->
+    <section class="notice" aria-label="Aviso del sistema">
+      <div class="notice-icon" aria-hidden="true">i</div>
+
+      <div>
+        <h2>Administración local</h2>
+        <p>
+          Los datos se procesan en el navegador. Importa y exporta
+          archivos JSON para conservar los cambios en tu computadora.
+          No cargues información privada en el repositorio público.
+        </p>
+      </div>
+    </section>
+
+    <!-- Navegación principal -->
+    <nav class="module-navigation" aria-label="Módulos administrativos">
+      <a class="module-link active" href="#directorio">
+        Personas y socios
+      </a>
+
+      <a class="module-link" href="#configuracionCuotasPanel">
+        Configuración de cuotas
+      </a>
+    </nav>
+
+    <!-- Módulo de personas y socios -->
+    <section id="directorio" class="module-section">
+
+      <div class="section-heading">
+        <div>
+          <p class="section-eyebrow">Módulo 01</p>
+          <h2>Directorio de personas y socios</h2>
+          <p class="section-description">
+            Consulta, registra y administra la información del padrón.
+          </p>
+        </div>
+      </div>
+
+      <!-- Indicadores -->
+      <section class="stats-grid" aria-label="Resumen del directorio">
+
+        <article class="stat-card">
+          <div class="stat-label">Total de registros</div>
+          <div class="stat-value" id="totalRegistros">0</div>
+          <div class="stat-footnote">Personas registradas</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-label">Vigentes</div>
+          <div class="stat-value" id="totalVigentes">0</div>
+          <div class="stat-footnote">Registros con estatus vigente</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-label">Otros estatus</div>
+          <div class="stat-value" id="totalOtros">0</div>
+          <div class="stat-footnote">Registros por revisar u otros</div>
+        </article>
+
+      </section>
+
+      <!-- Panel del directorio -->
+      <section class="panel">
+
+        <div class="panel-header">
+          <div>
+            <h3>Directorio</h3>
+            <p>
+              Busca personas, consulta sus fichas o modifica sus datos.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="btnNuevo"
+          >
+            + Nueva persona
+          </button>
+        </div>
+
+        <!-- Herramientas -->
+        <div class="toolbar">
+
+          <div class="toolbar-search">
+            <label for="buscar">Buscar persona</label>
+            <input
+              type="search"
+              id="buscar"
+              placeholder="Nombre, apellidos, correo o teléfono"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="toolbar-filter">
+            <label for="filtroEstatus">Filtrar por estatus</label>
+            <select id="filtroEstatus">
+              <option value="">Todos los estatus</option>
+              <option value="Por revisar">Por revisar</option>
+              <option value="Vigente">Vigente</option>
+              <option value="Inactivo">Inactivo</option>
+              <option value="No socio">No socio</option>
+            </select>
+          </div>
+
+          <div class="toolbar-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="btnImportar"
+            >
+              Importar padrón
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="btnExportar"
+            >
+              Exportar padrón
+            </button>
+
+            <input
+              type="file"
+              id="archivoJson"
+              accept=".json,application/json"
+              hidden
+            >
+          </div>
+
+        </div>
+
+        <div
+          id="resultadoBusqueda"
+          class="table-summary"
+          aria-live="polite"
+        ></div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Nombre completo</th>
+                <th scope="col">Tipo de registro</th>
+                <th scope="col">Categoría</th>
+                <th scope="col">Estatus</th>
+                <th scope="col">Contacto</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody id="tablaPersonas">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  No hay registros cargados.
+                  Importa un padrón JSON o registra una persona.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel-footer">
+          <span>
+            Los datos del directorio se respaldan mediante archivos JSON.
+          </span>
+        </div>
+
+      </section>
+
+      <!-- Formulario de alta y edición -->
+      <section
+        id="formPanel"
+        class="panel form-panel"
+        hidden
+      >
+        <div class="panel-header">
+          <div>
+            <p class="section-eyebrow" id="formEyebrow">
+              Registro
+            </p>
+
+            <h3 id="formTitulo">Nueva persona</h3>
+
+            <p>
+              Completa los campos disponibles.
+              Los campos opcionales pueden dejarse vacíos.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-ghost"
+            id="btnCerrarForm"
+            aria-label="Cerrar formulario"
+          >
+            Cerrar
+          </button>
+        </div>
+
+        <form id="personaForm">
+
+          <input type="hidden" id="personaId" name="personaId">
+
+          <div class="form-grid">
+
+            <div class="form-field">
+              <label for="nombres">Nombre(s) *</label>
+              <input
+                type="text"
+                id="nombres"
+                name="nombres"
+                required
+                maxlength="120"
+                autocomplete="given-name"
+              >
+            </div>
+
+            <div class="form-field">
+              <label for="apellidos">Apellidos *</label>
+              <input
+                type="text"
+                id="apellidos"
+                name="apellidos"
+                required
+                maxlength="120"
+                autocomplete="family-name"
+              >
+            </div>
+
+            <div class="form-field">
+              <label for="tipoRegistro">Tipo de registro *</label>
+              <select id="tipoRegistro" name="tipoRegistro" required>
+                <option value="Socio">Socio</option>
+                <option value="Persona relacionada">Persona relacionada</option>
+                <option value="Participante externo">Participante externo</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="categoria">Categoría *</label>
+              <select id="categoria" name="categoria" required>
+                <option value="Socio">Socio</option>
+                <option value="Amistad">Amistad</option>
+                <option value="Otra categoría">Otra categoría</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="subcategoria">Subcategoría</label>
+              <select id="subcategoria" name="subcategoria">
+                <option value="">Sin subcategoría</option>
+                <option value="Numerario">Numerario</option>
+                <option value="Honorario">Honorario</option>
+                <option value="Filoheleno">Filoheleno</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="estatus">Estatus *</label>
+              <select id="estatus" name="estatus" required>
+                <option value="Por revisar">Por revisar</option>
+                <option value="Vigente">Vigente</option>
+                <option value="Inactivo">Inactivo</option>
+                <option value="No socio">No socio</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="fechaIngreso">Fecha de ingreso</label>
+              <input
+                type="date"
+                id="fechaIngreso"
+                name="fechaIngreso"
+              >
+            </div>
+
+            <div class="form-field">
+              <label for="correo">Correo electrónico</label>
+              <input
+                type="email"
+                id="correo"
+                name="correo"
+                maxlength="180"
+                autocomplete="email"
+              >
+            </div>
+
+            <div class="form-field">
+              <label for="telefono">Teléfono</label>
+              <input
+                type="tel"
+                id="telefono"
+                name="telefono"
+                maxlength="40"
+                autocomplete="tel"
+              >
+            </div>
+
+            <div class="form-field form-field-full">
+              <label for="domicilio">Domicilio</label>
+              <input
+                type="text"
+                id="domicilio"
+                name="domicilio"
+                maxlength="250"
+                autocomplete="street-address"
+              >
+            </div>
+
+            <div class="form-field form-field-full">
+              <label for="notas">Notas administrativas</label>
+              <textarea
+                id="notas"
+                name="notas"
+                rows="4"
+                maxlength="2000"
+                placeholder="Información adicional relevante"
+              ></textarea>
+            </div>
+
+          </div>
+
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="btnCancelar"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+            >
+              Guardar persona
+            </button>
+          </div>
+
+        </form>
+      </section>
+
+    </section>
+
+    <!-- Módulo de configuración de cuotas -->
+    <section
+      id="configuracionCuotasPanel"
+      class="module-section"
+      aria-labelledby="tituloConfiguracionCuotas"
+    >
+
+      <div class="section-heading">
+        <div>
+          <p class="section-eyebrow">Módulo 02</p>
+          <h2 id="tituloConfiguracionCuotas">
+            Configuración de cuotas anuales
+          </h2>
+          <p class="section-description">
+            Define la cuota general de cada ejercicio y conserva
+            su configuración en un archivo independiente del padrón.
+          </p>
+        </div>
+      </div>
+
+      <section class="notice" aria-label="Información sobre las cuotas">
+        <div class="notice-icon" aria-hidden="true">i</div>
+
+        <div>
+          <h3>Configuración por ejercicio</h3>
+          <p>
+            La cuota se define para cada año. Modificar el importe
+            de un ejercicio no debe cambiar automáticamente la
+            configuración de años anteriores. Si un año no tiene
+            cuota configurada, se mostrará como pendiente de configuración,
+            no como una cuota de cero pesos.
+          </p>
+        </div>
+      </section>
+
+      <!-- Alta y edición de cuota anual -->
+      <section class="panel">
+
+        <div class="panel-header">
+          <div>
+            <h3>Cuota general</h3>
+            <p>
+              El importe general se aplicará a los socios que no tengan
+              una regla específica habilitada.
+            </p>
+          </div>
+        </div>
+
+        <form id="cuotaForm">
+
+          <div class="form-grid">
+
+            <div class="form-field">
+              <label for="configCuotaAnio">Ejercicio anual *</label>
+              <input
+                type="number"
+                id="configCuotaAnio"
+                name="configCuotaAnio"
+                min="2000"
+                max="2100"
+                step="1"
+                placeholder="Ej. 2026"
+                required
+              >
+            </div>
+
+            <div class="form-field">
+              <label for="configCuotaMonto">Cuota anual en MXN *</label>
+              <input
+                type="number"
+                id="configCuotaMonto"
+                name="configCuotaMonto"
+                min="0.01"
+                max="10000000"
+                step="0.01"
+                placeholder="Ej. 1500.00"
+                required
+              >
+            </div>
+
+          </div>
+
+          <p class="field-help">
+            Ingresa el importe aprobado para ese ejercicio.
+            Antes de modificar una cuota existente, verifica que
+            corresponda al año correcto.
+          </p>
+
+          <div class="form-actions">
+            <button
+              type="reset"
+              class="btn btn-ghost"
+              id="btnCancelarEdicionCuota"
+            >
+              Limpiar
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="btnGuardarCuota"
+            >
+              Guardar cuota anual
+            </button>
+          </div>
+
+        </form>
+
+      </section>
+
+      <!-- Reglas especiales previstas para una etapa posterior -->
+      <section class="panel">
+
+        <div class="panel-header">
+          <div>
+            <h3>Reglas especiales</h3>
+            <p>
+              Estructura prevista para futuras mejoras.
+              Estas reglas todavía no se aplican al cálculo de cuotas.
+            </p>
+          </div>
+        </div>
+
+        <div class="future-rules-grid">
+
+          <article class="future-rule">
+            <div class="future-rule-heading">
+              <h4>Cuotas por categoría o tipo de socio</h4>
+              <span class="status-badge status-pending">
+                Etapa posterior
+              </span>
+            </div>
+
+            <p>
+              Permitirá definir importes distintos por categoría
+              cuando el Consejo Directivo lo determine.
+            </p>
+          </article>
+
+          <article class="future-rule">
+            <div class="future-rule-heading">
+              <h4>Excepción individual autorizada</h4>
+              <span class="status-badge status-pending">
+                Etapa posterior
+              </span>
+            </div>
+
+            <p>
+              Permitirá registrar cuotas especiales por persona,
+              conservando la autorización y el motivo correspondiente.
+            </p>
+          </article>
+
+        </div>
+
+        <p class="field-help">
+          Orden previsto de aplicación: excepción individual autorizada,
+          cuota por categoría o tipo de socio y, finalmente,
+          cuota general del ejercicio. Las reglas especiales no
+          estarán activas hasta que se implemente su administración.
+        </p>
+
+      </section>
+
+      <!-- Tabla de cuotas -->
+      <section class="panel">
+
+        <div class="panel-header">
+          <div>
+            <h3>Cuotas configuradas por año</h3>
+            <p>
+              Consulta los ejercicios y sus importes registrados
+              en la configuración cargada.
+            </p>
+          </div>
+        </div>
+
+        <div
+          id="resultadoCuotas"
+          class="table-summary"
+          aria-live="polite"
+        >
+          La configuración de cuotas aún no se ha cargado.
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Ejercicio</th>
+                <th scope="col">Cuota general</th>
+                <th scope="col">Moneda</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody id="tablaCuotasAnuales">
+              <tr>
+                <td colspan="4" class="empty-state">
+                  No hay cuotas cargadas.
+                  Importa la configuración o registra un ejercicio.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- Importación y exportación independiente -->
+      <section class="panel">
+
+        <div class="panel-header">
+          <div>
+            <h3>Respaldo de configuración</h3>
+            <p>
+              Administra el archivo JSON de cuotas de forma independiente
+              del archivo JSON del directorio.
+            </p>
+          </div>
+        </div>
+
+        <div class="backup-info">
+          <div class="backup-info-icon" aria-hidden="true">
+            <icon name="folder-lock" size="xl" />
+          </div>
+
+          <div>
+            <h4>Archivo local de cuotas</h4>
+            <p>
+              Guarda el archivo en una carpeta privada de tu computadora.
+              Al exportar, podrás descargar la versión actualizada y
+              conservar una copia anterior como respaldo.
+            </p>
+          </div>
+        </div>
+
+        <div class="toolbar-actions backup-actions">
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="btnImportarCuotas"
+          >
+            Importar configuración JSON
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="btnExportarCuotas"
+          >
+            Exportar configuración JSON
+          </button>
+
+          <input
+            type="file"
+            id="archivoCuotasJson"
+            accept=".json,application/json"
+            hidden
+          >
+
+        </div>
+
+        <p class="field-help">
+          La importación deberá validar el archivo antes de reemplazar
+          la configuración que se encuentre en memoria.
+        </p>
+
+      </section>
+
+    </section>
+
+    <!-- Ficha de detalle de una persona -->
+    <dialog
+      id="detalleDialog"
+      class="detail-dialog"
+      aria-labelledby="detalleNombre"
+    >
+
+      <div class="dialog-header">
+        <div>
+          <p class="section-eyebrow">Ficha de registro</p>
+          <h2 id="detalleNombre">Detalle de persona</h2>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-ghost"
+          id="btnCerrarDetalle"
+          aria-label="Cerrar ficha"
+        >
+          Cerrar
+        </button>
+      </div>
+
+      <div
+        id="detalleCampos"
+        class="detail-grid"
+      ></div>
+
+      <div class="dialog-actions">
+        <button
+          type="button"
+          class="btn btn-ghost"
+          id="btnDetalleCerrar"
+        >
+          Cerrar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="btnDetalleEditar"
+        >
+          Editar persona
+        </button>
+      </div>
+
+    </dialog>
+
+    <!-- Mensajes del sistema -->
+    <div
+      id="mensaje"
+      class="toast"
+      role="status"
+      aria-live="polite"
+    ></div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>Comunidad Helénica de México, A.C.</strong>
+      <p>Administración institucional</p>
+    </div>
+
+    <div class="footer-note">
+      <span>Uso administrativo</span>
+      <span>·</span>
+      <span>Los respaldos se gestionan mediante archivos JSON</span>
+    </div>
+  </footer>
+
+</body>
+</html>
