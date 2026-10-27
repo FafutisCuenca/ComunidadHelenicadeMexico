@@ -486,53 +486,77 @@ function actualizarTitulos() {
   });
 }
 
+
 function leerAsistente(tarjeta) {
   const campo = nombre =>
     tarjeta.querySelector('[data-campo="' + nombre + '"]');
 
   const nombre = campo("nombre").value.trim();
-  const edadTexto = campo("edad").value.trim();
+  const tipoAsistente = campo("tipo_asistente").value;
 
-  if (!nombre) throw new Error("Escribe el nombre de cada asistente.");
-  if (edadTexto === "" || !Number.isInteger(Number(edadTexto))) {
-    throw new Error("Captura una edad entera para cada asistente.");
+  if (!nombre) {
+    throw new Error("Escribe el nombre de cada asistente.");
+  }
+
+  if (!["adulto", "menor"].includes(tipoAsistente)) {
+    throw new Error("Selecciona Adulto o Menor para cada asistente.");
   }
 
   const beneficioId = campo("beneficio").value || null;
-  const regla = configuracion.beneficios.find(b => b.id === beneficioId);
-  const autorizado = beneficioId ? campo("autorizado").checked : false;
-  const autorizador = beneficioId ? campo("autorizador").value.trim() : "";
-  const motivo = beneficioId ? campo("motivo").value.trim() : "";
+  const regla = configuracion.beneficios.find(
+    b => b.id === beneficioId
+  );
+
+  const autorizado = beneficioId
+    ? campo("autorizado").checked
+    : false;
+
+  const autorizador = beneficioId
+    ? campo("autorizador").value.trim()
+    : "";
+
+  const motivo = beneficioId
+    ? campo("motivo").value.trim()
+    : "";
 
   if (regla && regla.requiere_autorizacion && !autorizado) {
-    throw new Error("El beneficio " + regla.nombre + " requiere autorización.");
+    throw new Error(
+      "El beneficio " + regla.nombre + " requiere autorización."
+    );
   }
+
   if (regla && regla.requiere_autorizacion && !autorizador) {
     throw new Error("Indica quién autorizó el beneficio.");
   }
-  if ((regla && regla.requiere_motivo) ||
-      beneficioId === "ITHAKI_50" || beneficioId === "EGEO_50") {
-    if (!motivo) throw new Error("Indica el motivo del beneficio.");
+
+  if (regla && regla.requiere_motivo && !motivo) {
+    throw new Error("Indica el motivo del beneficio.");
   }
 
-  const resultado = window.CalculoAsistentesOXI.calcularAsistente({
-    nombre, edad:Number(edadTexto), beneficio_id:beneficioId,
-    autorizado, autorizador, motivo
-  });
+  const resultado =
+    window.CalculoAsistentesOXI.calcularAsistente({
+      nombre,
+      tipo_asistente: tipoAsistente,
+      beneficio_id: beneficioId,
+      autorizado,
+      autorizador,
+      motivo
+    });
 
   return {
     nombre,
-    edad:resultado.edad,
-    categoria:resultado.categoria,
-    tarifa_original:resultado.tarifa_original,
-    beneficio_id:resultado.beneficio_id,
-    beneficio_nombre:resultado.beneficio_nombre,
-    autorizado:resultado.autorizado,
-    tipo_ajuste:resultado.tipo_ajuste,
-    importe_ajuste:resultado.importe_ajuste,
-    importe_final:resultado.importe_final,
-    motivo:resultado.motivo,
-    autorizador:resultado.autorizador
+    tipo_asistente: tipoAsistente,
+    edad: null,
+    categoria: resultado.categoria,
+    tarifa_original: resultado.tarifa_original,
+    beneficio_id: resultado.beneficio_id,
+    beneficio_nombre: resultado.beneficio_nombre,
+    autorizado: resultado.autorizado,
+    tipo_ajuste: resultado.tipo_ajuste,
+    importe_ajuste: resultado.importe_ajuste,
+    importe_final: resultado.importe_final,
+    motivo: resultado.motivo,
+    autorizador: resultado.autorizador
   };
 }
 
