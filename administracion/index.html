@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173c35">
+
+  <title>Personas y Socios | Comunidad Helénica de México</title>
+
+  <link rel="stylesheet" href="./css/estilos.css">
+  <script src="./js/app.js" defer></script>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">ΧΕ</div>
+      <div>
+        <p class="eyebrow">Comunidad Helénica de México, A.C.</p>
+        <h1>Personas y Socios</h1>
+      </div>
+    </div>
+
+    <a class="back-link" href="../index.html">
+      ← Volver al portal
+    </a>
+  </header>
+
+  <main class="page">
+
+    <section class="notice">
+      <strong>Modo local</strong>
+      <span>
+        Importa un archivo JSON desde tu computadora y exporta
+        los cambios cuando termines. Este módulo es independiente
+        de las reservaciones del OXI.
+      </span>
+    </section>
+
+    <section class="stats">
+      <article class="stat-card">
+        <span>Registros cargados</span>
+        <strong id="totalRegistros">0</strong>
+      </article>
+
+      <article class="stat-card">
+        <span>Socios vigentes</span>
+        <strong id="totalVigentes">0</strong>
+      </article>
+
+      <article class="stat-card">
+        <span>Otros / por revisar</span>
+        <strong id="totalOtros">0</strong>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Directorio institucional</p>
+          <h2>Buscar y consultar personas</h2>
+        </div>
+
+        <button
+          class="button button-primary"
+          id="btnNuevo"
+          type="button">
+          + Nueva persona
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <label class="search-field">
+          <span class="sr-only">Buscar personas</span>
+          <input
+            id="buscar"
+            type="search"
+            placeholder="Buscar por nombre, folio, correo o categoría..."
+            autocomplete="off">
+        </label>
+
+        <label class="filter-field">
+          <span class="sr-only">Filtrar por estatus</span>
+          <select id="filtroEstatus">
+            <option value="">Todos los estatus</option>
+            <option value="Vigente">Vigente</option>
+            <option value="Inactivo">Inactivo</option>
+            <option value="Por revisar">Por revisar</option>
+            <option value="No socio">No socio</option>
+          </select>
+        </label>
+
+        <button
+          class="button button-secondary"
+          id="btnImportar"
+          type="button">
+          Importar JSON
+        </button>
+
+        <button
+          class="button button-secondary"
+          id="btnExportar"
+          type="button">
+          Exportar JSON
+        </button>
+
+        <input
+          id="archivoJson"
+          type="file"
+          accept=".json,application/json"
+          hidden>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Nombre completo</th>
+              <th>Categoría</th>
+              <th>Estatus</th>
+              <th>Contacto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody id="tablaPersonas">
+            <tr>
+              <td colspan="6" class="empty">
+                No hay registros cargados.
+                Crea una persona de prueba o importa un JSON.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="table-foot" id="resultadoBusqueda">
+        0 registros
+      </p>
+    </section>
+
+    <!-- Formulario de alta y edición -->
+    <section class="panel form-panel" id="formPanel" hidden>
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow" id="formEyebrow">Nuevo registro</p>
+          <h2 id="formTitulo">Nueva persona</h2>
+        </div>
+
+        <button
+          class="icon-button"
+          id="btnCerrarForm"
+          type="button"
+          aria-label="Cerrar formulario">
+          ×
+        </button>
+      </div>
+
+      <form id="personaForm">
+        <input id="personaId" type="hidden">
+
+        <div class="form-grid">
+          <label>
+            Nombre(s) *
+            <input id="nombres" required maxlength="100">
+          </label>
+
+          <label>
+            Apellidos *
+            <input id="apellidos" required maxlength="120">
+          </label>
+
+          <label>
+            Tipo de registro *
+            <select id="tipoRegistro" required>
+              <option value="Socio">Socio</option>
+              <option value="Persona relacionada">Persona relacionada</option>
+              <option value="Participante externo">Participante externo</option>
+            </select>
+          </label>
+
+          <label>
+            Categoría de socio
+            <select id="categoria">
+              <option value="">Sin definir</option>
+              <option value="Socio numerario">Socio numerario</option>
+              <option value="Socio amigo">Socio amigo</option>
+              <option value="Otra categoría">Otra categoría</option>
+            </select>
+          </label>
+
+          <label>
+            Estatus del registro *
+            <select id="estatus" required>
+              <option value="Por revisar">Por revisar</option>
+              <option value="Vigente">Vigente</option>
+              <option value="Inactivo">Inactivo</option>
+              <option value="No socio">No socio</option>
+            </select>
+          </label>
+
+          <label>
+            Fecha de ingreso
+            <input id="fechaIngreso" type="date">
+          </label>
+
+          <label>
+            Correo electrónico
+            <input id="correo" type="email" maxlength="160">
+          </label>
+
+          <label>
+            Teléfono / celular
+            <input id="telefono" type="tel" maxlength="40">
+          </label>
+
+          <label class="full-width">
+            Domicilio
+            <input id="domicilio" maxlength="240">
+          </label>
+
+          <label class="full-width">
+            Notas administrativas
+            <textarea
+              id="notas"
+              rows="3"
+              maxlength="1000"
+              placeholder="Solo información confirmada."></textarea>
+          </label>
+        </div>
+
+        <p class="form-hint">
+          La vigencia de la membresía es independiente de las cuotas
+          y los pagos. Los campos de contacto son opcionales.
+        </p>
+
+        <div class="form-actions">
+          <button
+            class="button button-secondary"
+            id="btnCancelar"
+            type="button">
+            Cancelar
+          </button>
+
+          <button class="button button-primary" type="submit">
+            Guardar registro
+          </button>
+        </div>
+
+        <p class="save-warning">
+          Los cambios permanecen en la sesión hasta exportar
+          el JSON actualizado. Guarda el archivo en tu carpeta privada.
+        </p>
+      </form>
+    </section>
+
+    <!-- Consulta detallada -->
+    <dialog id="detalleDialog" class="detail-dialog">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Ficha de persona</p>
+          <h2 id="detalleNombre">Detalle</h2>
+        </div>
+
+        <button
+          class="icon-button"
+          id="btnCerrarDetalle"
+          type="button"
+          aria-label="Cerrar detalle">
+          ×
+        </button>
+      </div>
+
+      <dl class="detail-grid" id="detalleCampos"></dl>
+
+      <div class="form-actions">
+        <button
+          class="button button-secondary"
+          id="btnDetalleCerrar"
+          type="button">
+          Cerrar
+        </button>
+
+        <button
+          class="button button-primary"
+          id="btnDetalleEditar"
+          type="button">
+          Editar registro
+        </button>
+      </div>
+    </dialog>
+
+    <div
+      id="mensaje"
+      class="toast"
+      role="status"
+      aria-live="polite"
+      hidden>
+    </div>
+
+  </main>
+
+  <footer>
+    <span>Comunidad Helénica de México, A.C.</span>
+    <span>Personas y Socios · Versión 0.1.0</span>
+  </footer>
+</body>
+</html>
