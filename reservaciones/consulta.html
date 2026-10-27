@@ -632,7 +632,14 @@ function escapar(valor) {
 }
 
 function referencia(r) {
-  return texto(r.folio || r.referencia || r.id_reservacion || r.id || "SIN-REF");
+  return texto(
+    r.folio ||
+    r.referencia ||
+    r.reservacion_id ||
+    r.id_reservacion ||
+    r.id ||
+    "SIN-REF"
+  );
 }
 
 function nombreGrupo(r) {
