@@ -368,8 +368,7 @@ function conectarEventos() {
   $("btnCerrarForm")?.addEventListener("click", cerrarFormulario);
   $("btnCancelar")?.addEventListener("click", cerrarFormulario);
 
-  $("btnCerrarDetalle")?.addEventListener("click", cerrarDetalle);
-  $("btnDetalleCerrar")?.addEventListener("click", cerrarDetalle);
+$("btnCerrarDetalle")?.addEventListener("click", cerrarDetalle);
 
   $("btnDetalleEditar")?.addEventListener(
     "click",
