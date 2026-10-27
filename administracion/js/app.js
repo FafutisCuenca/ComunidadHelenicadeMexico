@@ -386,6 +386,21 @@ function conectarEventos() {
   $("btnImportar")?.addEventListener("click", abrirSelectorArchivo);
   $("btnExportar")?.addEventListener("click", exportarJSON);
 
+  $("btnImportarMaestro")?.addEventListener(
+  "click",
+  abrirSelectorMaestro
+);
+
+$("btnExportarMaestro")?.addEventListener(
+  "click",
+  exportarMaestroJSON
+);
+
+$("archivoMaestroJson")?.addEventListener(
+  "change",
+  importarMaestroJSON
+);
+  
   $("archivoJson")?.addEventListener("change", importarJSON);
 
   $("buscar")?.addEventListener("input", renderizarTabla);
