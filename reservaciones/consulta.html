@@ -1020,7 +1020,7 @@ function renderizarGrupos() {
       <td class="num">${debe > 0 ? `<span class="badge pendiente">${dinero(debe)}</span>` : dinero(0)}</td>
       <td>${escapar(notas(r) || "—")}</td>
       <td class="acciones-celda no-imprimir">
-        <button class="secundario btn-editar-reservacion" type="button" data-id="${escapar(String(r.id))}">Editar</button>
+        <button class="secundario btn-editar-reservacion" type="button" data-id="${escapar(idReservacion(r))}">Editar</button>
       </td>
     </tr>`;
   }).join("");
@@ -1311,7 +1311,7 @@ function exportarCSV() {
   ]];
 
   reservaciones.forEach(r => filas.push([
-    referencia(r), r.id, nombreGrupo(r), tipoReservacion(r), adultos(r), ninos(r),
+    referencia(r), idReservacion(r), nombreGrupo(r), tipoReservacion(r), adultos(r), ninos(r),
     totalAsientos(r), mesaNumero(r) ?? "", beneficio(r), etiquetaPago(r), formaPago(r),
     costoExcel(r), importeCortesia(r), importeSubtotal(r), importePagado(r),
     importeDebe(r), notas(r)
@@ -1340,11 +1340,11 @@ function exportarFinanzasCSV() {
     "Costo Excel", "Cortesía", "Subtotal", "Pagado", "Saldo pendiente", "Notas"
   ]];
 
-  reservaciones.forEach(r => filas.push([
-    referencia(r), r.id, nombreGrupo(r), etiquetaPago(r), formaPago(r),
-    costoExcel(r), importeCortesia(r), importeSubtotal(r), importePagado(r),
-    importeDebe(r), notas(r)
-  ]));
+reservaciones.forEach(r => filas.push([
+  referencia(r), idReservacion(r), nombreGrupo(r), etiquetaPago(r),
+  formaPago(r), costoExcel(r), importeCortesia(r),
+  importeSubtotal(r), importePagado(r), importeDebe(r), notas(r)
+]));
 
   descargarCSV("OXI-2026-finanzas.csv", filas);
 }
