@@ -2051,6 +2051,39 @@ footer span:first-child,
   }
 }
 
+/* Histórico de pagos */
+#historicoPagosPanel .stats-grid {
+  margin-top: 22px;
+  margin-bottom: 22px;
+}
 
+#historicoPagosPanel .table-container {
+  overflow-x: auto;
+}
+
+#historicoPagosPanel .data-table {
+  min-width: 760px;
+}
+
+#historicoPagosPanel [hidden] {
+  display: none !important;
+}
+
+#historicoPagosPanel .form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+#historicoPagosPanel .stat-value {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  #historicoPagosPanel .form-actions .btn {
+    width: 100%;
+  }
+}
 
 
