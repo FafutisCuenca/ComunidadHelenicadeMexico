@@ -1098,52 +1098,159 @@ function mostrarDetalle(id) {
   const persona = obtenerPersonaPorId(id);
 
   if (!persona) {
-    mostrarMensaje("No se encontró el registro seleccionado.", "error");
+    mostrarMensaje(
+      "No se encontró el registro seleccionado.",
+      "error"
+    );
     return;
   }
 
-  if ($("detalleNombre")) {
-    $("detalleNombre").textContent = nombreCompleto(persona);
-  }
-
+  const titulo = $("detalleNombre");
   const campos = $("detalleCampos");
+  const botonEditar = $("btnDetalleEditar");
+  const dialogo = $("detalleDialog");
 
-  if (campos) {
-    const todosLosCampos = [
-      ["Identificador", persona.id],
-      ["Nombres", persona.nombres],
-      ["Apellidos", persona.apellidos],
-      ...CAMPOS_DETALLE.map(
-        ([clave, etiqueta]) => [etiqueta, persona[clave]]
-      )
-    ];
-
-    campos.innerHTML = todosLosCampos.map(([etiqueta, valor]) => `
-      <dt>${escaparHTML(etiqueta)}</dt>
-      <dd>${escaparHTML(valor) || "—"}</dd>
-    `).join("");
+  if (!titulo || !campos || !dialogo) {
+    mostrarMensaje(
+      "No se encontró la estructura de la ficha de detalle.",
+      "error"
+    );
+    return;
   }
 
-  const botonEditar = $("btnDetalleEditar");
+  // Encabezado
+  titulo.textContent = nombreCompleto(persona) || "Persona sin nombre";
+
+  // Grupo 1: identificación
+  const identificacion = crearGrupoDetalle(
+    "Identificación",
+    "Datos generales del registro",
+    [
+      ["Identificador", persona.id],
+      ["Nombre(s)", persona.nombres],
+      ["Apellidos", persona.apellidos]
+    ]
+  );
+
+  // Grupo 2: membresía
+  const membresia = crearGrupoDetalle(
+    "Membresía",
+    "Clasificación y situación institucional",
+    [
+      ["Tipo de registro", persona.tipoRegistro],
+      ["Categoría", persona.categoria],
+      ["Subcategoría", persona.subcategoria],
+      ["Estatus", persona.estatus],
+      ["Fecha de ingreso", formatearFechaDetalle(persona.fechaIngreso)]
+    ]
+  );
+
+  // Grupo 3: contacto
+  const contacto = crearGrupoDetalle(
+    "Contacto",
+    "Medios de comunicación registrados",
+    [
+      ["Correo electrónico", persona.correo],
+      ["Teléfono", persona.telefono]
+    ]
+  );
+
+  // Grupo 4: domicilio
+  const domicilio = crearGrupoDetalle(
+    "Domicilio",
+    "Dirección registrada",
+    [
+      ["Domicilio", persona.domicilio]
+    ]
+  );
+
+  // Grupo 5: notas administrativas
+  const notas = crearGrupoDetalle(
+    "Notas administrativas",
+    "Observaciones del registro",
+    [
+      ["Notas", persona.notas]
+    ]
+  );
+
+  // Renderizado seguro: todos los valores se escapan antes de insertarse.
+  campos.replaceChildren(
+    identificacion,
+    membresia,
+    contacto,
+    domicilio,
+    notas
+  );
 
   if (botonEditar) {
     botonEditar.dataset.id = persona.id;
   }
 
-  const dialogo = $("detalleDialog");
-
-  if (dialogo && typeof dialogo.showModal === "function") {
+  if (typeof dialogo.showModal === "function") {
     if (!dialogo.open) {
       dialogo.showModal();
     }
   } else {
     mostrarMensaje(
-      "Este navegador no permite abrir el detalle en una ventana.",
+      "Este navegador no permite abrir la ficha en una ventana.",
       "error"
     );
   }
 }
 
+function crearGrupoDetalle(titulo, descripcion, campos) {
+  const seccion = document.createElement("section");
+  seccion.className = "detail-section";
+
+  const encabezado = document.createElement("div");
+  encabezado.className = "detail-section-heading";
+
+  const tituloSeccion = document.createElement("h3");
+  tituloSeccion.textContent = titulo;
+
+  const descripcionSeccion = document.createElement("p");
+  descripcionSeccion.textContent = descripcion;
+
+  encabezado.append(tituloSeccion, descripcionSeccion);
+
+  const lista = document.createElement("dl");
+  lista.className = "detail-grid";
+
+  campos.forEach(([etiqueta, valor]) => {
+    const termino = document.createElement("dt");
+    termino.textContent = etiqueta;
+
+    const definicion = document.createElement("dd");
+    definicion.textContent =
+      valor !== null && valor !== undefined && String(valor).trim() !== ""
+        ? String(valor).trim()
+        : "—";
+
+    lista.append(termino, definicion);
+  });
+
+  seccion.append(encabezado, lista);
+
+  return seccion;
+}
+
+function formatearFechaDetalle(fecha) {
+  if (!fecha) {
+    return "";
+  }
+
+  // Las fechas guardadas como YYYY-MM-DD se formatean sin
+  // conversión de zona horaria para evitar cambiar el día.
+  const coincidencia = String(fecha).match(
+    /^(\d{4})-(\d{2})-(\d{2})$/
+  );
+
+  if (coincidencia) {
+    return `${coincidencia[3]}/${coincidencia[2]}/${coincidencia[1]}`;
+  }
+
+  return String(fecha);
+}
 function cerrarDetalle() {
   const dialogo = $("detalleDialog");
 
