@@ -247,49 +247,142 @@ function prepararBotonVolverArriba() {
   actualizarVisibilidad();
 }
 
+
 function conectarEventos() {
-  /* Directorio */
-  $("btnNuevo")?.addEventListener("click", abrirFormularioNuevo);
-  $("btnImportar")?.addEventListener("click", abrirSelectorArchivo);
-  $("btnExportar")?.addEventListener("click", exportarJSON);
+  /* Respaldo maestro: único punto de importación y exportación */
   $("btnImportarMaestro")?.addEventListener(
-  "click",
-  abrirSelectorMaestro
-);
-$("btnExportarMaestro")?.addEventListener(
-  "click",
-  exportarMaestroJSON
-);
-$("archivoMaestroJson")?.addEventListener(
-  "change",
-  importarMaestroJSON
-);
-  $("archivoJson")?.addEventListener("change", importarJSON);
-  $("buscar")?.addEventListener("input", renderizarTabla);
-  $("filtroEstatus")?.addEventListener("change", renderizarTabla);
-  $("categoria")?.addEventListener("change", actualizarSubcategorias);
-  $("tipoRegistro")?.addEventListener("change", ajustarCategoriaPorTipo);
-  $("personaForm")?.addEventListener("submit", guardarPersona);
-  $("btnCerrarForm")?.addEventListener("click", cerrarFormulario);
-  $("btnCancelar")?.addEventListener("click", cerrarFormulario);
-$("btnCerrarDetalle")?.addEventListener("click", cerrarDetalle);
+    "click",
+    abrirSelectorMaestro
+  );
+
+  $("btnExportarMaestro")?.addEventListener(
+    "click",
+    exportarMaestroJSON
+  );
+
+  $("archivoMaestroJson")?.addEventListener(
+    "change",
+    importarMaestroJSON
+  );
+
+  /* Directorio de personas y socios */
+  $("btnNuevo")?.addEventListener(
+    "click",
+    abrirFormularioNuevo
+  );
+
+  $("buscar")?.addEventListener(
+    "input",
+    renderizarTabla
+  );
+
+  $("filtroEstatus")?.addEventListener(
+    "change",
+    renderizarTabla
+  );
+
+  $("categoria")?.addEventListener(
+    "change",
+    actualizarSubcategorias
+  );
+
+  $("tipoRegistro")?.addEventListener(
+    "change",
+    ajustarCategoriaPorTipo
+  );
+
+  $("personaForm")?.addEventListener(
+    "submit",
+    guardarPersona
+  );
+
+  $("btnCerrarForm")?.addEventListener(
+    "click",
+    cerrarFormulario
+  );
+
+  $("btnCancelar")?.addEventListener(
+    "click",
+    cerrarFormulario
+  );
+
+  $("btnCerrarDetalle")?.addEventListener(
+    "click",
+    cerrarDetalle
+  );
+
   $("btnDetalleEditar")?.addEventListener(
     "click",
     editarPersonaDesdeDetalle
   );
+
   $("detalleDialog")?.addEventListener("click", (evento) => {
     if (evento.target === $("detalleDialog")) {
       cerrarDetalle();
     }
   });
-$("btnImportarPadronInicial")?.addEventListener(
-  "click",
-  abrirSelectorArchivo
-);
-$("btnCrearPadronInicial")?.addEventListener(
-  "click",
-  abrirFormularioNuevo
-);
+
+  /* Configuración de cuotas anuales */
+  $("cuotaForm")?.addEventListener(
+    "submit",
+    guardarCuotaAnual
+  );
+
+  $("btnCancelarEdicionCuota")?.addEventListener(
+    "click",
+    limpiarFormularioCuota
+  );
+
+  $("tablaCuotasAnuales")?.addEventListener("click", (evento) => {
+    const boton = evento.target.closest("button[data-accion]");
+    if (!boton) return;
+
+    if (boton.dataset.accion === "editar-cuota") {
+      editarCuotaAnual(boton.dataset.anio);
+    }
+  });
+
+  /* Histórico de cuotas y pagos */
+  $("pagoPersonaId")?.addEventListener(
+    "change",
+    actualizarCuotaSugerida
+  );
+
+  $("pagoAnio")?.addEventListener(
+    "change",
+    actualizarCuotaSugerida
+  );
+
+  $("btnAsignarCuotaSocio")?.addEventListener(
+    "click",
+    asignarCuotaIndividual
+  );
+
+  $("formMovimientoPago")?.addEventListener(
+    "submit",
+    registrarMovimientoPago
+  );
+
+  $("pagosVista")?.addEventListener(
+    "change",
+    renderizarHistoricoPagos
+  );
+
+  $("pagosAnioConsulta")?.addEventListener(
+    "input",
+    renderizarHistoricoPagos
+  );
+
+  $("buscarSocioPagos")?.addEventListener(
+    "input",
+    renderizarHistoricoPagos
+  );
+
+  $("tablaMovimientosPagos")?.addEventListener(
+    "click",
+    manejarAccionPago
+  );
+}
 
   /* Configuración de cuotas */
   $("cuotaForm")?.addEventListener("submit", guardarCuotaAnual);
