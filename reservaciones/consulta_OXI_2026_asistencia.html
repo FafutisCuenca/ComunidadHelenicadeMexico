@@ -1,0 +1,1961 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OXI-2026 | Consulta de reservaciones</title>
+
+  <style>
+    :root {
+      --azul: #17324d;
+      --azul2: #244b6b;
+      --dorado: #c5a45d;
+      --fondo: #f4f6f8;
+      --blanco: #ffffff;
+      --texto: #24313d;
+      --gris: #667482;
+      --borde: #dce3e8;
+      --verde: #217346;
+      --rojo: #a62c2c;
+      --naranja: #976300;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--azul);
+      color: white;
+      padding: 24px;
+      border-bottom: 5px solid var(--dorado);
+    }
+
+    header .contenido,
+    main {
+      width: min(1500px, 96%);
+      margin: auto;
+    }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: clamp(24px, 3vw, 34px);
+    }
+
+    header p { margin: 0; color: #e1e8ef; }
+
+    main { padding: 22px 0 40px; }
+
+    .panel {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px #15283b0a;
+    }
+
+    h2 {
+      color: var(--azul);
+      margin: 0 0 14px;
+      font-size: 21px;
+    }
+
+    h3 { color: var(--azul); }
+
+    .fila {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 150px;
+      flex: 1;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--azul);
+    }
+
+    input, select, textarea {
+      font: inherit;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #bdc8d1;
+      border-radius: 7px;
+      background: white;
+      color: var(--texto);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid #c5a45d66;
+      border-color: var(--dorado);
+    }
+
+    textarea { min-height: 90px; resize: vertical; }
+
+    button, .boton {
+      border: 0;
+      border-radius: 7px;
+      padding: 10px 14px;
+      background: var(--azul);
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    button:hover, .boton:hover { background: var(--azul2); }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    button.secundario {
+      background: #e8edf1;
+      color: var(--azul);
+      border: 1px solid #d2dce4;
+    }
+
+    button.secundario:hover { background: #dce5eb; }
+
+    button.dorado {
+      background: var(--dorado);
+      color: #172737;
+    }
+
+    button.peligro { background: var(--rojo); }
+
+    .acciones {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .mensaje {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 7px;
+      background: #edf2f6;
+      color: var(--azul);
+      overflow-wrap: anywhere;
+    }
+
+    .mensaje.ok { background: #e8f5ec; color: var(--verde); }
+    .mensaje.error { background: #fff0f0; color: var(--rojo); }
+    .mensaje.aviso { background: #fff6df; color: var(--naranja); }
+
+    .resumen {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .tarjeta {
+      padding: 18px;
+      border-radius: 10px;
+      background: white;
+      border: 1px solid var(--borde);
+      border-top: 4px solid var(--dorado);
+      min-width: 0;
+    }
+
+    .tarjeta .etiqueta {
+      color: var(--gris);
+      font-size: 13px;
+    }
+
+    .tarjeta .valor {
+      display: block;
+      font-size: 25px;
+      font-weight: bold;
+      color: var(--azul);
+      margin-top: 6px;
+      overflow-wrap: anywhere;
+    }
+
+    .navegacion {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .navegacion button.activo { background: var(--dorado); color: #172737; }
+
+    .vista { display: none; }
+    .vista.activa { display: block; }
+
+    .tabla-contenedor {
+      overflow: auto;
+      width: 100%;
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      margin-top: 14px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 13px;
+      background: white;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--borde);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #eaf0f4;
+      color: var(--azul);
+      white-space: nowrap;
+    }
+
+    tbody tr:hover { background: #f8fafb; }
+    tfoot { font-weight: bold; background: #f0f3f5; }
+    td.numero, th.numero { text-align: right; white-space: nowrap; }
+
+    .badge {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .pagado { background: #e0f3e7; color: #17683a; }
+    .pendiente { background: #fff0cf; color: #855600; }
+    .sin-pago { background: #fce6e6; color: #9a2424; }
+    .neutral { background: #e8edf1; color: #405364; }
+    .asistencia-pendiente { background: #fff0cf; color: #855600; }
+    .asistencia-si { background: #e0f3e7; color: #17683a; }
+    .asistencia-no { background: #fce6e6; color: #9a2424; }
+
+    .editor {
+      border: 2px solid var(--dorado);
+      border-radius: 10px;
+      padding: 18px;
+      margin-top: 20px;
+      background: #fffdf8;
+    }
+
+    .editor[hidden] { display: none; }
+
+    .nota {
+      color: var(--gris);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .vacio {
+      padding: 22px;
+      text-align: center;
+      color: var(--gris);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--gris);
+      font-size: 12px;
+      padding: 20px;
+    }
+
+    @media (max-width: 700px) {
+      header { padding: 20px 12px; }
+      main { width: 96%; }
+      .panel { padding: 14px; }
+      .campo { min-width: 100%; }
+      button { max-width: 100%; }
+    }
+
+    @media print {
+      body { background: white; font-size: 10px; }
+      header { background: white; color: black; border-bottom: 2px solid black; padding: 10px; }
+      header p { color: black; }
+      main { width: 100%; padding: 8px 0; }
+      .no-imprimir, .navegacion, #panelCarga, #editorReservacion { display: none !important; }
+      .panel, .tarjeta { box-shadow: none; break-inside: avoid; }
+      .vista { display: none !important; }
+      .vista.activa { display: block !important; }
+      .tabla-contenedor { overflow: visible; }
+      table { font-size: 8px; }
+      th, td { padding: 4px; }
+      .resumen { grid-template-columns: repeat(4, 1fr); }
+      .tarjeta .valor { font-size: 16px; }
+    }
+    /* Acceso persistente al HOME institucional */
+    .home-float {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 9999;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 54px;
+      height: 54px;
+      padding: 0 16px;
+      overflow: hidden;
+      border: 2px solid #fff;
+      border-radius: 999px;
+      background: #17365d;
+      color: #fff;
+      box-shadow: 0 5px 18px rgba(0,0,0,.24);
+      text-decoration: none;
+      font: 700 14px/1 Arial, Helvetica, sans-serif;
+      white-space: nowrap;
+      transition: width .22s ease, background .18s ease, transform .18s ease;
+    }
+    .home-float svg { flex: 0 0 22px; width: 22px; height: 22px; }
+    .home-float .home-label { max-width: 0; opacity: 0; overflow: hidden; transition: max-width .22s ease, opacity .15s ease; }
+    .home-float:hover, .home-float:focus-visible { width: 205px; background: #102844; transform: translateY(-2px); outline: 3px solid #b59655; outline-offset: 3px; }
+    .home-float:hover .home-label, .home-float:focus-visible .home-label { max-width: 155px; opacity: 1; }
+    .home-float:focus-visible { outline-offset: 4px; }
+    @media (prefers-reduced-motion: reduce) { .home-float, .home-float .home-label { transition: none; } }
+    @media (max-width: 520px) { .home-float { right: 14px; bottom: 14px; width: 50px; height: 50px; } .home-float:hover, .home-float:focus-visible { width: 195px; } }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="contenido">
+    <h1>Comunidad Helénica de México</h1>
+    <p>OXI-2026 · Consulta y administración de reservaciones</p>
+  </div>
+</header>
+
+<main>
+  <section class="panel no-imprimir" id="panelCarga">
+    <h2>1. Cargar información</h2>
+    <p>Selecciona el JSON histórico de reservaciones para consultar, editar y exportar los cambios.</p>
+
+    <div class="fila">
+      <div class="campo">
+        <label for="archivoJson">Archivo JSON de reservaciones</label>
+        <input type="file" id="archivoJson" accept=".json,application/json">
+      </div>
+      <button type="button" id="btnCargar">Cargar archivo</button>
+    </div>
+
+    <div id="estadoCarga" class="mensaje">Selecciona un archivo JSON para comenzar.</div>
+
+    <div class="acciones">
+      <button type="button" id="btnExportarJSON" class="dorado" disabled>
+        Exportar JSON actualizado
+      </button>
+      <button type="button" id="btnExportarPadron" disabled>
+        Exportar padrón CSV
+      </button>
+      <button type="button" id="btnExportarFinanzas" disabled>
+        Exportar finanzas CSV
+      </button>
+      <button type="button" id="btnReporteFinanciero" disabled>
+        Reporte financiero y asistencia
+      </button>
+      <button type="button" id="btnReporteMesas" disabled>
+        Reporte por mesa y espacios disponibles
+      </button>
+      <button type="button" id="btnReporteAlfabetico" disabled>
+        Reporte alfabético para recepción
+      </button>
+      <button type="button" id="btnImprimir" disabled>
+        Imprimir vista
+      </button>
+    </div>
+
+    <p class="nota">
+      Importante: los cambios se mantienen en esta página mientras permanezca abierta.
+      Para conservarlos, exporta el JSON y reemplaza manualmente el archivo correspondiente en GitHub.
+    </p>
+  </section>
+
+  <section id="resumen" class="resumen" aria-live="polite"></section>
+
+  <nav class="navegacion no-imprimir" aria-label="Secciones de consulta">
+    <button type="button" class="activo" data-vista="vistaMesas">Mesas</button>
+    <button type="button" data-vista="vistaPadron">Padrón de asistentes</button>
+    <button type="button" data-vista="vistaGrupos">Reservaciones y edición</button>
+    <button type="button" data-vista="vistaSinMesa">Sin mesa asignada</button>
+  </nav>
+
+  <section class="panel vista activa" id="vistaMesas">
+    <h2>2. Resumen por mesa</h2>
+    <p class="nota">La ocupación se calcula con asistencia confirmada; las reservaciones pendientes conservan sus lugares planeados y las marcadas como no asistió no ocupan lugares reales.</p>
+    <div id="totalesMesas"></div>
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Mesa</th>
+            <th class="numero">Grupos</th>
+            <th class="numero">Adultos</th>
+            <th class="numero">Niños</th>
+            <th class="numero">Asistentes</th>
+            <th class="numero">Capacidad</th>
+            <th class="numero">Disponibles</th>
+            <th>Observación</th>
+          </tr>
+        </thead>
+        <tbody id="tablaMesas"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel vista" id="vistaPadron">
+    <h2>3. Padrón de asistentes</h2>
+
+    <div class="fila no-imprimir">
+      <div class="campo">
+        <label for="buscarPadron">Buscar por nombre o referencia</label>
+        <input id="buscarPadron" type="search" placeholder="Escribe para buscar">
+      </div>
+      <div class="campo">
+        <label for="filtroTipo">Tipo</label>
+        <select id="filtroTipo">
+          <option value="">Todos</option>
+          <option value="grupo">Grupo</option>
+          <option value="cortesia_institucional">Cortesía institucional</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="filtroMesa">Mesa</label>
+        <select id="filtroMesa">
+          <option value="">Todas las mesas</option>
+          <option value="sin-mesa">Sin mesa</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="filtroPago">Estado de pago</label>
+        <select id="filtroPago">
+          <option value="">Todos</option>
+          <option value="pagado">Pagado</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="sin-pago">Sin pago</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Referencia</th>
+            <th>Grupo / responsable</th>
+            <th>Asistentes registrados</th>
+            <th>Tipo</th>
+            <th class="numero">Adultos</th>
+            <th class="numero">Niños</th>
+            <th class="numero">Total</th>
+            <th>Mesa</th>
+            <th>Estado de pago</th>
+            <th>Asistencia</th>
+            <th class="no-imprimir">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPadron"></tbody>
+      </table>
+    </div>
+    <div id="totalesPadron" class="nota"></div>
+  </section>
+
+  <section class="panel vista" id="vistaGrupos">
+    <h2>4. Reservaciones y edición</h2>
+    <p>
+      Usa el botón <strong>Editar</strong> al final de cada fila. Si no aparece, desplázate horizontalmente dentro de la tabla.
+      Después exporta el JSON para conservar los cambios. Los importes históricos no se recalculan automáticamente.
+    </p>
+
+    <div class="fila no-imprimir">
+      <div class="campo">
+        <label for="buscarGrupo">Buscar reservación</label>
+        <input id="buscarGrupo" type="search" placeholder="Nombre, ID, notas o mesa">
+      </div>
+      <button type="button" id="btnNuevaLlegada" class="dorado">Registrar llegada directa</button>
+    </div>
+
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Referencia</th>
+            <th>Grupo / responsable</th>
+            <th>Tipo</th>
+            <th class="numero">Adultos</th>
+            <th class="numero">Niños</th>
+            <th class="numero">Total</th>
+            <th>Mesa</th>
+            <th>Beneficio</th>
+            <th>Estado pago</th>
+            <th>Asistencia</th>
+            <th>Forma pago</th>
+            <th class="numero">Costo Excel</th>
+            <th class="numero">Cortesía</th>
+            <th class="numero">Subtotal</th>
+            <th class="numero">Pagado</th>
+            <th class="numero">Debe</th>
+            <th>Notas</th>
+            <th class="no-imprimir">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaGrupos"></tbody>
+        <tfoot id="totalesGrupos"></tfoot>
+      </table>
+    </div>
+
+    <section class="editor" id="editorReservacion" hidden>
+      <h3>Editar reservación</h3>
+      <p id="referenciaEdicion" class="nota"></p>
+
+      <form id="formEditarReservacion">
+        <input type="hidden" id="editId">
+
+        <div class="fila">
+          <div class="campo">
+            <label for="editNombre">Nombre del grupo o responsable *</label>
+            <input id="editNombre" required maxlength="250">
+          </div>
+          <div class="campo">
+            <label for="editTipo">Tipo de reservación</label>
+            <select id="editTipo">
+              <option value="grupo">Grupo</option>
+              <option value="cortesia_institucional">Cortesía institucional</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="editMesa">Mesa</label>
+            <select id="editMesa">
+              <option value="">Sin mesa asignada</option>
+              <option value="1">Mesa 1</option>
+              <option value="2">Mesa 2</option>
+              <option value="3">Mesa 3</option>
+              <option value="4">Mesa 4</option>
+              <option value="5">Mesa 5</option>
+              <option value="6">Mesa 6</option>
+              <option value="7">Mesa 7</option>
+              <option value="8">Mesa 8</option>
+              <option value="9">Mesa 9</option>
+              <option value="10">Mesa 10</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="editAdultos">Adultos</label>
+            <input type="number" id="editAdultos" min="0" step="1" required>
+          </div>
+          <div class="campo">
+            <label for="editNinos">Niños</label>
+            <input type="number" id="editNinos" min="0" step="1" required>
+          </div>
+          <div class="campo">
+            <label for="editBeneficio">Beneficio</label>
+            <input id="editBeneficio" maxlength="200">
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="editEstadoPago">Estado de pago</label>
+            <select id="editEstadoPago">
+              <option value="">Sin especificar</option>
+              <option value="PAGADO">PAGADO</option>
+              <option value="PENDIENTE">PENDIENTE</option>
+              <option value="PARCIAL">PARCIAL</option>
+              <option value="CORTESIA">CORTESÍA</option>
+              <option value="NO PAGADO">NO PAGADO</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="editFormaPago">Forma de pago</label>
+            <select id="editFormaPago">
+              <option value="">Sin especificar</option>
+              <option value="EFECTIVO">EFECTIVO</option>
+              <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+              <option value="TARJETA">TARJETA</option>
+              <option value="DEPÓSITO">DEPÓSITO</option>
+              <option value="CORTESIA">CORTESÍA</option>
+              <option value="OTRO">OTRO</option>
+            </select>
+          </div>
+        </div>
+
+        <h4>Control de asistencia y origen</h4>
+        <div class="fila">
+          <div class="campo">
+            <label for="editOrigenRegistro">Origen del registro</label>
+            <select id="editOrigenRegistro">
+              <option value="RESERVA_PREVIA">Reservación previa</option>
+              <option value="ENTRADA_DIRECTA">Llegó sin reservación (entrada)</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="editMomentoPago">Cuándo pagó</label>
+            <select id="editMomentoPago">
+              <option value="SIN_ESPECIFICAR">Sin especificar</option>
+              <option value="ANTES_EVENTO">Antes del evento</option>
+              <option value="ENTRADA">En la entrada</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="editAsistencia">Estado de asistencia</label>
+            <select id="editAsistencia">
+              <option value="PENDIENTE">Pendiente de confirmar</option>
+              <option value="ASISTIO">Asistió</option>
+              <option value="NO_ASISTIO">No asistió</option>
+            </select>
+          </div>
+        </div>
+        <div class="fila">
+          <div class="campo">
+            <label for="editAdultosAsistieron">Adultos que asistieron</label>
+            <input type="number" id="editAdultosAsistieron" min="0" step="1">
+          </div>
+          <div class="campo">
+            <label for="editNinosAsistieron">Niños que asistieron</label>
+            <input type="number" id="editNinosAsistieron" min="0" step="1">
+          </div>
+        </div>
+        <p class="nota">Para registros anteriores, la asistencia queda como pendiente hasta confirmarla. Si no asistió, el pago se conserva en la recaudación total, pero se separa de los importes asociados a asistentes.</p>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="editCosto">Costo Excel</label>
+            <input type="number" id="editCosto" min="0" step="0.01">
+          </div>
+          <div class="campo">
+            <label for="editCortesia">Cortesía</label>
+            <input type="number" id="editCortesia" min="0" step="0.01">
+          </div>
+          <div class="campo">
+            <label for="editSubtotal">Subtotal histórico</label>
+            <input type="number" id="editSubtotal" min="0" step="0.01">
+          </div>
+          <div class="campo">
+            <label for="editPagado">Importe pagado</label>
+            <input type="number" id="editPagado" min="0" step="0.01">
+          </div>
+          <div class="campo">
+            <label for="editDebe">Saldo pendiente</label>
+            <input type="number" id="editDebe" min="0" step="0.01">
+          </div>
+        </div>
+
+        <div class="campo" style="margin-top:12px">
+          <label for="editNotas">Notas</label>
+          <textarea id="editNotas" maxlength="2000"></textarea>
+        </div>
+
+        <p class="nota">
+          Los importes se editan manualmente. Verifica costo, cortesía, subtotal, pagado y saldo
+          antes de guardar. La información original de importación se conserva.
+        </p>
+
+        <div class="acciones">
+          <button type="submit" class="dorado">Guardar cambios</button>
+          <button type="button" id="btnCancelarEdicion" class="secundario">Cancelar</button>
+        </div>
+
+        <div id="estadoEdicion" class="mensaje" hidden></div>
+      </form>
+    </section>
+  </section>
+
+  <section class="panel vista" id="vistaSinMesa">
+    <h2>5. Reservaciones sin mesa asignada</h2>
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Referencia</th>
+            <th>Grupo / responsable</th>
+            <th class="numero">Adultos</th>
+            <th class="numero">Niños</th>
+            <th class="numero">Total</th>
+            <th>Estado de pago</th>
+            <th class="no-imprimir">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tablaSinMesa"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Comunidad Helénica de México · OXI-2026 · Consulta local de reservaciones
+</footer>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+let documentoActual = null;
+let reservaciones = [];
+let padron = [];
+let mesas = [];
+let capacidadMesa = 10;
+let vistaActual = "vistaMesas";
+let modoFormularioReservacion = "editar";
+
+const dinero = valor => new Intl.NumberFormat("es-MX", {
+  style: "currency",
+  currency: "MXN"
+}).format(numero(valor));
+
+function numero(valor) {
+  if (valor === null || valor === undefined || valor === "") return 0;
+  const n = Number(valor);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function texto(valor) {
+  return valor === null || valor === undefined ? "" : String(valor);
+}
+
+function escapar(valor) {
+  return texto(valor).replace(/[&<>"']/g, caracter => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[caracter]);
+}
+
+function referencia(r) {
+  return texto(r.reservacion_id || r.id || "");
+}
+
+function nombreGrupo(r) {
+  return texto(
+    r.nombre_reservacion || r.nombre_familia || r.grupo ||
+    r.nombre_grupo || r.responsable || r.nombre_responsable ||
+    r.nombre || r.titular || r.cliente || r.nombre_completo ||
+    "Sin nombre registrado"
+  );
+}
+
+function listaAsistentes(r) {
+  const lista = Array.isArray(r.detalle_asistentes) ? r.detalle_asistentes
+    : (Array.isArray(r.asistentes) ? r.asistentes : []);
+  const nombres = lista.map(a => {
+    if (typeof a === "string") return a.trim();
+    if (!a || typeof a !== "object") return "";
+    return texto(a.nombre_completo || a.nombre || a.nombre_asistente ||
+      a.nombre_persona || a.asistente || a.titular).trim();
+  }).filter(Boolean);
+  return [...new Set(nombres)];
+}
+
+function textoAsistentes(r) {
+  const nombres = listaAsistentes(r);
+  return nombres.length ? nombres.join(", ") : "Nombres individuales no registrados";
+}
+
+function adultos(r) {
+  if (r.adultos !== undefined) return numero(r.adultos);
+  if (Array.isArray(r.asistentes)) {
+    return r.asistentes.filter(a =>
+      texto(a.tipo || a.categoria).toLowerCase().includes("adult")
+    ).length;
+  }
+  return 0;
+}
+
+function ninos(r) {
+  if (r.ninos !== undefined) return numero(r.ninos);
+  if (Array.isArray(r.asistentes)) {
+    return r.asistentes.filter(a =>
+      texto(a.tipo || a.categoria).toLowerCase().includes("niñ") ||
+      texto(a.tipo || a.categoria).toLowerCase().includes("nin")
+    ).length;
+  }
+  return 0;
+}
+
+function totalAsientos(r) {
+  if (r.total_asientos_excel !== undefined &&
+      r.total_asientos_excel !== null &&
+      r.total_asientos_excel !== "") {
+    return numero(r.total_asientos_excel);
+  }
+  if (r.totales && r.totales.cantidad_asistentes !== undefined) {
+    return numero(r.totales.cantidad_asistentes);
+  }
+  return adultos(r) + ninos(r);
+}
+
+function mesaNumero(r) {
+  if (r.mesa_numero !== undefined && r.mesa_numero !== null &&
+      r.mesa_numero !== "") return numero(r.mesa_numero);
+
+  const id = texto(r.mesa_id);
+  const coincidencia = id.match(/(\d+)/);
+  return coincidencia ? Number(coincidencia[1]) : null;
+}
+
+function tipoReservacion(r) {
+  return texto(r.tipo_reservacion || "grupo");
+}
+
+function estatusPago(r) {
+  return texto(r.estado_pago_excel || r.estado_pago || "").trim();
+}
+
+function formaPago(r) {
+  return texto(r.forma_pago_excel || r.forma_pago || "").trim();
+}
+
+function estadoAsistencia(r) {
+  const valor = texto(r.estado_asistencia || "PENDIENTE").trim().toUpperCase();
+  if (["ASISTIO", "ASISTIÓ", "SI", "SÍ", "ASISTENCIA_CONFIRMADA"].includes(valor)) return "ASISTIO";
+  if (["NO_ASISTIO", "NO ASISTIO", "NO ASISTIÓ", "AUSENTE"].includes(valor)) return "NO_ASISTIO";
+  return "PENDIENTE";
+}
+
+function origenRegistro(r) {
+  const valor = texto(r.origen_registro || "RESERVA_PREVIA").trim().toUpperCase();
+  return valor === "ENTRADA_DIRECTA" ? "ENTRADA_DIRECTA" : "RESERVA_PREVIA";
+}
+
+function momentoPago(r) {
+  const valor = texto(r.momento_pago || "SIN_ESPECIFICAR").trim().toUpperCase();
+  return ["ENTRADA", "ANTES_EVENTO"].includes(valor) ? valor : "SIN_ESPECIFICAR";
+}
+
+function adultosAsistieron(r) {
+  if (estadoAsistencia(r) === "NO_ASISTIO") return 0;
+  if (estadoAsistencia(r) !== "ASISTIO") return 0;
+  return Math.max(0, numero(r.adultos_asistieron ?? r.adultos));
+}
+
+function ninosAsistieron(r) {
+  if (estadoAsistencia(r) === "NO_ASISTIO") return 0;
+  if (estadoAsistencia(r) !== "ASISTIO") return 0;
+  return Math.max(0, numero(r.ninos_asistieron ?? r.ninos));
+}
+
+function totalAsistentesConfirmados(r) {
+  return adultosAsistieron(r) + ninosAsistieron(r);
+}
+
+function etiquetaAsistencia(r) {
+  const asistencia = estadoAsistencia(r);
+  const pago = etiquetaPago(r)[0].toUpperCase();
+  const pagado = clasePago(r) === "pagado";
+  const directa = origenRegistro(r) === "ENTRADA_DIRECTA";
+  const enEntrada = momentoPago(r) === "ENTRADA";
+
+  if (asistencia === "NO_ASISTIO") {
+    return [pagado ? "Pagado · No asistió" : "Reservó · No asistió", "asistencia-no"];
+  }
+  if (asistencia === "PENDIENTE") {
+    return ["Pendiente de confirmar", "asistencia-pendiente"];
+  }
+  if (directa) return ["Llegada directa · Asistió", "asistencia-si"];
+  if (pagado && enEntrada) return ["Pagado en entrada · Asistió", "asistencia-si"];
+  if (pagado) return ["Pagado · Asistió", "asistencia-si"];
+  return ["Asistió · Pago por revisar", "asistencia-si"];
+}
+
+function asientosParaMesa(r) {
+  if (estadoAsistencia(r) === "NO_ASISTIO") return 0;
+  if (estadoAsistencia(r) === "ASISTIO") return totalAsistentesConfirmados(r);
+  return totalAsientos(r);
+}
+
+function etiquetaPago(r) {
+  const estado = estatusPago(r).toUpperCase();
+
+  if (estado.includes("PAGADO") && !estado.includes("NO PAGADO")) {
+    if (estado.includes("PARCIAL")) return ["Parcial", "pendiente"];
+    return ["Pagado", "pagado"];
+  }
+
+  if (estado.includes("CORTESIA")) return ["Cortesía", "neutral"];
+  if (estado.includes("PENDIENTE") || estado.includes("PARCIAL")) {
+    return ["Pendiente", "pendiente"];
+  }
+  if (estado.includes("NO PAGADO")) return ["No pagado", "sin-pago"];
+
+  const pagado = numero(r.pagado_excel);
+  const debe = numero(r.debe_excel);
+
+  if (debe > 0 && pagado > 0) return ["Parcial", "pendiente"];
+  if (debe > 0) return ["Pendiente", "pendiente"];
+  if (pagado > 0) return ["Pagado", "pagado"];
+
+  return ["Sin dato", "neutral"];
+}
+
+function clasePago(r) {
+  return etiquetaPago(r)[1];
+}
+
+function validarDocumento(doc) {
+  if (!doc || typeof doc !== "object" || Array.isArray(doc)) {
+    throw new Error("El archivo no contiene un objeto JSON válido.");
+  }
+
+  if (doc.formato_version !== 2) {
+    throw new Error(
+      "Se esperaba un JSON de formato_version 2. Este módulo aún no importa directamente el formato familiar anidado."
+    );
+  }
+
+  if (doc.evento_id !== "OXI-2026") {
+    throw new Error("El evento_id debe ser OXI-2026.");
+  }
+
+  if (!Array.isArray(doc.reservaciones)) {
+    throw new Error("No se encontró el arreglo reservaciones.");
+  }
+
+  const ids = new Set();
+
+  doc.reservaciones.forEach((r, i) => {
+    if (!r || typeof r !== "object" || Array.isArray(r)) {
+      throw new Error(`La reservación ${i + 1} no es un objeto válido.`);
+    }
+
+    if (!referencia(r)) {
+      throw new Error(`La reservación ${i + 1} no tiene identificador.`);
+    }
+
+    if (ids.has(referencia(r))) {
+      throw new Error(`Identificador duplicado: ${referencia(r)}.`);
+    }
+
+    ids.add(referencia(r));
+
+    if (adultos(r) < 0 || ninos(r) < 0 ||
+        !Number.isInteger(adultos(r)) ||
+        !Number.isInteger(ninos(r))) {
+      throw new Error(
+        `La reservación ${referencia(r)} tiene cantidades inválidas de asistentes.`
+      );
+    }
+  });
+
+  return true;
+}
+
+function construirPadron() {
+  const resultado = [];
+
+  reservaciones.forEach(r => {
+    resultado.push({
+      id: referencia(r),
+      nombre: nombreGrupo(r),
+      asistentes: textoAsistentes(r),
+      tipo: tipoReservacion(r),
+      adultos: adultos(r),
+      ninos: ninos(r),
+      total: totalAsientos(r),
+      mesa: mesaNumero(r),
+      pago: etiquetaPago(r)[0],
+      clasePago: clasePago(r),
+      asistencia: etiquetaAsistencia(r)[0],
+      claseAsistencia: etiquetaAsistencia(r)[1],
+      asistentesConfirmados: totalAsistentesConfirmados(r)
+    });
+  });
+
+  padron = resultado;
+}
+
+function construirMesas() {
+  const mapa = new Map();
+
+  const numerosMesas = new Set(Array.from({ length: 10 }, (_, i) => i + 1));
+  reservaciones.forEach(r => {
+    const m = mesaNumero(r);
+    if (Number.isInteger(m) && m >= 1) numerosMesas.add(m);
+  });
+
+  [...numerosMesas].sort((a, b) => a - b).forEach(numeroMesa => {
+    mapa.set(numeroMesa, {
+      numero: numeroMesa,
+      grupos: 0,
+      adultos: 0,
+      ninos: 0,
+      total: 0
+    });
+  });
+
+  reservaciones.forEach(r => {
+    const m = mesaNumero(r);
+    if (!Number.isInteger(m) || m < 1 || !mapa.has(m)) return;
+
+    const mesa = mapa.get(m);
+    mesa.grupos++;
+    mesa.adultos += estadoAsistencia(r) === "ASISTIO" ? adultosAsistieron(r) : (estadoAsistencia(r) === "NO_ASISTIO" ? 0 : adultos(r));
+    mesa.ninos += estadoAsistencia(r) === "ASISTIO" ? ninosAsistieron(r) : (estadoAsistencia(r) === "NO_ASISTIO" ? 0 : ninos(r));
+    mesa.total += asientosParaMesa(r);
+  });
+
+  mesas = [...mapa.values()];
+}
+
+function crearTarjeta(etiqueta, valor) {
+  return `<div class="tarjeta">
+    <span class="etiqueta">${escapar(etiqueta)}</span>
+    <span class="valor">${escapar(valor)}</span>
+  </div>`;
+}
+
+function renderizarResumen() {
+  const grupos = reservaciones.length;
+  const adultosTotal = reservaciones.reduce((s, r) => s + adultos(r), 0);
+  const ninosTotal = reservaciones.reduce((s, r) => s + ninos(r), 0);
+  const asientos = reservaciones.reduce((s, r) => s + totalAsientos(r), 0);
+  const asistentesConfirmados = reservaciones.reduce((s, r) => s + totalAsistentesConfirmados(r), 0);
+  const asistenciaPendiente = reservaciones.filter(r => estadoAsistencia(r) === "PENDIENTE").length;
+  const pagado = reservaciones.reduce((s, r) => s + numero(r.pagado_excel), 0);
+  const saldo = reservaciones.reduce((s, r) => s + numero(r.debe_excel), 0);
+  const sinMesa = reservaciones.filter(r => {
+    const m = mesaNumero(r);
+    return !Number.isInteger(m) || m < 1;
+  }).length;
+
+  $("resumen").innerHTML =
+    crearTarjeta("Reservaciones", grupos) +
+    crearTarjeta("Adultos", adultosTotal) +
+    crearTarjeta("Niños", ninosTotal) +
+    crearTarjeta("Personas reservadas", asientos) +
+    crearTarjeta("Asistentes confirmados", asistentesConfirmados) +
+    crearTarjeta("Reservaciones por confirmar", asistenciaPendiente) +
+    crearTarjeta("Importe pagado registrado", dinero(pagado)) +
+    crearTarjeta("Saldo registrado", dinero(saldo)) +
+    crearTarjeta("Reservaciones sin mesa", sinMesa);
+}
+
+function renderizarMesas() {
+  $("tablaMesas").innerHTML = mesas.map(m => {
+    const disponibles = capacidadMesa - m.total;
+    let observacion = "Disponible";
+
+    if (m.total > capacidadMesa) observacion = "Excede capacidad";
+    else if (m.total === capacidadMesa) observacion = "Completa";
+    else if (m.total === 0) observacion = "Sin asignaciones";
+
+    return `<tr>
+      <td>Mesa ${m.numero}</td>
+      <td class="numero">${m.grupos}</td>
+      <td class="numero">${m.adultos}</td>
+      <td class="numero">${m.ninos}</td>
+      <td class="numero">${m.total}</td>
+      <td class="numero">${capacidadMesa}</td>
+      <td class="numero">${disponibles}</td>
+      <td>${escapar(observacion)}</td>
+    </tr>`;
+  }).join("");
+
+  const total = mesas.reduce((s, m) => s + m.total, 0);
+  const ocupadas = mesas.filter(m => m.total > 0).length;
+
+  $("totalesMesas").innerHTML =
+    `<p><strong>Capacidad teórica:</strong> ${mesas.length * capacidadMesa} personas.
+    <strong>Mesas con reservaciones:</strong> ${ocupadas}.
+    <strong>Asientos asignados:</strong> ${total}.</p>`;
+}
+
+function renderizarPadron() {
+  const buscar = $("buscarPadron").value.trim().toLowerCase();
+  const tipo = $("filtroTipo").value;
+  const mesaFiltro = $("filtroMesa").value;
+  const pagoFiltro = $("filtroPago").value;
+
+  const filtrados = padron.filter(p => {
+    const coincideTexto = !buscar ||
+      `${p.id} ${p.nombre} ${p.asistentes} ${p.mesa ?? ""}`.toLowerCase().includes(buscar);
+
+    const coincideTipo = !tipo || p.tipo === tipo;
+
+    const coincideMesa = !mesaFiltro ||
+      (mesaFiltro === "sin-mesa"
+        ? !Number.isInteger(p.mesa) || p.mesa < 1
+        : String(p.mesa) === mesaFiltro);
+
+    let coincidePago = true;
+    if (pagoFiltro === "pagado") coincidePago = p.clasePago === "pagado";
+    if (pagoFiltro === "pendiente") coincidePago = p.clasePago === "pendiente";
+    if (pagoFiltro === "sin-pago") coincidePago = p.clasePago === "sin-pago";
+
+    return coincideTexto && coincideTipo && coincideMesa && coincidePago;
+  });
+
+  $("tablaPadron").innerHTML = filtrados.length
+    ? filtrados.map(p => `<tr>
+        <td>${escapar(p.id)}</td>
+        <td>${escapar(p.nombre)}</td>
+        <td>${escapar(p.asistentes)}</td>
+        <td>${escapar(p.tipo)}</td>
+        <td class="numero">${p.adultos}</td>
+        <td class="numero">${p.ninos}</td>
+        <td class="numero">${p.total}</td>
+        <td>${p.mesa ? "Mesa " + p.mesa : "Sin mesa"}</td>
+        <td><span class="badge ${p.clasePago}">${escapar(p.pago)}</span></td>
+        <td><span class="badge ${p.claseAsistencia}">${escapar(p.asistencia)}</span></td>
+        <td class="no-imprimir"><button type="button" class="secundario btn-editar-reservacion" data-id="${escapar(p.id)}">Editar</button></td>
+      </tr>`).join("")
+    : `<tr><td colspan="11" class="vacio">No hay resultados para estos filtros.</td></tr>`;
+
+  $("totalesPadron").textContent =
+    `Mostrando ${filtrados.length} de ${padron.length} reservaciones. Si el JSON no contiene nombres individuales, se indicará en la columna de asistentes.`;
+}
+
+function renderizarGrupos() {
+  const buscar = $("buscarGrupo").value.trim().toLowerCase();
+
+  const filtrados = reservaciones.filter(r =>
+    !buscar || [
+      referencia(r), nombreGrupo(r), tipoReservacion(r),
+      mesaNumero(r), r.beneficio_excel, estatusPago(r), formaPago(r),
+      etiquetaAsistencia(r)[0], origenRegistro(r), momentoPago(r),
+      r.notas_excel, r.estado_excel_columna_J
+    ].map(texto).join(" ").toLowerCase().includes(buscar)
+  );
+
+  $("tablaGrupos").innerHTML = filtrados.length
+    ? filtrados.map(r => {
+        const mesa = mesaNumero(r);
+        const beneficio = r.beneficio_excel ?? "";
+        const estado = etiquetaPago(r);
+        const asistencia = etiquetaAsistencia(r);
+        const notas = r.notas ?? r.notas_excel ?? "";
+
+        return `<tr>
+          <td>${escapar(referencia(r))}</td>
+          <td>${escapar(nombreGrupo(r))}</td>
+          <td>${escapar(tipoReservacion(r))}</td>
+          <td class="numero">${adultos(r)}</td>
+          <td class="numero">${ninos(r)}</td>
+          <td class="numero">${totalAsientos(r)}</td>
+          <td>${mesa ? "Mesa " + mesa : "Sin mesa"}</td>
+          <td>${escapar(beneficio)}</td>
+          <td><span class="badge ${estado[1]}">${escapar(estado[0])}</span></td>
+          <td><span class="badge ${asistencia[1]}">${escapar(asistencia[0])}</span></td>
+          <td>${escapar(formaPago(r))}</td>
+          <td class="numero">${dinero(r.costo_excel)}</td>
+          <td class="numero">${dinero(r.cortesia_excel)}</td>
+          <td class="numero">${dinero(r.subtotal_excel)}</td>
+          <td class="numero">${dinero(r.pagado_excel)}</td>
+          <td class="numero">${dinero(r.debe_excel)}</td>
+          <td>${escapar(notas)}</td>
+          <td class="no-imprimir">
+            <button type="button" class="secundario btn-editar-reservacion"
+              data-id="${escapar(referencia(r))}">Editar</button>
+          </td>
+        </tr>`;
+      }).join("")
+    : `<tr><td colspan="18" class="vacio">No hay reservaciones que coincidan.</td></tr>`;
+
+  const suma = campo => reservaciones.reduce((s, r) => s + numero(r[campo]), 0);
+
+  $("totalesGrupos").innerHTML = `
+    <tr>
+      <td colspan="3">TOTAL GENERAL</td>
+      <td class="numero">${reservaciones.reduce((s,r)=>s+adultos(r),0)}</td>
+      <td class="numero">${reservaciones.reduce((s,r)=>s+ninos(r),0)}</td>
+      <td class="numero">${reservaciones.reduce((s,r)=>s+totalAsientos(r),0)}</td>
+      <td colspan="5">Importes sumados por reservación</td>
+      <td class="numero">${dinero(suma("costo_excel"))}</td>
+      <td class="numero">${dinero(suma("cortesia_excel"))}</td>
+      <td class="numero">${dinero(suma("subtotal_excel"))}</td>
+      <td class="numero">${dinero(suma("pagado_excel"))}</td>
+      <td class="numero">${dinero(suma("debe_excel"))}</td>
+      <td>Totales históricos</td>
+      <td class="no-imprimir">—</td>
+    </tr>`;
+}
+
+function renderizarSinMesa() {
+  const lista = reservaciones.filter(r => {
+    const m = mesaNumero(r);
+    return !Number.isInteger(m) || m < 1;
+  });
+
+  $("tablaSinMesa").innerHTML = lista.length
+    ? lista.map(r => `<tr>
+        <td>${escapar(referencia(r))}</td>
+        <td>${escapar(nombreGrupo(r))}</td>
+        <td class="numero">${adultos(r)}</td>
+        <td class="numero">${ninos(r)}</td>
+        <td class="numero">${totalAsientos(r)}</td>
+        <td><span class="badge ${clasePago(r)}">${escapar(etiquetaPago(r)[0])}</span></td>
+        <td class="no-imprimir">
+          <button type="button" class="secundario btn-editar-reservacion"
+            data-id="${escapar(referencia(r))}">Asignar mesa</button>
+        </td>
+      </tr>`).join("")
+    : `<tr><td colspan="7" class="vacio">Todas las reservaciones tienen mesa asignada.</td></tr>`;
+}
+
+function actualizarFiltroMesas() {
+  const select = $("filtroMesa");
+  const valorAnterior = select.value;
+
+  select.innerHTML =
+    '<option value="">Todas las mesas</option>' +
+    '<option value="sin-mesa">Sin mesa</option>' +
+    mesas.map(m => `<option value="${m.numero}">Mesa ${m.numero}</option>`).join("");
+
+  if ([...select.options].some(o => o.value === valorAnterior)) {
+    select.value = valorAnterior;
+  }
+}
+
+function renderizarTodo() {
+  construirPadron();
+  construirMesas();
+  renderizarResumen();
+  renderizarMesas();
+  renderizarPadron();
+  renderizarGrupos();
+  renderizarSinMesa();
+  actualizarFiltroMesas();
+
+  [
+    "btnExportarJSON", "btnExportarPadron", "btnExportarFinanzas",
+    "btnReporteFinanciero", "btnReporteMesas", "btnReporteAlfabetico", "btnImprimir"
+  ].forEach(id => $(id).disabled = false);
+}
+
+function mostrarEstado(mensaje, tipo = "") {
+  const elemento = $("estadoCarga");
+  elemento.textContent = mensaje;
+  elemento.className = "mensaje" + (tipo ? " " + tipo : "");
+}
+
+async function cargarArchivo() {
+  const archivo = $("archivoJson").files[0];
+
+  if (!archivo) {
+    mostrarEstado("Primero selecciona un archivo JSON.", "aviso");
+    return;
+  }
+
+  try {
+    const contenido = await archivo.text();
+    const doc = JSON.parse(contenido);
+    validarDocumento(doc);
+
+    documentoActual = doc;
+    reservaciones = doc.reservaciones;
+    capacidadMesa = numero(doc.capacidad_mesa_personas) || 10;
+
+    cancelarEdicion();
+    renderizarTodo();
+
+    mostrarEstado(
+      `Archivo cargado correctamente: ${archivo.name}. ` +
+      `${reservaciones.length} reservaciones disponibles para consulta.`,
+      "ok"
+    );
+  } catch (error) {
+    documentoActual = null;
+    reservaciones = [];
+    padron = [];
+    mesas = [];
+
+    $("resumen").innerHTML = "";
+    $("tablaMesas").innerHTML = "";
+    $("tablaPadron").innerHTML = "";
+    $("tablaGrupos").innerHTML = "";
+    $("totalesGrupos").innerHTML = "";
+    $("tablaSinMesa").innerHTML = "";
+
+    [
+      "btnExportarJSON", "btnExportarPadron", "btnExportarFinanzas",
+      "btnReporteFinanciero", "btnReporteMesas", "btnReporteAlfabetico", "btnImprimir"
+    ].forEach(id => $(id).disabled = true);
+
+    mostrarEstado("No se pudo cargar el archivo: " + error.message, "error");
+  }
+}
+
+function valorCampoNumerico(id, etiqueta, permitirVacio = true) {
+  const campo = $(id);
+  const valor = campo.value.trim();
+
+  if (valor === "") {
+    if (permitirVacio) return null;
+    throw new Error(`${etiqueta} es obligatorio.`);
+  }
+
+  const n = Number(valor);
+  if (!Number.isFinite(n) || n < 0) {
+    throw new Error(`${etiqueta} debe ser un número igual o mayor que cero.`);
+  }
+
+  return n;
+}
+
+function iniciarEdicion(id) {
+  modoFormularioReservacion = "editar";
+  const r = reservaciones.find(x => referencia(x) === id);
+
+  if (!r) {
+    mostrarEstado("No se encontró la reservación seleccionada.", "error");
+    return;
+  }
+
+  $("formEditarReservacion").reset();
+  $("estadoEdicion").hidden = true;
+  $("editId").value = referencia(r);
+  $("referenciaEdicion").textContent = "Referencia: " + referencia(r);
+  $("editNombre").value = nombreGrupo(r);
+  $("editTipo").value = tipoReservacion(r);
+  $("editAdultos").value = adultos(r);
+  $("editNinos").value = ninos(r);
+
+  const m = mesaNumero(r);
+  const selectMesa = $("editMesa");
+  const maxMesa = Math.max(10, Number.isInteger(m) && m >= 1 ? m : 0,
+    ...reservaciones.map(x => mesaNumero(x)).filter(n => Number.isInteger(n) && n >= 1)) + 1;
+  selectMesa.innerHTML = '<option value="">Sin mesa asignada</option>' +
+    Array.from({ length: maxMesa }, (_, i) => `<option value="${i + 1}">Mesa ${i + 1}</option>`).join("");
+  selectMesa.value = Number.isInteger(m) && m >= 1 ? String(m) : "";
+
+  $("editBeneficio").value = texto(r.beneficio_excel);
+  $("editEstadoPago").value = estatusPago(r);
+  $("editFormaPago").value = formaPago(r);
+  $("editOrigenRegistro").value = origenRegistro(r);
+  $("editMomentoPago").value = momentoPago(r);
+  $("editAsistencia").value = estadoAsistencia(r);
+  $("editAdultosAsistieron").value = estadoAsistencia(r) === "ASISTIO" ? adultosAsistieron(r) : (estadoAsistencia(r) === "NO_ASISTIO" ? 0 : "");
+  $("editNinosAsistieron").value = estadoAsistencia(r) === "ASISTIO" ? ninosAsistieron(r) : (estadoAsistencia(r) === "NO_ASISTIO" ? 0 : "");
+
+  $("editCosto").value = r.costo_excel ?? "";
+  $("editCortesia").value = r.cortesia_excel ?? "";
+  $("editSubtotal").value = r.subtotal_excel ?? "";
+  $("editPagado").value = r.pagado_excel ?? "";
+  $("editDebe").value = r.debe_excel ?? "";
+  $("editNotas").value = texto(r.notas ?? r.notas_excel);
+
+  $("editorReservacion").hidden = false;
+  $("editorReservacion").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function iniciarNuevaLlegada() {
+  modoFormularioReservacion = "nueva_llegada";
+  $("formEditarReservacion").reset();
+  $("estadoEdicion").hidden = true;
+  $("editId").value = "__NUEVA_LLEGADA__";
+  $("referenciaEdicion").textContent = "Nueva llegada directa · se generará un folio al guardar";
+  $("editNombre").value = "";
+  $("editTipo").value = "grupo";
+  $("editAdultos").value = 1;
+  $("editNinos").value = 0;
+  const selectMesa = $("editMesa");
+  const maxMesa = Math.max(10, ...reservaciones.map(x => mesaNumero(x)).filter(n => Number.isInteger(n) && n >= 1)) + 1;
+  selectMesa.innerHTML = '<option value="">Seleccionar mesa</option>' +
+    Array.from({ length: maxMesa }, (_, i) => `<option value="${i + 1}">Mesa ${i + 1}</option>`).join("");
+  selectMesa.value = "";
+  $("editBeneficio").value = "";
+  $("editEstadoPago").value = "PAGADO";
+  $("editFormaPago").value = "EFECTIVO";
+  $("editOrigenRegistro").value = "ENTRADA_DIRECTA";
+  $("editMomentoPago").value = "ENTRADA";
+  $("editAsistencia").value = "ASISTIO";
+  $("editAdultosAsistieron").value = 1;
+  $("editNinosAsistieron").value = 0;
+  $("editCosto").value = "";
+  $("editCortesia").value = "";
+  $("editSubtotal").value = "";
+  $("editPagado").value = "";
+  $("editDebe").value = 0;
+  $("editNotas").value = "Llegada directa registrada en la entrada.";
+  $("editorReservacion").hidden = false;
+  $("editorReservacion").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function generarFolioLlegadaDirecta() {
+  const prefijo = "OXI-2026-ENT-";
+  const usados = reservaciones.map(r => referencia(r))
+    .filter(id => id.startsWith(prefijo))
+    .map(id => Number(id.slice(prefijo.length)))
+    .filter(n => Number.isInteger(n) && n > 0);
+  const siguiente = Math.max(0, ...usados) + 1;
+  return prefijo + String(siguiente).padStart(3, "0");
+}
+
+function cancelarEdicion() {
+  modoFormularioReservacion = "editar";
+  $("formEditarReservacion").reset();
+  $("editorReservacion").hidden = true;
+  $("estadoEdicion").hidden = true;
+  $("editId").value = "";
+}
+
+function guardarEdicion(evento) {
+  evento.preventDefault();
+
+  try {
+    const id = $("editId").value;
+    const esNuevaLlegada = modoFormularioReservacion === "nueva_llegada" && id === "__NUEVA_LLEGADA__";
+    const indice = esNuevaLlegada ? -1 : reservaciones.findIndex(r => referencia(r) === id);
+
+    if (!esNuevaLlegada && indice < 0) throw new Error("La reservación ya no existe en la lista.");
+
+    const original = esNuevaLlegada ? {} : reservaciones[indice];
+    const nombre = $("editNombre").value.trim();
+
+    if (!nombre) throw new Error("El nombre del grupo es obligatorio.");
+
+    const adultosNuevo = valorCampoNumerico("editAdultos", "Adultos", false);
+    const ninosNuevo = valorCampoNumerico("editNinos", "Niños", false);
+
+    if (!Number.isInteger(adultosNuevo) || !Number.isInteger(ninosNuevo)) {
+      throw new Error("Adultos y niños deben ser números enteros.");
+    }
+
+    const mesaValor = $("editMesa").value;
+    const mesaNueva = mesaValor === "" ? null : Number(mesaValor);
+
+    if (mesaNueva !== null && (!Number.isInteger(mesaNueva) || mesaNueva < 1)) {
+      throw new Error("La mesa debe ser un número entero mayor o igual a 1.");
+    }
+
+    const estadoAsistenciaNuevo = $("editAsistencia").value || "PENDIENTE";
+    const origenNuevo = $("editOrigenRegistro").value || "RESERVA_PREVIA";
+    const momentoPagoNuevo = $("editMomentoPago").value || "SIN_ESPECIFICAR";
+    let adultosAsistieronNuevo = valorCampoNumerico("editAdultosAsistieron", "Adultos que asistieron");
+    let ninosAsistieronNuevo = valorCampoNumerico("editNinosAsistieron", "Niños que asistieron");
+
+    if (estadoAsistenciaNuevo === "ASISTIO") {
+      if (adultosAsistieronNuevo === null) adultosAsistieronNuevo = adultosNuevo;
+      if (ninosAsistieronNuevo === null) ninosAsistieronNuevo = ninosNuevo;
+      if (!Number.isInteger(adultosAsistieronNuevo) || !Number.isInteger(ninosAsistieronNuevo)) {
+        throw new Error("Las cantidades de adultos y niños que asistieron deben ser enteros.");
+      }
+      if (adultosAsistieronNuevo > adultosNuevo || ninosAsistieronNuevo > ninosNuevo) {
+        throw new Error("Las personas que asistieron no pueden superar las cantidades reservadas. Si fue una llegada directa, registra como reservadas las cantidades que llegaron.");
+      }
+    } else if (estadoAsistenciaNuevo === "NO_ASISTIO") {
+      adultosAsistieronNuevo = 0;
+      ninosAsistieronNuevo = 0;
+    } else {
+      adultosAsistieronNuevo = null;
+      ninosAsistieronNuevo = null;
+    }
+
+    if (origenNuevo === "ENTRADA_DIRECTA" && estadoAsistenciaNuevo !== "ASISTIO") {
+      throw new Error("Una llegada directa debe registrarse como asistida.");
+    }
+
+    const importePagadoNuevo = valorCampoNumerico("editPagado", "Importe pagado");
+    if (esNuevaLlegada && (!Number.isFinite(importePagadoNuevo) || importePagadoNuevo <= 0)) {
+      throw new Error("Para registrar una llegada directa, captura el importe que pagó.");
+    }
+
+    const actualizado = {
+      ...original,
+      ...(esNuevaLlegada ? { reservacion_id: generarFolioLlegadaDirecta() } : {}),
+      nombre_reservacion: nombre,
+      tipo_reservacion: $("editTipo").value,
+      adultos: adultosNuevo,
+      ninos: ninosNuevo,
+      total_asientos_excel: adultosNuevo + ninosNuevo,
+      mesa_numero: mesaNueva,
+      mesa_id: mesaNueva === null
+        ? null
+        : "OXI-M" + String(mesaNueva).padStart(3, "0"),
+      beneficio_excel: $("editBeneficio").value.trim() || null,
+      estado_pago_excel: $("editEstadoPago").value || null,
+      forma_pago_excel: $("editFormaPago").value || null,
+      origen_registro: origenNuevo,
+      momento_pago: momentoPagoNuevo,
+      estado_asistencia: estadoAsistenciaNuevo,
+      adultos_asistieron: adultosAsistieronNuevo,
+      ninos_asistieron: ninosAsistieronNuevo,
+      costo_excel: valorCampoNumerico("editCosto", "Costo"),
+      cortesia_excel: valorCampoNumerico("editCortesia", "Cortesía"),
+      subtotal_excel: valorCampoNumerico("editSubtotal", "Subtotal"),
+      pagado_excel: importePagadoNuevo,
+      debe_excel: valorCampoNumerico("editDebe", "Saldo pendiente"),
+      notas: $("editNotas").value.trim() || null,
+      notas_excel: original.notas_excel ?? null
+    };
+
+    // Conserva cualquier otro campo original que no se esté editando.
+    if (esNuevaLlegada) {
+      reservaciones.push(actualizado);
+    } else {
+      reservaciones[indice] = actualizado;
+    }
+    documentoActual.reservaciones = reservaciones;
+
+    renderizarTodo();
+    cancelarEdicion();
+
+    mostrarEstado(
+      esNuevaLlegada
+        ? "Llegada directa registrada. Exporta el JSON actualizado para conservarla."
+        : "Cambios guardados en memoria. Exporta el JSON actualizado para conservarlos.",
+      "ok"
+    );
+  } catch (error) {
+    $("estadoEdicion").hidden = false;
+    $("estadoEdicion").className = "mensaje error";
+    $("estadoEdicion").textContent = error.message;
+  }
+}
+
+function descargarArchivo(nombre, contenido, tipo) {
+  const blob = new Blob([contenido], { type: tipo });
+  const url = URL.createObjectURL(blob);
+  const enlace = document.createElement("a");
+
+  enlace.href = url;
+  enlace.download = nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  enlace.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function exportarJSONActualizado() {
+  if (!documentoActual) {
+    mostrarEstado("Carga primero un JSON válido.", "error");
+    return;
+  }
+
+  try {
+    const salida = {
+      ...documentoActual,
+      formato_version: 2,
+      evento_id: "OXI-2026",
+      capacidad_mesa_personas: capacidadMesa,
+      reservaciones: reservaciones
+    };
+
+    const contenido = JSON.stringify(salida, null, 2);
+
+    descargarArchivo(
+      "reservaciones-OXI-2026-actualizado.json",
+      contenido,
+      "application/json;charset=utf-8"
+    );
+
+    mostrarEstado(
+      "JSON preparado para descarga. Revisa el archivo descargado y después reemplaza " +
+      "el JSON correspondiente en GitHub mediante un commit. La descarga no modifica " +
+      "automáticamente el repositorio.",
+      "ok"
+    );
+  } catch (error) {
+    mostrarEstado("Error al preparar el JSON: " + error.message, "error");
+  }
+}
+
+function csvSeguro(valor) {
+  let s = texto(valor);
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+
+function exportarCSV(nombre, filas) {
+  const contenido = "\uFEFF" + filas.map(f =>
+    f.map(csvSeguro).join(",")
+  ).join("\r\n");
+
+  descargarArchivo(nombre, contenido, "text/csv;charset=utf-8");
+}
+
+function exportarPadronCSV() {
+  const filas = [[
+    "Referencia", "Nombre", "Tipo", "Adultos reservados", "Niños reservados",
+    "Total reservado", "Adultos asistentes", "Niños asistentes", "Total asistentes confirmados",
+    "Mesa", "Estado de pago", "Estado de asistencia"
+  ]];
+
+  reservaciones.forEach(r => filas.push([
+    referencia(r), nombreGrupo(r), tipoReservacion(r), adultos(r), ninos(r), totalAsientos(r),
+    estadoAsistencia(r) === "ASISTIO" ? adultosAsistieron(r) : 0,
+    estadoAsistencia(r) === "ASISTIO" ? ninosAsistieron(r) : 0,
+    totalAsistentesConfirmados(r), mesaNumero(r) ? "Mesa " + mesaNumero(r) : "Sin mesa",
+    etiquetaPago(r)[0], etiquetaAsistencia(r)[0]
+  ]));
+
+  exportarCSV("padron-OXI-2026.csv", filas);
+}
+
+function exportarFinanzasCSV() {
+  const filas = [[
+    "Referencia", "Nombre", "Tipo", "Origen registro", "Estado pago", "Forma pago",
+    "Momento pago", "Estado asistencia", "Adultos reservados", "Niños reservados",
+    "Adultos asistentes", "Niños asistentes", "Mesa", "Costo Excel", "Cortesía",
+    "Subtotal", "Pagado", "Debe"
+  ]];
+
+  reservaciones.forEach(r => filas.push([
+    referencia(r), nombreGrupo(r), tipoReservacion(r), origenRegistro(r),
+    estatusPago(r), formaPago(r), momentoPago(r), etiquetaAsistencia(r)[0],
+    adultos(r), ninos(r), estadoAsistencia(r) === "ASISTIO" ? adultosAsistieron(r) : 0,
+    estadoAsistencia(r) === "ASISTIO" ? ninosAsistieron(r) : 0,
+    mesaNumero(r) ?? "", r.costo_excel ?? "", r.cortesia_excel ?? "",
+    r.subtotal_excel ?? "", r.pagado_excel ?? "", r.debe_excel ?? ""
+  ]));
+
+  exportarCSV("finanzas-OXI-2026.csv", filas);
+}
+
+function abrirReporte(titulo, contenido) {
+  const ventana = window.open("", "_blank");
+
+  if (!ventana) {
+    mostrarEstado(
+      "El navegador bloqueó la ventana del reporte. Permite ventanas emergentes e inténtalo de nuevo.",
+      "error"
+    );
+    return;
+  }
+
+  ventana.document.open();
+  ventana.document.write(`<!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>${escapar(titulo)}</title>
+      <style>
+        body{font-family:Arial,sans-serif;color:#24313d;margin:28px}
+        h1,h2{color:#17324d}
+        table{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}
+        th,td{border:1px solid #ccd5dd;padding:7px;text-align:left}
+        th{background:#eaf0f4}
+        .tarjetas{display:flex;gap:12px;flex-wrap:wrap}
+        .tarjeta{border:1px solid #ccd5dd;padding:12px;min-width:150px}
+        .nota{color:#667482;font-size:11px}
+        .mesa-reporte{margin-top:24px;break-inside:avoid}
+        .ocupacion{margin:4px 0 8px}
+        .por-cobrar{color:#a32929}
+        button{padding:9px 14px;cursor:pointer}
+        @media print{.no-print{display:none}.mesa-reporte{break-inside:avoid} body{margin:12px}}
+      </style>
+    </head>
+    <body>
+      <div class="no-print"><button onclick="window.print()">Imprimir reporte</button></div>
+      ${contenido}
+    </body></html>`);
+  ventana.document.close();
+}
+
+function saldoPendiente(r) {
+  return Math.max(0, numero(r.debe_excel));
+}
+
+function estadoCobro(r) {
+  const saldo = saldoPendiente(r);
+  const clase = clasePago(r);
+  if (saldo > 0) return "POR COBRAR";
+  if (clase === "pendiente" || clase === "sin-pago") return "REVISAR PAGO";
+  if (clase === "pagado") return "PAGADO";
+  if (clase === "neutral" && tipoReservacion(r).toLowerCase().includes("cortesia")) {
+    return "CORTESÍA";
+  }
+  return "SIN SALDO REGISTRADO";
+}
+
+function celdaSaldo(r) {
+  const saldo = saldoPendiente(r);
+  if (saldo > 0) return `<strong class="por-cobrar">${dinero(saldo)}</strong>`;
+  if (estadoCobro(r) === "REVISAR PAGO") return `<strong class="por-cobrar">Confirmar</strong>`;
+  return "—";
+}
+
+function crearReporteFinanciero() {
+  const dineroTotal = lista => lista.reduce((s, r) => s + numero(r.pagado_excel), 0);
+  const asistentes = reservaciones.filter(r => estadoAsistencia(r) === "ASISTIO");
+  const noAsistieron = reservaciones.filter(r => estadoAsistencia(r) === "NO_ASISTIO");
+  const pendientes = reservaciones.filter(r => estadoAsistencia(r) === "PENDIENTE");
+  const pagadasAsistieron = dineroTotal(asistentes);
+  const pagadasNoAsistieron = dineroTotal(noAsistieron);
+  const pagadasPendientes = dineroTotal(pendientes);
+  const recaudacionTotal = dineroTotal(reservaciones);
+  const totalAsistentes = asistentes.reduce((s, r) => s + totalAsistentesConfirmados(r), 0);
+
+  const filas = reservaciones.map(r => `<tr>
+    <td>${escapar(referencia(r))}</td>
+    <td>${escapar(nombreGrupo(r))}</td>
+    <td>${escapar(origenRegistro(r) === "ENTRADA_DIRECTA" ? "Llegada directa" : "Reservación previa")}</td>
+    <td>${escapar(etiquetaAsistencia(r)[0])}</td>
+    <td>${totalAsistentesConfirmados(r)}</td>
+    <td>${escapar(formaPago(r) || "Sin especificar")}</td>
+    <td>${escapar(momentoPago(r))}</td>
+    <td>${dinero(r.pagado_excel)}</td>
+    <td>${dinero(r.debe_excel)}</td>
+  </tr>`).join("");
+
+  abrirReporte("Reporte financiero y asistencia OXI-2026", `
+    <h1>Comunidad Helénica de México</h1>
+    <h2>Reporte financiero y de asistencia · OXI-2026</h2>
+    <p class="nota">Los registros históricos sin estado de asistencia se consideran pendientes, no asistentes. El dinero pagado por una reservación no utilizada permanece en la recaudación total y se identifica por separado.</p>
+    <div class="tarjetas">
+      <div class="tarjeta"><span>Personas asistentes confirmadas</span><h2>${totalAsistentes}</h2></div>
+      <div class="tarjeta"><span>Reservaciones que asistieron</span><h2>${asistentes.length}</h2></div>
+      <div class="tarjeta"><span>Pagado asociado a reservaciones con asistencia</span><h2>${dinero(pagadasAsistieron)}</h2></div>
+      <div class="tarjeta"><span>Pagado por reservaciones sin asistencia</span><h2>${dinero(pagadasNoAsistieron)}</h2></div>
+      <div class="tarjeta"><span>Pagado con asistencia pendiente</span><h2>${dinero(pagadasPendientes)}</h2></div>
+      <div class="tarjeta"><span>Recaudación total registrada</span><h2>${dinero(recaudacionTotal)}</h2></div>
+    </div>
+    <p><strong>Interpretación:</strong> los importes se clasifican por reservación completa. Si una reservación tiene asistencia parcial, el pago completo se agrupa en «reservaciones con asistencia»; no se prorratea automáticamente por persona. La recaudación total incluye todos los pagos efectivamente registrados, incluso los pagos de personas que no asistieron.</p>
+    <table>
+      <thead><tr><th>Referencia</th><th>Reservación</th><th>Origen</th><th>Asistencia</th><th>Personas presentes</th><th>Medio de pago</th><th>Momento del pago</th><th>Pagado</th><th>Saldo</th></tr></thead>
+      <tbody>${filas || '<tr><td colspan="9">No hay reservaciones cargadas.</td></tr>'}</tbody>
+    </table>
+  `);
+}
+
+function crearReporteMesas() {
+  const secciones = mesas.map(m => {
+    const asignadas = reservaciones
+      .filter(r => mesaNumero(r) === m.numero)
+      .sort((a, b) => nombreGrupo(a).localeCompare(nombreGrupo(b), "es", {sensitivity:"base"}));
+    const ocupados = asignadas.reduce((s, r) => s + asientosParaMesa(r), 0);
+    const disponibles = capacidadMesa - ocupados;
+    const filas = asignadas.map(r => `<tr>
+      <td>${escapar(nombreGrupo(r))}</td>
+      <td>${asientosParaMesa(r)}</td>
+      <td>${escapar(etiquetaAsistencia(r)[0])}</td>
+      <td>${escapar(estadoCobro(r))}</td>
+      <td>${celdaSaldo(r)}</td>
+    </tr>`).join("");
+
+    return `<section class="mesa-reporte">
+      <h2>Mesa ${m.numero}</h2>
+      <p class="ocupacion">Lugares asignados: <strong>${ocupados}</strong> de ${capacidadMesa} ·
+      Espacios disponibles: <strong>${disponibles}</strong></p>
+      <table>
+        <thead><tr><th>Nombre de reservación / grupo</th><th>Personas presentes/asignadas</th><th>Asistencia</th><th>Estado de cobro</th><th>Saldo pendiente</th></tr></thead>
+        <tbody>${filas || '<tr><td colspan="5">Sin reservaciones asignadas.</td></tr>'}</tbody>
+      </table>
+    </section>`;
+  }).join("");
+
+  const sinMesa = reservaciones.filter(r => {
+    const m = mesaNumero(r);
+    return !Number.isInteger(m) || m < 1;
+  }).sort((a, b) => nombreGrupo(a).localeCompare(nombreGrupo(b), "es", {sensitivity:"base"}));
+
+  const filasSinMesa = sinMesa.map(r => `<tr>
+    <td>${escapar(nombreGrupo(r))}</td>
+    <td>${asientosParaMesa(r)}</td>
+    <td>${escapar(etiquetaAsistencia(r)[0])}</td>
+    <td>${escapar(estadoCobro(r))}</td>
+    <td>${celdaSaldo(r)}</td>
+  </tr>`).join("");
+
+  abrirReporte("Asignación por mesa OXI-2026", `
+    <h1>Comunidad Helénica de México</h1>
+    <h2>Asignación de asistentes por mesa · OXI-2026</h2>
+    <p>Capacidad de referencia: ${capacidadMesa} personas por mesa. Los importes solo aparecen cuando hay saldo pendiente registrado.</p>
+    ${secciones}
+    <section class="mesa-reporte">
+      <h2>Reservaciones sin mesa asignada</h2>
+      <table>
+        <thead><tr><th>Nombre de reservación / grupo</th><th>Personas presentes/asignadas</th><th>Asistencia</th><th>Estado de cobro</th><th>Saldo pendiente</th></tr></thead>
+        <tbody>${filasSinMesa || '<tr><td colspan="5">No hay reservaciones sin mesa asignada.</td></tr>'}</tbody>
+      </table>
+    </section>
+  `);
+}
+
+function crearReporteAlfabetico() {
+  const filasPersonas = [];
+
+  reservaciones.forEach(r => {
+    const detalle = Array.isArray(r.detalle_asistentes) ? r.detalle_asistentes
+      : (Array.isArray(r.asistentes) ? r.asistentes : []);
+    const personasConNombre = detalle.filter(p => p && texto(p.nombre).trim());
+    const mesa = mesaNumero(r);
+    const saldo = saldoPendiente(r);
+    const estado = estadoCobro(r);
+
+    if (personasConNombre.length) {
+      personasConNombre.forEach((p, indice) => {
+        filasPersonas.push({
+          nombre: texto(p.nombre).trim(),
+          grupo: nombreGrupo(r),
+          mesa,
+          estado,
+          saldoGrupo: saldo,
+          saldoTexto: "",
+          id: referencia(r),
+          ordenGrupo: indice
+        });
+      });
+    } else {
+      // Los registros históricos importados desde Excel representan grupos;
+      // no se inventan nombres individuales que no existen en el JSON.
+      filasPersonas.push({
+        nombre: nombreGrupo(r),
+        grupo: "Registro histórico de grupo (sin detalle individual)",
+        mesa,
+        estado,
+        saldoGrupo: saldo,
+        saldoTexto: celdaSaldo(r),
+        id: referencia(r),
+        ordenGrupo: 0
+      });
+    }
+  });
+
+  filasPersonas.sort((a, b) =>
+    a.nombre.localeCompare(b.nombre, "es", {sensitivity:"base"}) ||
+    a.grupo.localeCompare(b.grupo, "es", {sensitivity:"base"})
+  );
+
+  const gruposConSaldoMostrado = new Set();
+  filasPersonas.forEach(p => {
+    if (!p.saldoTexto) {
+      if (gruposConSaldoMostrado.has(p.id)) {
+        p.saldoTexto = p.saldoGrupo > 0 ? "Saldo del grupo ya indicado" : "—";
+      } else {
+        p.saldoTexto = celdaSaldo(reservaciones.find(r => referencia(r) === p.id));
+        gruposConSaldoMostrado.add(p.id);
+      }
+    } else {
+      gruposConSaldoMostrado.add(p.id);
+    }
+  });
+
+  const filas = filasPersonas.map(p => `<tr>
+    <td>${escapar(p.nombre)}</td>
+    <td>${p.mesa ? "Mesa " + p.mesa : "Sin mesa"}</td>
+    <td>${escapar(p.estado)}</td>
+    <td>${p.saldoTexto}</td>
+    <td>${escapar(p.id)}</td>
+  </tr>`).join("");
+
+  abrirReporte("Lista alfabética para recepción OXI-2026", `
+    <h1>Comunidad Helénica de México</h1>
+    <h2>Lista alfabética para recepción · OXI-2026</h2>
+    <p>Busca por nombre para ubicar la mesa. Revisa la columna de saldo pendiente y cobra únicamente el importe registrado como adeudo.</p>
+    <p class="nota">Los registros históricos del Excel contienen nombres de reservación o grupo, no nombres individuales de cada asistente. Para esas filas se muestra el nombre registrado sin inventar integrantes.</p>
+    <table>
+      <thead><tr><th>Nombre (orden alfabético)</th><th>Mesa asignada</th><th>Estado de cobro</th><th>Saldo pendiente</th><th>ID de reservación</th></tr></thead>
+      <tbody>${filas || '<tr><td colspan="5">No hay reservaciones cargadas.</td></tr>'}</tbody>
+    </table>
+  `);
+}
+
+function activarVista(id) {
+  vistaActual = id;
+
+  document.querySelectorAll(".vista").forEach(v => {
+    v.classList.toggle("activa", v.id === id);
+  });
+
+  document.querySelectorAll(".navegacion button").forEach(b => {
+    b.classList.toggle("activo", b.dataset.vista === id);
+  });
+}
+
+$("btnCargar").addEventListener("click", cargarArchivo);
+$("btnExportarJSON").addEventListener("click", exportarJSONActualizado);
+$("btnExportarPadron").addEventListener("click", exportarPadronCSV);
+$("btnExportarFinanzas").addEventListener("click", exportarFinanzasCSV);
+$("btnReporteFinanciero").addEventListener("click", crearReporteFinanciero);
+$("btnReporteMesas").addEventListener("click", crearReporteMesas);
+$("btnReporteAlfabetico").addEventListener("click", crearReporteAlfabetico);
+$("btnImprimir").addEventListener("click", () => window.print());
+
+$("buscarPadron").addEventListener("input", renderizarPadron);
+$("filtroTipo").addEventListener("change", renderizarPadron);
+$("filtroMesa").addEventListener("change", renderizarPadron);
+$("filtroPago").addEventListener("change", renderizarPadron);
+$("buscarGrupo").addEventListener("input", renderizarGrupos);
+
+$("formEditarReservacion").addEventListener("submit", guardarEdicion);
+$("btnNuevaLlegada").addEventListener("click", () => {
+  activarVista("vistaGrupos");
+  iniciarNuevaLlegada();
+});
+$("btnCancelarEdicion").addEventListener("click", cancelarEdicion);
+
+$("editAsistencia").addEventListener("change", () => {
+  const estado = $("editAsistencia").value;
+  if (estado === "ASISTIO") {
+    $("editAdultosAsistieron").value = $("editAdultos").value || 0;
+    $("editNinosAsistieron").value = $("editNinos").value || 0;
+  } else if (estado === "NO_ASISTIO") {
+    $("editAdultosAsistieron").value = 0;
+    $("editNinosAsistieron").value = 0;
+  } else {
+    $("editAdultosAsistieron").value = "";
+    $("editNinosAsistieron").value = "";
+  }
+});
+
+$("editOrigenRegistro").addEventListener("change", () => {
+  if ($("editOrigenRegistro").value === "ENTRADA_DIRECTA") {
+    $("editAsistencia").value = "ASISTIO";
+    $("editAdultosAsistieron").value = $("editAdultos").value || 0;
+    $("editNinosAsistieron").value = $("editNinos").value || 0;
+    if ($("editMomentoPago").value === "SIN_ESPECIFICAR") $("editMomentoPago").value = "ENTRADA";
+    if (!$("editEstadoPago").value) $("editEstadoPago").value = "PAGADO";
+    if (!$("editFormaPago").value) $("editFormaPago").value = "EFECTIVO";
+  }
+});
+
+["editAdultos", "editNinos"].forEach(id => $(id).addEventListener("change", () => {
+  if ($("editAsistencia").value !== "ASISTIO") return;
+  if (id === "editAdultos" && $("editAdultosAsistieron").value === "") $("editAdultosAsistieron").value = $(id).value;
+  if (id === "editNinos" && $("editNinosAsistieron").value === "") $("editNinosAsistieron").value = $(id).value;
+}));
+
+document.querySelectorAll(".navegacion button").forEach(b => {
+  b.addEventListener("click", () => activarVista(b.dataset.vista));
+});
+
+function manejarClickEditar(evento) {
+  const boton = evento.target.closest(".btn-editar-reservacion");
+  if (!boton) return;
+
+  activarVista("vistaGrupos");
+  iniciarEdicion(boton.dataset.id);
+}
+
+$("tablaGrupos").addEventListener("click", manejarClickEditar);
+$("tablaSinMesa").addEventListener("click", manejarClickEditar);
+$("tablaPadron").addEventListener("click", manejarClickEditar);
+</script>
+
+  <a class="home-float" href="../index.html" aria-label="Regresar al HOME de la Comunidad Helénica" title="Regresar al HOME de la Comunidad Helénica">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 10.8 12 3l9 7.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M5.5 9.5V21h13V9.5M9.2 21v-6.4h5.6V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="home-label">HOME · Comunidad Helénica</span>
+  </a>
+</body>
+</html>
