@@ -117,33 +117,33 @@ function iniciarModulo() {
    ========================================================= */
 function prepararNavegacionModulos() {
   const navegacion = document.querySelector(".module-navigation");
-  if (!navegacion) {
-    return;
-  }
+  if (!navegacion) return;
+
   const enlaces = Array.from(
     navegacion.querySelectorAll(".module-link")
   );
+
   const secciones = Array.from(
     document.querySelectorAll(".module-section")
   );
-  function mostrarModulo(id, actualizarDireccion = false) {
+
+  function mostrarModulo(id, actualizarHistorial = false) {
     const seccionActiva = secciones.find(
       (seccion) => seccion.id === id
     );
-    if (!seccionActiva) {
-      return;
-    }
-    // Mostrar únicamente la sección seleccionada.
+
+    if (!seccionActiva) return;
+
     secciones.forEach((seccion) => {
       const activa = seccion === seccionActiva;
       seccion.classList.toggle("is-hidden", !activa);
       seccion.setAttribute("aria-hidden", String(!activa));
     });
 
-    // Actualizar el estado visual y accesible del menú.
     enlaces.forEach((enlace) => {
       const activa = enlace.getAttribute("href") === `#${id}`;
       enlace.classList.toggle("active", activa);
+
       if (activa) {
         enlace.setAttribute("aria-current", "page");
       } else {
@@ -151,35 +151,57 @@ function prepararNavegacionModulos() {
       }
     });
 
-    // Mantener visible el módulo elegido en la dirección del navegador.
-    if (actualizarDireccion) {
-      history.replaceState(null, "", `#${id}`);
+    const enlaceActivo = enlaces.find(
+      (enlace) => enlace.getAttribute("href") === `#${id}`
+    );
+
+    const textoActivo = document.getElementById("moduloActivoTexto");
+
+    if (textoActivo && enlaceActivo) {
+      textoActivo.textContent = enlaceActivo.textContent.trim();
+    }
+
+    if (actualizarHistorial) {
+      history.pushState(null, "", `#${id}`);
     }
   }
 
-  // Cambiar de módulo al seleccionar una opción del menú.
   navegacion.addEventListener("click", (evento) => {
     const enlace = evento.target.closest(".module-link");
-    if (!enlace || !navegacion.contains(enlace)) {
-      return;
-    }
+
+    if (!enlace || !navegacion.contains(enlace)) return;
+
     const destino = enlace.getAttribute("href");
-    if (!destino || !destino.startsWith("#")) {
-      return;
-    }
+
+    if (!destino || !destino.startsWith("#")) return;
+
     const id = destino.slice(1);
-    if (!secciones.some((seccion) => seccion.id === id)) {
-      return;
-    }
+
+    if (!secciones.some((seccion) => seccion.id === id)) return;
+
     evento.preventDefault();
     mostrarModulo(id, true);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
   });
 
-  // Al abrir el portal, respetar el módulo indicado en la dirección.
+  window.addEventListener("popstate", () => {
+    const id = window.location.hash.slice(1);
+
+    const modulo = secciones.some(
+      (seccion) => seccion.id === id
+    )
+      ? id
+      : secciones[0]?.id;
+
+    if (modulo) mostrarModulo(modulo);
+  });
+
   const idInicial = window.location.hash.slice(1);
-  const moduloInicialExiste = secciones.some(
-    (seccion) => seccion.id === idInicial
-  );
+
   const primerDestino = enlaces
     .map((enlace) => enlace.getAttribute("href"))
     .find((destino) =>
@@ -189,89 +211,18 @@ function prepararNavegacionModulos() {
         (seccion) => seccion.id === destino.slice(1)
       )
     );
-  const moduloInicial = moduloInicialExiste
+
+  const moduloInicial = secciones.some(
+    (seccion) => seccion.id === idInicial
+  )
     ? idInicial
     : primerDestino?.slice(1);
+
   if (moduloInicial) {
     mostrarModulo(moduloInicial);
   }
 }
 
-/* =========================================================
-   NAVEGACIÓN ENTRE MÓDULOS
-   ========================================================= */
-function prepararNavegacionModulos() {
-  const navegacion = document.querySelector(".module-navigation");
-  if (!navegacion) return;
-  const enlaces = Array.from(
-    navegacion.querySelectorAll(".module-link")
-  );
-  const secciones = Array.from(
-    document.querySelectorAll(".module-section")
-  );
-  function mostrarModulo(id, actualizarHistorial = false) {
-    const seccionActiva = secciones.find(
-      (seccion) => seccion.id === id
-    );
-    if (!seccionActiva) return;
-    secciones.forEach((seccion) => {
-      const activa = seccion === seccionActiva;
-      seccion.classList.toggle("is-hidden", !activa);
-      seccion.setAttribute("aria-hidden", String(!activa));
-    });
-    enlaces.forEach((enlace) => {
-      const activa = enlace.getAttribute("href") === `#${id}`;
-      enlace.classList.toggle("active", activa);
-      if (activa) {
-        enlace.setAttribute("aria-current", "page");
-      } else {
-        enlace.removeAttribute("aria-current");
-      }
-    });
-    const enlaceActivo = enlaces.find(
-      (enlace) => enlace.getAttribute("href") === `#${id}`
-    );
-    const textoActivo = document.getElementById("moduloActivoTexto");
-    if (textoActivo && enlaceActivo) {
-      textoActivo.textContent = enlaceActivo.textContent.trim();
-    }
-    if (actualizarHistorial) {
-      history.pushState(null, "", `#${id}`);
-    }
-  }
-  navegacion.addEventListener("click", (evento) => {
-    const enlace = evento.target.closest(".module-link");
-    if (!enlace || !navegacion.contains(enlace)) return;
-    const destino = enlace.getAttribute("href");
-    if (!destino || !destino.startsWith("#")) return;
-    const id = destino.slice(1);
-    if (!secciones.some((seccion) => seccion.id === id)) return;
-    evento.preventDefault();
-    mostrarModulo(id, true);
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-  });
-
-  // Permite usar los botones Atrás y Adelante del navegador.
-  window.addEventListener("popstate", () => {
-    const id = window.location.hash.slice(1);
-    mostrarModulo(
-      secciones.some((seccion) => seccion.id === id)
-        ? id
-        : "directorio"
-    );
-  });
-
-  // Abre directamente el módulo indicado en la dirección.
-  const idInicial = window.location.hash.slice(1);
-  mostrarModulo(
-    secciones.some((seccion) => seccion.id === idInicial)
-      ? idInicial
-      : "directorio"
-  );
-}
 
 /* =========================================================
    BOTÓN VOLVER ARRIBA
