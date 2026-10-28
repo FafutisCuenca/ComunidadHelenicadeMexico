@@ -52,7 +52,61 @@
         </p>
       </div>
     </section>
+<section class="panel" id="panelMaestro">
 
+  <div class="panel-header">
+    <div>
+      <h3>Respaldo maestro de la comunidad</h3>
+      <p>
+        Un solo archivo para personas, cuotas anuales,
+        cuotas individuales e historial de pagos.
+      </p>
+    </div>
+  </div>
+
+  <div class="backup-info">
+    <div class="backup-info-icon" aria-hidden="true">JSON</div>
+    <div>
+      <h4>Archivo maestro local</h4>
+      <p>
+        Los datos se procesan en este navegador. Guarda el archivo
+        exportado en una carpeta privada de tu computadora.
+        La importación reemplaza los datos que estén en memoria.
+      </p>
+    </div>
+  </div>
+
+  <div class="toolbar-actions backup-actions">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="btnImportarMaestro"
+    >
+      Importar JSON maestro
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-secondary"
+      id="btnExportarMaestro"
+    >
+      Exportar JSON maestro
+    </button>
+
+    <input
+      type="file"
+      id="archivoMaestroJson"
+      accept=".json,application/json"
+      hidden
+    >
+  </div>
+
+  <p id="estadoMaestro" class="field-help" aria-live="polite">
+    No se ha importado un archivo maestro en esta sesión.
+  </p>
+
+</section>
+      
 <!-- Navegación principal -->
 <nav class="module-navigation" aria-label="Módulos administrativos">
   <a
@@ -643,61 +697,6 @@
       </section>
 
       <!-- Importación y exportación del JSON maestro -->
-<section class="panel" id="panelMaestro">
-
-  <div class="panel-header">
-    <div>
-      <h3>Respaldo maestro de la comunidad</h3>
-      <p>
-        Un solo archivo para personas, cuotas anuales,
-        cuotas individuales e historial de pagos.
-      </p>
-    </div>
-  </div>
-
-  <div class="backup-info">
-    <div class="backup-info-icon" aria-hidden="true">JSON</div>
-    <div>
-      <h4>Archivo maestro local</h4>
-      <p>
-        Los datos se procesan en este navegador. Guarda el archivo
-        exportado en una carpeta privada de tu computadora.
-        La importación reemplaza los datos que estén en memoria.
-      </p>
-    </div>
-  </div>
-
-  <div class="toolbar-actions backup-actions">
-    <button
-      type="button"
-      class="btn btn-secondary"
-      id="btnImportarMaestro"
-    >
-      Importar JSON maestro
-    </button>
-
-    <button
-      type="button"
-      class="btn btn-secondary"
-      id="btnExportarMaestro"
-    >
-      Exportar JSON maestro
-    </button>
-
-    <input
-      type="file"
-      id="archivoMaestroJson"
-      accept=".json,application/json"
-      hidden
-    >
-  </div>
-
-  <p id="estadoMaestro" class="field-help" aria-live="polite">
-    No se ha importado un archivo maestro en esta sesión.
-  </p>
-
-</section>
-      
       <!-- Importación y exportación independiente -->
       <section class="panel">
 
