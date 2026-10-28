@@ -1117,11 +1117,13 @@ function construirMesas() {
   mesas = [...mapa.values()];
 }
 
-function crearTarjeta(etiqueta, valor) {
-  return `<div class="tarjeta">
-    <span class="etiqueta">${escapar(etiqueta)}</span>
-    <span class="valor">${escapar(valor)}</span>
-  </div>`;
+function crearTarjeta(etiqueta, valor, claseExtra = "") {
+    return `
+        <div class="tarjeta ${claseExtra}">
+            <div class="etiqueta">${etiqueta}</div>
+            <div class="valor">${valor}</div>
+        </div>
+    `;
 }
 
 function renderizarResumen() {
