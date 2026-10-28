@@ -884,33 +884,29 @@ function construirPadron() {
 function construirMesas() {
   const mapa = new Map();
 
-  // Conserva las primeras 10 mesas y agrega cualquier mesa
-  // válida que ya esté registrada en las reservaciones.
-  for (let i = 1; i <= 10; i++) {
-    mapa.set(i, {
-      numero: i,
+  function crearMesa(numeroMesa) {
+    return {
+      numero: numeroMesa,
       grupos: 0,
       adultos: 0,
       ninos: 0,
       total: 0
-    });
+    };
   }
 
+  // Conserva las mesas iniciales.
+  for (let i = 1; i <= 10; i++) {
+    mapa.set(i, crearMesa(i));
+  }
+
+  // Incorpora todas las mesas válidas que ya existan.
   reservaciones.forEach(r => {
     const m = mesaNumero(r);
 
-    // Ignora mesas vacías, inválidas o no positivas.
-    if (m === null || !Number.isInteger(m) || m < 1) return;
+    if (!Number.isInteger(m) || m < 1) return;
 
-    // Si la mesa supera la 10, se agrega automáticamente.
     if (!mapa.has(m)) {
-      mapa.set(m, {
-        numero: m,
-        grupos: 0,
-        adultos: 0,
-        ninos: 0,
-        total: 0
-      });
+      mapa.set(m, crearMesa(m));
     }
 
     const mesa = mapa.get(m);
@@ -922,7 +918,6 @@ function construirMesas() {
 
   mesas = [...mapa.values()].sort((a, b) => a.numero - b.numero);
 }
-
 function crearTarjeta(etiqueta, valor) {
   return `<div class="tarjeta">
     <span class="etiqueta">${escapar(etiqueta)}</span>
