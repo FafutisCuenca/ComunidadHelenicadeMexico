@@ -1138,18 +1138,18 @@ function renderizarResumen() {
     return !Number.isInteger(m) || m < 1;
   }).length;
 
-  $("resumen").innerHTML =
+ $("resumen").innerHTML =
     crearTarjeta("Reservaciones", grupos) +
     crearTarjeta("Adultos", adultosTotal) +
     crearTarjeta("Niños", ninosTotal) +
     crearTarjeta("Personas reservadas", asientos) +
     crearTarjeta("Asistentes confirmados", asistentesConfirmados) +
     crearTarjeta("Reservaciones por confirmar", asistenciaPendiente) +
-    crearTarjeta("Importe pagado registrado", dinero(pagado)) +
-    crearTarjeta("Saldo registrado", dinero(saldo)) +
-    crearTarjeta("Reservaciones sin mesa", sinMesa);
+    crearTarjeta("Reservaciones sin mesa", sinMesa) +
+    crearTarjeta("Importe pagado registrado", dinero(pagado), "resumen-dinero") +
+    crearTarjeta("Saldo registrado", dinero(saldo), "resumen-dinero");
 }
-
+  
 function renderizarMesas() {
   $("tablaMesas").innerHTML = mesas.map(m => {
     const disponibles = capacidadMesa - m.total;
