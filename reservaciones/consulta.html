@@ -337,6 +337,66 @@
     .home-float:focus-visible { outline-offset: 4px; }
     @media (prefers-reduced-motion: reduce) { .home-float, .home-float .home-label { transition: none; } }
     @media (max-width: 520px) { .home-float { right: 14px; bottom: 14px; width: 50px; height: 50px; } .home-float:hover, .home-float:focus-visible { width: 195px; } }
+
+    /* Ocultar temporalmente los botones de exportación CSV */
+#btnExportarPadron,
+#btnExportarFinanzas {
+  display: none !important;
+}
+/* Resumen compacto: menos espacio por indicador */
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.resumen .tarjeta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  margin: 0;
+  border-radius: 6px;
+  min-width: 0;
+}
+
+.resumen .etiqueta {
+  font-size: 12px;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.resumen .valor {
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 700;
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 600px) {
+  .resumen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .resumen .tarjeta {
+    padding: 7px 8px;
+  }
+
+  .resumen .etiqueta {
+    font-size: 11px;
+  }
+
+  .resumen .valor {
+    font-size: 16px;
+  }
+}
   </style>
 </head>
 
