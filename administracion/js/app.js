@@ -1,43 +1,32 @@
-
 "use strict";
-
 /*
  * Comunidad Helénica de México, A.C.
  * Módulo de administración: Personas y Socios
  * Versión: 0.3.0
- *
  * Directorio de personas:
  * - Datos en memoria durante la sesión.
  * - Importación y exportación independiente del padrón JSON.
- *
  * Configuración de cuotas:
  * - Cuota general por ejercicio anual.
  * - Configuración independiente del padrón.
  * - Importación y exportación de JSON.
  * - Sin base de datos ni persistencia automática.
- *
  * Independiente del módulo de reservaciones OXI.
  */
 
 const VERSION_MODULO = "0.3.0";
-
 const FORMATO_DATOS = "comunidad-helenica-personas";
 const VERSION_FORMATO = 2;
-
 const FORMATO_CUOTAS = "comunidad-helenica-cuotas";
 const VERSION_FORMATO_CUOTAS = 1;
-
 const MONEDA_CUOTAS = "MXN";
-
 const FORMATO_HISTORICO_PAGOS = "comunidad-helenica-historico-pagos";
 const VERSION_FORMATO_HISTORICO_PAGOS = 1;
 
 let cuotasSocioAnuales = [];
 let movimientosPago = [];
-
 let historicoPagosImportado = false;
 let historicoPagosPendienteExportar = false;
-
 let personas = [];
 let personaEnEdicion = null;
 let mensajeTemporizador = null;
@@ -48,7 +37,6 @@ let mensajeTemporizador = null;
  */
 let padronCargado = false;
 let padronPendienteExportar = false;
-
 let cuotasAnuales = crearCuotasIniciales();
 let anioCuotaEnEdicion = null;
 let cuotasImportadas = false;
@@ -56,49 +44,39 @@ let cuotasPendientesExportar = true;
 
 const FORMATO_MAESTRO = "comunidad-helenica-maestro";
 const VERSION_FORMATO_MAESTRO = 1;
-
 const FORMATO_HISTORICO_PAGOS =
   "comunidad-helenica-historico-pagos";
-
 let cuotasSocioAnuales = [];
 let movimientosPago = [];
-
 let reglasCuotas = {
   cuota_general_habilitada: true,
   cuotas_por_categoria_habilitadas: false,
   excepciones_individuales_habilitadas: false
 };
-
 let maestroImportado = false;
 let maestroPendienteExportar = true;
-
 const $ = (id) => document.getElementById(id);
-
 const ESTATUS_VALIDOS = [
   "Por revisar",
   "Vigente",
   "Inactivo",
   "No socio"
 ];
-
 const TIPOS_VALIDOS = [
   "Socio",
   "Persona relacionada",
   "Participante externo"
 ];
-
 const CATEGORIAS_VALIDAS = [
   "Socio",
   "Amistad",
   "Otra categoría"
 ];
-
 const SUBCATEGORIAS = {
   "Socio": ["Numerario", "Honorario"],
   "Amistad": ["Filoheleno"],
   "Otra categoría": []
 };
-
 const CAMPOS_DETALLE = [
   ["tipoRegistro", "Tipo de registro"],
   ["categoria", "Categoría"],
@@ -114,26 +92,21 @@ const CAMPOS_DETALLE = [
 /* =========================================================
    INICIO
    ========================================================= */
-
 document.addEventListener("DOMContentLoaded", iniciarModulo);
-
-
 function iniciarModulo() {
   prepararNavegacionModulos();
   prepararBotonVolverArriba();
   prepararSelectCategoria();
   conectarEventos();
   actualizarSubcategorias();
-
   renderizarTodo();
   renderizarCuotas();
   actualizarEstadoPadron();
-
-    prepararSelectSociosPagos();
+  prepararSelectSociosPagos();
   prepararEjercicioConsultaPagos();
   renderizarHistoricoPagos();
   renderizarMovimientosPagos();
-  
+ 
   mostrarMensaje(
     "Módulo listo. Importa un padrón existente o crea uno nuevo. " +
     "Los cambios se conservan mediante archivos JSON.",
@@ -144,35 +117,27 @@ function iniciarModulo() {
 /* =========================================================
    NAVEGACIÓN ENTRE MÓDULOS
    ========================================================= */
-
 function prepararNavegacionModulos() {
   const navegacion = document.querySelector(".module-navigation");
-
   if (!navegacion) {
     return;
   }
-
   const enlaces = Array.from(
     navegacion.querySelectorAll(".module-link")
   );
-
   const secciones = Array.from(
     document.querySelectorAll(".module-section")
   );
-
   function mostrarModulo(id, actualizarDireccion = false) {
     const seccionActiva = secciones.find(
       (seccion) => seccion.id === id
     );
-
     if (!seccionActiva) {
       return;
     }
-
     // Mostrar únicamente la sección seleccionada.
     secciones.forEach((seccion) => {
       const activa = seccion === seccionActiva;
-
       seccion.classList.toggle("is-hidden", !activa);
       seccion.setAttribute("aria-hidden", String(!activa));
     });
@@ -180,9 +145,7 @@ function prepararNavegacionModulos() {
     // Actualizar el estado visual y accesible del menú.
     enlaces.forEach((enlace) => {
       const activa = enlace.getAttribute("href") === `#${id}`;
-
       enlace.classList.toggle("active", activa);
-
       if (activa) {
         enlace.setAttribute("aria-current", "page");
       } else {
@@ -199,34 +162,26 @@ function prepararNavegacionModulos() {
   // Cambiar de módulo al seleccionar una opción del menú.
   navegacion.addEventListener("click", (evento) => {
     const enlace = evento.target.closest(".module-link");
-
     if (!enlace || !navegacion.contains(enlace)) {
       return;
     }
-
     const destino = enlace.getAttribute("href");
-
     if (!destino || !destino.startsWith("#")) {
       return;
     }
-
     const id = destino.slice(1);
-
     if (!secciones.some((seccion) => seccion.id === id)) {
       return;
     }
-
     evento.preventDefault();
     mostrarModulo(id, true);
   });
 
   // Al abrir el portal, respetar el módulo indicado en la dirección.
   const idInicial = window.location.hash.slice(1);
-
   const moduloInicialExiste = secciones.some(
     (seccion) => seccion.id === idInicial
   );
-
   const primerDestino = enlaces
     .map((enlace) => enlace.getAttribute("href"))
     .find((destino) =>
@@ -236,91 +191,65 @@ function prepararNavegacionModulos() {
         (seccion) => seccion.id === destino.slice(1)
       )
     );
-
   const moduloInicial = moduloInicialExiste
     ? idInicial
     : primerDestino?.slice(1);
-
   if (moduloInicial) {
     mostrarModulo(moduloInicial);
   }
 }
 
-
 /* =========================================================
    NAVEGACIÓN ENTRE MÓDULOS
    ========================================================= */
-
 function prepararNavegacionModulos() {
   const navegacion = document.querySelector(".module-navigation");
-
   if (!navegacion) return;
-
   const enlaces = Array.from(
     navegacion.querySelectorAll(".module-link")
   );
-
   const secciones = Array.from(
     document.querySelectorAll(".module-section")
   );
-
   function mostrarModulo(id, actualizarHistorial = false) {
     const seccionActiva = secciones.find(
       (seccion) => seccion.id === id
     );
-
     if (!seccionActiva) return;
-
     secciones.forEach((seccion) => {
       const activa = seccion === seccionActiva;
-
       seccion.classList.toggle("is-hidden", !activa);
       seccion.setAttribute("aria-hidden", String(!activa));
     });
-
     enlaces.forEach((enlace) => {
       const activa = enlace.getAttribute("href") === `#${id}`;
-
       enlace.classList.toggle("active", activa);
-
       if (activa) {
         enlace.setAttribute("aria-current", "page");
       } else {
         enlace.removeAttribute("aria-current");
       }
     });
-
     const enlaceActivo = enlaces.find(
       (enlace) => enlace.getAttribute("href") === `#${id}`
     );
-
     const textoActivo = document.getElementById("moduloActivoTexto");
-
     if (textoActivo && enlaceActivo) {
       textoActivo.textContent = enlaceActivo.textContent.trim();
     }
-
     if (actualizarHistorial) {
       history.pushState(null, "", `#${id}`);
     }
   }
-
   navegacion.addEventListener("click", (evento) => {
     const enlace = evento.target.closest(".module-link");
-
     if (!enlace || !navegacion.contains(enlace)) return;
-
     const destino = enlace.getAttribute("href");
-
     if (!destino || !destino.startsWith("#")) return;
-
     const id = destino.slice(1);
-
     if (!secciones.some((seccion) => seccion.id === id)) return;
-
     evento.preventDefault();
     mostrarModulo(id, true);
-
     window.scrollTo({
       top: 0,
       behavior: "smooth"
@@ -330,7 +259,6 @@ function prepararNavegacionModulos() {
   // Permite usar los botones Atrás y Adelante del navegador.
   window.addEventListener("popstate", () => {
     const id = window.location.hash.slice(1);
-
     mostrarModulo(
       secciones.some((seccion) => seccion.id === id)
         ? id
@@ -340,7 +268,6 @@ function prepararNavegacionModulos() {
 
   // Abre directamente el módulo indicado en la dirección.
   const idInicial = window.location.hash.slice(1);
-
   mostrarModulo(
     secciones.some((seccion) => seccion.id === idInicial)
       ? idInicial
@@ -351,156 +278,117 @@ function prepararNavegacionModulos() {
 /* =========================================================
    BOTÓN VOLVER ARRIBA
    ========================================================= */
-
 function prepararBotonVolverArriba() {
   const boton = $("btnVolverArriba");
-
   if (!boton) return;
-
   function actualizarVisibilidad() {
     const mostrar = window.scrollY > 350;
-
     boton.hidden = !mostrar;
     boton.classList.toggle("is-visible", mostrar);
   }
-
   boton.addEventListener("click", () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth"
     });
   });
-
   window.addEventListener("scroll", actualizarVisibilidad, {
     passive: true
   });
-
   actualizarVisibilidad();
 }
 
-
 function conectarEventos() {
   /* Directorio */
-
   $("btnNuevo")?.addEventListener("click", abrirFormularioNuevo);
   $("btnImportar")?.addEventListener("click", abrirSelectorArchivo);
   $("btnExportar")?.addEventListener("click", exportarJSON);
-
   $("btnImportarMaestro")?.addEventListener(
   "click",
   abrirSelectorMaestro
 );
-
 $("btnExportarMaestro")?.addEventListener(
   "click",
   exportarMaestroJSON
 );
-
 $("archivoMaestroJson")?.addEventListener(
   "change",
   importarMaestroJSON
 );
-  
   $("archivoJson")?.addEventListener("change", importarJSON);
-
   $("buscar")?.addEventListener("input", renderizarTabla);
   $("filtroEstatus")?.addEventListener("change", renderizarTabla);
-
   $("categoria")?.addEventListener("change", actualizarSubcategorias);
-
   $("tipoRegistro")?.addEventListener("change", ajustarCategoriaPorTipo);
-
   $("personaForm")?.addEventListener("submit", guardarPersona);
-
   $("btnCerrarForm")?.addEventListener("click", cerrarFormulario);
   $("btnCancelar")?.addEventListener("click", cerrarFormulario);
-
 $("btnCerrarDetalle")?.addEventListener("click", cerrarDetalle);
-
   $("btnDetalleEditar")?.addEventListener(
     "click",
     editarPersonaDesdeDetalle
   );
-
   $("detalleDialog")?.addEventListener("click", (evento) => {
     if (evento.target === $("detalleDialog")) {
       cerrarDetalle();
     }
   });
-  
 $("btnImportarPadronInicial")?.addEventListener(
   "click",
   abrirSelectorArchivo
 );
-
 $("btnCrearPadronInicial")?.addEventListener(
   "click",
   abrirFormularioNuevo
 );
 
-  
   /* Configuración de cuotas */
-
   $("cuotaForm")?.addEventListener("submit", guardarCuotaAnual);
-
   $("btnCancelarEdicionCuota")?.addEventListener(
     "click",
     limpiarFormularioCuota
   );
-
   $("btnImportarCuotas")?.addEventListener(
     "click",
     abrirSelectorCuotas
   );
-
   $("btnExportarCuotas")?.addEventListener(
     "click",
     exportarCuotasJSON
   );
-
   $("archivoCuotasJson")?.addEventListener(
     "change",
     importarCuotasJSON
   );
-
   $("tablaCuotasAnuales")?.addEventListener("click", (evento) => {
     const boton = evento.target.closest("button[data-accion]");
-
     if (!boton) {
       return;
     }
-
     if (boton.dataset.accion === "editar-cuota") {
       editarCuotaAnual(boton.dataset.anio);
     }
   });
 
   /* Histórico de pagos */
-
   $("pagoPersonaId")?.addEventListener("change", actualizarCuotaSugerida);
   $("pagoAnio")?.addEventListener("change", actualizarCuotaSugerida);
-
   $("btnAsignarCuotaSocio")?.addEventListener(
     "click",
     asignarCuotaIndividual
   );
-
   $("formMovimientoPago")?.addEventListener(
     "submit",
     registrarMovimientoPago
   );
-
   $("pagosVista")?.addEventListener("change", renderizarHistoricoPagos);
   $("pagosAnioConsulta")?.addEventListener("input", renderizarHistoricoPagos);
   $("buscarSocioPagos")?.addEventListener("input", renderizarHistoricoPagos);
-
   $("tablaMovimientosPagos")?.addEventListener("click", manejarAccionPago);
-
   $("btnExportarPagos")?.addEventListener("click", exportarHistoricoPagos);
   $("btnImportarPagos")?.addEventListener("click", () => {
     $("archivoPagosJson")?.click();
   });
-
   $("archivoPagosJson")?.addEventListener(
     "change",
     importarHistoricoPagos
@@ -510,12 +398,10 @@ $("btnCrearPadronInicial")?.addEventListener(
 /* =========================================================
    UTILIDADES GENERALES
    ========================================================= */
-
 function crearId() {
   if (window.crypto && typeof window.crypto.randomUUID === "function") {
     return "PER-" + window.crypto.randomUUID();
   }
-
   return (
     "PER-" +
     Date.now().toString(36) +
@@ -523,15 +409,12 @@ function crearId() {
     Math.random().toString(36).slice(2, 10)
   ).toUpperCase();
 }
-
 function textoSeguro(valor) {
   if (valor === null || valor === undefined) {
     return "";
   }
-
   return String(valor).trim();
 }
-
 function escaparHTML(valor) {
   return textoSeguro(valor)
     .replace(/&/g, "&amp;")
@@ -540,106 +423,81 @@ function escaparHTML(valor) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
 function buscarOpcion(valor, opciones) {
   const recibido = textoSeguro(valor).toLocaleLowerCase("es-MX");
-
   return opciones.find(
     (opcion) => opcion.toLocaleLowerCase("es-MX") === recibido
   ) || "";
 }
-
 function normalizarEstatus(valor) {
   return buscarOpcion(valor, ESTATUS_VALIDOS) || "Por revisar";
 }
-
 function normalizarTipo(valor) {
   return buscarOpcion(valor, TIPOS_VALIDOS) || "Persona relacionada";
 }
-
 function normalizarCategoria(valor) {
   const recibida = textoSeguro(valor);
-
   if (/^socio numerario$/i.test(recibida)) {
     return "Socio";
   }
-
   if (/^socio honorario$/i.test(recibida)) {
     return "Socio";
   }
-
   if (/^socio amigo$/i.test(recibida)) {
     return "Amistad";
   }
-
   if (/^amigo$/i.test(recibida)) {
     return "Amistad";
   }
-
   return buscarOpcion(recibida, CATEGORIAS_VALIDAS) ||
     "Otra categoría";
 }
-
 function normalizarSubcategoria(categoria, valor, categoriaOriginal) {
   const recibida = textoSeguro(valor);
-
   if (/^socio numerario$/i.test(textoSeguro(categoriaOriginal))) {
     return "Numerario";
   }
-
   if (/^socio honorario$/i.test(textoSeguro(categoriaOriginal))) {
     return "Honorario";
   }
-
   if (/^filoheleno$/i.test(recibida)) {
     return categoria === "Amistad" ? "Filoheleno" : "";
   }
-
   return buscarOpcion(recibida, SUBCATEGORIAS[categoria] || []);
 }
-
 function nombreCompleto(persona) {
   return [
     textoSeguro(persona.nombres),
     textoSeguro(persona.apellidos)
   ].filter(Boolean).join(" ");
 }
-
 function valorCampo(id) {
   return $(id) ? textoSeguro($(id).value) : "";
 }
-
 function asignarValor(id, valor) {
   if ($(id)) {
     $(id).value = valor ?? "";
   }
 }
-
 function obtenerPersonaPorId(id) {
   return personas.find((persona) => persona.id === id) || null;
 }
-
 function fechaLocalISO() {
   const fecha = new Date();
   const desplazamiento = fecha.getTimezoneOffset() * 60000;
-
   return new Date(fecha.getTime() - desplazamiento)
     .toISOString()
     .slice(0, 10);
 }
-
 function normalizarPersona(datos) {
   const original = datos && typeof datos === "object" ? datos : {};
-
   const tipoRegistro = normalizarTipo(original.tipoRegistro);
   const categoria = normalizarCategoria(original.categoria);
-
   const subcategoria = normalizarSubcategoria(
     categoria,
     original.subcategoria,
     original.categoria
   );
-
   return {
     id: textoSeguro(original.id) || crearId(),
     nombres: textoSeguro(original.nombres),
@@ -659,65 +517,49 @@ function normalizarPersona(datos) {
 /* =========================================================
    CATEGORÍAS Y SUBCATEGORÍAS
    ========================================================= */
-
 function prepararSelectCategoria() {
   const select = $("categoria");
-
   if (!select) {
     return;
   }
-
   const valorAnterior = select.value;
-
   select.replaceChildren();
-
   const opcionVacia = document.createElement("option");
   opcionVacia.value = "";
   opcionVacia.textContent = "Selecciona una categoría";
   select.appendChild(opcionVacia);
-
   CATEGORIAS_VALIDAS.forEach((categoria) => {
     const opcion = document.createElement("option");
     opcion.value = categoria;
     opcion.textContent = categoria;
     select.appendChild(opcion);
   });
-
   if (CATEGORIAS_VALIDAS.includes(valorAnterior)) {
     select.value = valorAnterior;
   }
 }
-
 function actualizarSubcategorias(valorPreferido = "") {
   const selectCategoria = $("categoria");
   const selectSubcategoria = $("subcategoria");
-
   if (!selectSubcategoria) {
     return;
   }
-
   const categoria = selectCategoria?.value || "";
   const opciones = SUBCATEGORIAS[categoria] || [];
-
   selectSubcategoria.replaceChildren();
-
   const opcionVacia = document.createElement("option");
   opcionVacia.value = "";
   opcionVacia.textContent = opciones.length
     ? "Selecciona una subcategoría"
     : "Sin subcategoría";
-
   selectSubcategoria.appendChild(opcionVacia);
-
   opciones.forEach((subcategoria) => {
     const opcion = document.createElement("option");
     opcion.value = subcategoria;
     opcion.textContent = subcategoria;
     selectSubcategoria.appendChild(opcion);
   });
-
   selectSubcategoria.disabled = opciones.length === 0;
-
   if (opciones.includes(valorPreferido)) {
     selectSubcategoria.value = valorPreferido;
   } else {
@@ -728,11 +570,9 @@ function actualizarSubcategorias(valorPreferido = "") {
 function ajustarCategoriaPorTipo() {
   const tipo = valorCampo("tipoRegistro");
   const categoria = $("categoria");
-
   if (!categoria) {
     return;
   }
-
   if (tipo === "Socio") {
     if (!categoria.value || categoria.value === "Amistad") {
       categoria.value = "Socio";
@@ -746,31 +586,25 @@ function ajustarCategoriaPorTipo() {
       categoria.value = "Otra categoría";
     }
   }
-
   actualizarSubcategorias();
 }
 
 /* =========================================================
    MENSAJES
    ========================================================= */
-
 function mostrarMensaje(texto, tipo = "aviso") {
   const elemento = $("mensaje");
-
   if (!elemento) {
     return;
   }
-
   if (mensajeTemporizador) {
     clearTimeout(mensajeTemporizador);
     mensajeTemporizador = null;
   }
-
   elemento.textContent = texto;
   elemento.className = "toast visible " + tipo;
   elemento.setAttribute("role", tipo === "error" ? "alert" : "status");
   elemento.hidden = false;
-
   if (tipo === "exito") {
     mensajeTemporizador = setTimeout(() => {
       elemento.className = "toast";
@@ -780,50 +614,35 @@ function mostrarMensaje(texto, tipo = "aviso") {
   }
 }
 
-
 /* =========================================================
    ESTADO DE CARGA DEL PADRÓN
    ========================================================= */
-
 function actualizarEstadoPadron() {
   const panel = $("estadoCargaPadron");
   const titulo = $("estadoCargaTitulo");
   const texto = $("estadoCargaTexto");
-
   if (!panel || !titulo || !texto) return;
-
   panel.classList.remove("status-loaded", "status-pending");
-
   if (!padronCargado) {
     panel.classList.add("status-pending");
-
     titulo.textContent = "Padrón pendiente de cargar";
-
     texto.textContent =
       "Importa tu archivo JSON para recuperar los registros existentes " +
       "o inicia un padrón nuevo. Los cambios deberán exportarse a JSON " +
       "para conservarse después de cerrar la sesión.";
-
     return;
   }
-
   if (padronPendienteExportar) {
     panel.classList.add("status-pending");
-
     titulo.textContent = "Cambios pendientes de exportar";
-
     texto.textContent =
       `Hay ${personas.length} registro(s) en memoria. ` +
       "Exporta el padrón JSON para conservar las modificaciones " +
       "en tu computadora.";
-
     return;
   }
-
   panel.classList.add("status-loaded");
-
   titulo.textContent = "Padrón cargado";
-
   texto.textContent = personas.length === 0
     ? "El padrón está cargado, pero no contiene registros. " +
       "Puedes comenzar a registrar personas."
@@ -831,41 +650,32 @@ function actualizarEstadoPadron() {
       "Puedes consultar, buscar o editar la información.";
 }
 
-
 /* =========================================================
    INDICADORES Y TABLA DEL DIRECTORIO
    ========================================================= */
-
 function renderizarTodo() {
   renderizarIndicadores();
   renderizarTabla();
   actualizarEstadoPadron();
 }
-
 function renderizarIndicadores() {
   const total = personas.length;
-
   const vigentes = personas.filter(
     (persona) => persona.estatus === "Vigente"
   ).length;
-
   if ($("totalRegistros")) {
     $("totalRegistros").textContent = total;
   }
-
   if ($("totalVigentes")) {
     $("totalVigentes").textContent = vigentes;
   }
-
   if ($("totalOtros")) {
     $("totalOtros").textContent = total - vigentes;
   }
 }
-
 function obtenerPersonasFiltradas() {
   const busqueda = valorCampo("buscar").toLocaleLowerCase("es-MX");
   const estatus = valorCampo("filtroEstatus");
-
   return personas.filter((persona) => {
     const textoBusqueda = [
       persona.id,
@@ -877,19 +687,15 @@ function obtenerPersonasFiltradas() {
       persona.correo,
       persona.telefono
     ].join(" ").toLocaleLowerCase("es-MX");
-
     const coincideBusqueda =
       !busqueda || textoBusqueda.includes(busqueda);
-
     const coincideEstatus =
       !estatus || persona.estatus === estatus;
-
     return coincideBusqueda && coincideEstatus;
   }).sort((a, b) =>
     nombreCompleto(a).localeCompare(nombreCompleto(b), "es-MX")
   );
 }
-
 function claseEstatus(estatus) {
   switch (estatus) {
     case "Vigente":
@@ -902,21 +708,16 @@ function claseEstatus(estatus) {
       return "por-revisar";
   }
 }
-
 function renderizarTabla() {
   const tabla = $("tablaPersonas");
-
   if (!tabla) {
     return;
   }
-
   const filtradas = obtenerPersonasFiltradas();
-
   if (filtradas.length === 0) {
     const mensajeVacio = personas.length === 0
       ? "Todavía no hay registros. Selecciona «Nueva persona» o importa un JSON."
       : "No hay registros que coincidan con la búsqueda.";
-
     tabla.innerHTML = `
       <tr>
         <td colspan="6" class="empty-state">
@@ -936,7 +737,6 @@ function renderizarTabla() {
       const contacto = escaparHTML(
         persona.correo || persona.telefono || "—"
       );
-
       return `
         <tr>
           <td>
@@ -978,12 +778,10 @@ function renderizarTabla() {
       `;
     }).join("");
   }
-
   tabla.querySelectorAll("button[data-accion]").forEach((boton) => {
     boton.addEventListener("click", () => {
       const id = boton.dataset.id;
       const accion = boton.dataset.accion;
-
       if (accion === "detalle") {
         mostrarDetalle(id);
       } else if (accion === "editar") {
@@ -991,7 +789,6 @@ function renderizarTabla() {
       }
     });
   });
-
   if ($("resultadoBusqueda")) {
     $("resultadoBusqueda").textContent =
       `${filtradas.length} de ${personas.length} registro(s)`;
@@ -1001,104 +798,77 @@ function renderizarTabla() {
 /* =========================================================
    FORMULARIO DE PERSONAS
    ========================================================= */
-
 function abrirFormularioNuevo() {
   personaEnEdicion = null;
-
   $("personaForm")?.reset();
-
   asignarValor("personaId", "");
   asignarValor("estatus", "Por revisar");
   asignarValor("tipoRegistro", "Socio");
   asignarValor("categoria", "Socio");
-
   actualizarSubcategorias();
   asignarValor("subcategoria", "");
   asignarValor("fechaIngreso", fechaLocalISO());
-
   if ($("formEyebrow")) {
     $("formEyebrow").textContent = "Nuevo registro";
   }
-
   if ($("formTitulo")) {
     $("formTitulo").textContent = "Registrar persona";
   }
-
   mostrarFormulario();
 }
-
 function abrirFormularioEdicion(id) {
   const persona = obtenerPersonaPorId(id);
-
   if (!persona) {
     mostrarMensaje("No se encontró el registro seleccionado.", "error");
     return;
   }
-
   personaEnEdicion = persona.id;
-
   asignarValor("personaId", persona.id);
   asignarValor("nombres", persona.nombres);
   asignarValor("apellidos", persona.apellidos);
   asignarValor("tipoRegistro", persona.tipoRegistro);
   asignarValor("categoria", persona.categoria);
-
   actualizarSubcategorias(persona.subcategoria);
-
   asignarValor("estatus", persona.estatus);
   asignarValor("fechaIngreso", persona.fechaIngreso);
   asignarValor("correo", persona.correo);
   asignarValor("telefono", persona.telefono);
   asignarValor("domicilio", persona.domicilio);
   asignarValor("notas", persona.notas);
-
   if ($("formEyebrow")) {
     $("formEyebrow").textContent = "Edición de registro";
   }
-
   if ($("formTitulo")) {
     $("formTitulo").textContent = "Editar persona";
   }
-
   cerrarDetalle();
   mostrarFormulario();
 }
-
 function mostrarFormulario() {
   const panel = $("formPanel");
-
   if (!panel) {
     return;
   }
-
   panel.hidden = false;
   panel.classList.add("visible");
   panel.scrollIntoView({ behavior: "smooth", block: "start" });
-
   const campoNombre = $("nombres");
-
   if (campoNombre) {
     setTimeout(() => campoNombre.focus(), 100);
   }
 }
-
 function cerrarFormulario() {
   const panel = $("formPanel");
-
   if (panel) {
     panel.classList.remove("visible");
     panel.hidden = true;
   }
-
   personaEnEdicion = null;
 }
-
 function guardarPersona(evento) {
   evento.preventDefault();
-
   const nombres = valorCampo("nombres");
   const apellidos = valorCampo("apellidos");
-
   if (!nombres || !apellidos) {
     mostrarMensaje(
       "Es necesario capturar nombres y apellidos.",
@@ -1106,15 +876,12 @@ function guardarPersona(evento) {
     );
     return;
   }
-
   const categoria = valorCampo("categoria");
   const subcategoria = valorCampo("subcategoria");
-
   if (!categoria) {
     mostrarMensaje("Selecciona una categoría.", "error");
     return;
   }
-
   if (
     (SUBCATEGORIAS[categoria] || []).length > 0 &&
     !subcategoria
@@ -1125,7 +892,6 @@ function guardarPersona(evento) {
     );
     return;
   }
-
   const persona = normalizarPersona({
     id: personaEnEdicion || crearId(),
     nombres,
@@ -1140,32 +906,25 @@ function guardarPersona(evento) {
     domicilio: valorCampo("domicilio"),
     notas: valorCampo("notas")
   });
-
   const indice = personas.findIndex(
     (elemento) => elemento.id === persona.id
   );
-
   if (indice >= 0) {
     personas[indice] = persona;
-
     mostrarMensaje(
       "Registro actualizado en memoria. Exporta el JSON para conservar el cambio.",
       "exito"
     );
   } else {
     personas.push(persona);
-
     mostrarMensaje(
       "Persona registrada en memoria. Exporta el JSON para conservar el cambio.",
       "exito"
     );
   }
-
   padronCargado = true;
   padronPendienteExportar = true;
-
 cerrarFormulario();
-
 renderizarTodo();
 prepararSelectSociosPagos();
 renderizarHistoricoPagos();
@@ -1175,10 +934,8 @@ renderizarMovimientosPagos();
 /* =========================================================
    DETALLE DE PERSONAS
    ========================================================= */
-
 function mostrarDetalle(id) {
   const persona = obtenerPersonaPorId(id);
-
   if (!persona) {
     mostrarMensaje(
       "No se encontró el registro seleccionado.",
@@ -1186,12 +943,10 @@ function mostrarDetalle(id) {
     );
     return;
   }
-
   const titulo = $("detalleNombre");
   const campos = $("detalleCampos");
   const botonEditar = $("btnDetalleEditar");
   const dialogo = $("detalleDialog");
-
   if (!titulo || !campos || !dialogo) {
     mostrarMensaje(
       "No se encontró la estructura de la ficha de detalle.",
@@ -1199,10 +954,8 @@ function mostrarDetalle(id) {
     );
     return;
   }
-
   // Encabezado
   titulo.textContent = nombreCompleto(persona) || "Persona sin nombre";
-
   // Grupo 1: identificación
   const identificacion = crearGrupoDetalle(
     "Identificación",
@@ -1213,7 +966,6 @@ function mostrarDetalle(id) {
       ["Apellidos", persona.apellidos]
     ]
   );
-
   // Grupo 2: membresía
   const membresia = crearGrupoDetalle(
     "Membresía",
@@ -1226,7 +978,6 @@ function mostrarDetalle(id) {
       ["Fecha de ingreso", formatearFechaDetalle(persona.fechaIngreso)]
     ]
   );
-
   // Grupo 3: contacto
   const contacto = crearGrupoDetalle(
     "Contacto",
@@ -1236,7 +987,6 @@ function mostrarDetalle(id) {
       ["Teléfono", persona.telefono]
     ]
   );
-
   // Grupo 4: domicilio
   const domicilio = crearGrupoDetalle(
     "Domicilio",
@@ -1245,7 +995,6 @@ function mostrarDetalle(id) {
       ["Domicilio", persona.domicilio]
     ]
   );
-
   // Grupo 5: notas administrativas
   const notas = crearGrupoDetalle(
     "Notas administrativas",
@@ -1254,7 +1003,6 @@ function mostrarDetalle(id) {
       ["Notas", persona.notas]
     ]
   );
-
   // Renderizado seguro: todos los valores se escapan antes de insertarse.
   campos.replaceChildren(
     identificacion,
@@ -1263,11 +1011,9 @@ function mostrarDetalle(id) {
     domicilio,
     notas
   );
-
   if (botonEditar) {
     botonEditar.dataset.id = persona.id;
   }
-
   if (typeof dialogo.showModal === "function") {
     if (!dialogo.open) {
       dialogo.showModal();
@@ -1279,75 +1025,56 @@ function mostrarDetalle(id) {
     );
   }
 }
-
 function crearGrupoDetalle(titulo, descripcion, campos) {
   const seccion = document.createElement("section");
   seccion.className = "detail-section";
-
   const encabezado = document.createElement("div");
   encabezado.className = "detail-section-heading";
-
   const tituloSeccion = document.createElement("h3");
   tituloSeccion.textContent = titulo;
-
   const descripcionSeccion = document.createElement("p");
   descripcionSeccion.textContent = descripcion;
-
   encabezado.append(tituloSeccion, descripcionSeccion);
-
   const lista = document.createElement("dl");
   lista.className = "detail-grid";
-
   campos.forEach(([etiqueta, valor]) => {
     const termino = document.createElement("dt");
     termino.textContent = etiqueta;
-
     const definicion = document.createElement("dd");
     definicion.textContent =
       valor !== null && valor !== undefined && String(valor).trim() !== ""
         ? String(valor).trim()
         : "—";
-
     lista.append(termino, definicion);
   });
-
   seccion.append(encabezado, lista);
-
   return seccion;
 }
-
 function formatearFechaDetalle(fecha) {
   if (!fecha) {
     return "";
   }
-
   // Las fechas guardadas como YYYY-MM-DD se formatean sin
   // conversión de zona horaria para evitar cambiar el día.
   const coincidencia = String(fecha).match(
     /^(\d{4})-(\d{2})-(\d{2})$/
   );
-
   if (coincidencia) {
     return `${coincidencia[3]}/${coincidencia[2]}/${coincidencia[1]}`;
   }
-
   return String(fecha);
 }
 function cerrarDetalle() {
   const dialogo = $("detalleDialog");
-
   if (dialogo?.open) {
     dialogo.close();
   }
 }
-
 function editarPersonaDesdeDetalle() {
   const id = $("btnDetalleEditar")?.dataset.id;
-
   if (!id) {
     return;
   }
-
   cerrarDetalle();
   abrirFormularioEdicion(id);
 }
@@ -1355,29 +1082,22 @@ function editarPersonaDesdeDetalle() {
 /* =========================================================
    IMPORTACIÓN DEL PADRÓN JSON
    ========================================================= */
-
 function abrirSelectorArchivo() {
-  const selector = $("archivoJson");
-
+ const selector = $("archivoJson");
   if (selector) {
     selector.value = "";
     selector.click();
   }
 }
-
 async function importarJSON(evento) {
   const archivo = evento.target.files?.[0];
-
   if (!archivo) {
     return;
   }
-
   try {
     const contenido = await archivo.text();
     const datos = JSON.parse(contenido);
-
     let registros;
-
     if (Array.isArray(datos)) {
       registros = datos;
     } else if (datos && Array.isArray(datos.personas)) {
@@ -1389,14 +1109,12 @@ async function importarJSON(evento) {
           "El archivo no corresponde al formato del padrón de personas."
         );
       }
-
       registros = datos.personas;
     } else {
       throw new Error(
         "El JSON debe contener un arreglo de personas o una propiedad «personas»."
       );
     }
-
     if (!registros.every(
       (registro) =>
         registro &&
@@ -1407,16 +1125,13 @@ async function importarJSON(evento) {
         "El archivo contiene registros con formato incorrecto."
       );
     }
-
     const normalizadas = registros.map(normalizarPersona);
     const ids = normalizadas.map((persona) => persona.id);
-
     if (new Set(ids).size !== ids.length) {
       throw new Error(
         "El archivo contiene identificadores duplicados. No se importó."
       );
     }
-
     if (normalizadas.some(
       (persona) => !persona.nombres || !persona.apellidos
     )) {
@@ -1424,31 +1139,24 @@ async function importarJSON(evento) {
         "Todos los registros deben tener nombres y apellidos. No se importó el archivo."
       );
     }
-
     const confirmar = window.confirm(
       `El archivo contiene ${normalizadas.length} registro(s).\n\n` +
       "La importación reemplazará los registros que están en memoria. " +
       "Si tienes cambios sin exportar, se perderán.\n\n" +
       "¿Deseas continuar?"
     );
-
     if (!confirmar) {
       return;
     }
-
     personas = normalizadas;
-
     padronCargado = true;
-padronPendienteExportar = false;
-
+    padronPendienteExportar = false;
     cerrarFormulario();
     cerrarDetalle();
     renderizarTodo();
-
     prepararSelectSociosPagos();
-renderizarHistoricoPagos();
-renderizarMovimientosPagos();
-    
+    renderizarHistoricoPagos();
+    renderizarMovimientosPagos();
     mostrarMensaje(
       `Importación correcta: ${personas.length} registro(s) cargados. ` +
       "Exporta el JSON si realizas modificaciones.",
@@ -1467,7 +1175,6 @@ renderizarMovimientosPagos();
 /* =========================================================
    EXPORTACIÓN DEL PADRÓN JSON
    ========================================================= */
-
 function exportarJSON() {
   const documento = {
     formato: FORMATO_DATOS,
@@ -1477,17 +1184,13 @@ function exportarJSON() {
     cantidad_registros: personas.length,
     personas: personas.map((persona) => ({ ...persona }))
   };
-
   descargarJSON(
     documento,
     `personas-socios-${fechaLocalISO()}.json`
   );
-
     padronCargado = true;
   padronPendienteExportar = false;
-
   actualizarEstadoPadron();
-
   mostrarMensaje(
     "Se generó la descarga del padrón. Verifica que el archivo quedó guardado en tu ubicación privada.",
     "exito"
@@ -1497,13 +1200,11 @@ function exportarJSON() {
 /* =========================================================
    CONFIGURACIÓN DE CUOTAS ANUALES
    ========================================================= */
-
 /*
  * Esta configuración inicial solo vive en memoria.
  * Para conservarla después de cerrar el navegador,
  * utiliza Exportar configuración JSON.
  */
-
 function crearCuotasIniciales() {
   return [
     {
@@ -1523,70 +1224,57 @@ function crearCuotasIniciales() {
     }
   ];
 }
-
 function normalizarCuota(datos) {
   if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
     throw new Error("Una cuota contiene un formato incorrecto.");
   }
-
   const anio = Number(datos.anio);
   const monto = Number(datos.monto);
   const moneda = textoSeguro(datos.moneda || MONEDA_CUOTAS);
-
   if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
     throw new Error(
       "Cada cuota debe tener un ejercicio entero entre 2000 y 2100."
     );
   }
-
   if (!Number.isFinite(monto) || monto <= 0 || monto > 10000000) {
     throw new Error(
       `El importe de la cuota del ejercicio ${anio} debe ser mayor que cero y no exceder $10,000,000.`
     );
   }
-
   if (moneda !== MONEDA_CUOTAS) {
     throw new Error(
       `La moneda de la cuota ${anio} debe ser MXN.`
     );
   }
-
   return {
     anio,
     monto: Math.round((monto + Number.EPSILON) * 100) / 100,
     moneda: MONEDA_CUOTAS
   };
 }
-
 function validarListaCuotas(registros) {
   if (!Array.isArray(registros)) {
     throw new Error("La configuración debe contener una lista de cuotas.");
   }
-
   if (registros.length === 0) {
     throw new Error(
       "La configuración no contiene cuotas. No se reemplazaron los datos actuales."
     );
   }
-
   const normalizadas = registros.map(normalizarCuota);
   const ejercicios = normalizadas.map((cuota) => cuota.anio);
-
   if (new Set(ejercicios).size !== ejercicios.length) {
     throw new Error(
       "La configuración contiene más de una cuota para el mismo año."
     );
   }
-
   return normalizadas.sort((a, b) => b.anio - a.anio);
 }
-
 function obtenerCuotaPorAnio(anio) {
   return cuotasAnuales.find(
     (cuota) => cuota.anio === Number(anio)
   ) || null;
 }
-
 function formatoMoneda(monto) {
   return new Intl.NumberFormat("es-MX", {
     style: "currency",
@@ -1595,37 +1283,29 @@ function formatoMoneda(monto) {
     maximumFractionDigits: 2
   }).format(monto);
 }
-
 function marcarCuotasModificadas() {
   cuotasPendientesExportar = true;
   renderizarCuotas();
 }
-
 function textoEstadoCuotas() {
   if (cuotasPendientesExportar) {
     return cuotasImportadas
       ? "Hay cambios pendientes de exportación. La configuración importada no se ha actualizado en el archivo original."
       : "Configuración en memoria. Exporta el JSON para conservar los cambios.";
   }
-
   if (cuotasImportadas) {
     return "Configuración cargada desde un archivo JSON. No hay cambios pendientes de exportación.";
   }
-
   return "Se generó la descarga de la configuración inicial. Verifica que el archivo quedó guardado.";
 }
-
 function renderizarCuotas() {
   const tabla = $("tablaCuotasAnuales");
-
   if (!tabla) {
     return;
   }
-
   const ordenadas = [...cuotasAnuales].sort(
     (a, b) => b.anio - a.anio
   );
-
   if (ordenadas.length === 0) {
     tabla.innerHTML = `
       <tr>
@@ -1654,9 +1334,7 @@ function renderizarCuotas() {
       </tr>
     `).join("");
   }
-
   const resultado = $("resultadoCuotas");
-
   if (resultado) {
     resultado.textContent = textoEstadoCuotas();
   }
@@ -1665,13 +1343,10 @@ function renderizarCuotas() {
 /* =========================================================
    ALTA Y MODIFICACIÓN DE CUOTAS
    ========================================================= */
-
 function guardarCuotaAnual(evento) {
   evento.preventDefault();
-
   const anioTexto = valorCampo("configCuotaAnio");
   const montoTexto = valorCampo("configCuotaMonto");
-
   if (!anioTexto || !montoTexto) {
     mostrarMensaje(
       "Captura el ejercicio y el importe de la cuota.",
@@ -1679,33 +1354,26 @@ function guardarCuotaAnual(evento) {
     );
     return;
   }
-
   const cuotaRecibida = {
     anio: Number(anioTexto),
     monto: Number(montoTexto),
     moneda: MONEDA_CUOTAS
   };
-
   let cuota;
-
   try {
     cuota = normalizarCuota(cuotaRecibida);
   } catch (error) {
     mostrarMensaje(error.message, "error");
     return;
   }
-
   const cuotaExistente = obtenerCuotaPorAnio(cuota.anio);
-
   /*
    * Si estamos editando una cuota, localizamos el ejercicio original.
    * Esto permite corregir también el año sin duplicar ejercicios.
    */
-
   const cuotaOriginal = anioCuotaEnEdicion !== null
     ? obtenerCuotaPorAnio(anioCuotaEnEdicion)
     : null;
-
   if (
     anioCuotaEnEdicion !== null &&
     !cuotaOriginal
@@ -1717,7 +1385,6 @@ function guardarCuotaAnual(evento) {
     limpiarFormularioCuota();
     return;
   }
-
   if (
     cuotaExistente &&
     (!cuotaOriginal || cuotaExistente.anio !== cuotaOriginal.anio)
@@ -1728,7 +1395,6 @@ function guardarCuotaAnual(evento) {
     );
     return;
   }
-
   if (cuotaOriginal) {
     const confirmar = window.confirm(
       `Se actualizará la cuota del ejercicio ${cuotaOriginal.anio}` +
@@ -1740,40 +1406,31 @@ function guardarCuotaAnual(evento) {
       "\n\nEste cambio solo modifica la configuración en memoria. " +
       "No modifica pagos ni saldos históricos.\n\n¿Deseas continuar?"
     );
-
     if (!confirmar) {
       return;
     }
-
     cuotasAnuales = cuotasAnuales.filter(
       (elemento) => elemento.anio !== cuotaOriginal.anio
     );
-
     cuotasAnuales.push(cuota);
-
     mostrarMensaje(
       "Cuota actualizada en memoria. Exporta la configuración JSON para conservar el cambio.",
       "exito"
     );
   } else {
     cuotasAnuales.push(cuota);
-
     mostrarMensaje(
       `Cuota del ejercicio ${cuota.anio} agregada en memoria. Exporta el JSON para conservarla.`,
       "exito"
     );
   }
-
   cuotasAnuales.sort((a, b) => b.anio - a.anio);
-
   marcarCuotasModificadas();
   limpiarFormularioCuota();
 }
-
 function editarCuotaAnual(anioTexto) {
   const anio = Number(anioTexto);
   const cuota = obtenerCuotaPorAnio(anio);
-
   if (!cuota) {
     mostrarMensaje(
       "No se encontró la cuota del ejercicio seleccionado.",
@@ -1781,36 +1438,27 @@ function editarCuotaAnual(anioTexto) {
     );
     return;
   }
-
   anioCuotaEnEdicion = cuota.anio;
-
   asignarValor("configCuotaAnio", cuota.anio);
   asignarValor("configCuotaMonto", cuota.monto);
-
   if ($("btnGuardarCuota")) {
     $("btnGuardarCuota").textContent = "Actualizar cuota";
   }
-
   if ($("cuotaForm")) {
     $("cuotaForm").scrollIntoView({
       behavior: "smooth",
       block: "center"
     });
   }
-
   mostrarMensaje(
     `Editando la cuota del ejercicio ${cuota.anio}.`,
     "aviso"
   );
-
   $("configCuotaMonto")?.focus();
 }
-
 function limpiarFormularioCuota() {
   anioCuotaEnEdicion = null;
-
   $("cuotaForm")?.reset();
-
   if ($("btnGuardarCuota")) {
     $("btnGuardarCuota").textContent = "Guardar cuota anual";
   }
@@ -1819,19 +1467,15 @@ function limpiarFormularioCuota() {
 /* =========================================================
    IMPORTACIÓN DE CONFIGURACIÓN DE CUOTAS
    ========================================================= */
-
 function abrirSelectorCuotas() {
   const selector = $("archivoCuotasJson");
-
   if (selector) {
     selector.value = "";
     selector.click();
   }
 }
-
 function leerConfiguracionCuotas(datos) {
   let registros;
-
   if (Array.isArray(datos)) {
     registros = datos;
   } else if (datos && typeof datos === "object") {
@@ -1843,7 +1487,6 @@ function leerConfiguracionCuotas(datos) {
         "El archivo no corresponde al formato de configuración de cuotas."
       );
     }
-
     if (
       Number.isInteger(datos.version_formato) &&
       datos.version_formato > VERSION_FORMATO_CUOTAS
@@ -1852,7 +1495,6 @@ function leerConfiguracionCuotas(datos) {
         "El archivo fue creado con una versión más reciente del formato. No se importó."
       );
     }
-
     if (Array.isArray(datos.cuotas_anuales)) {
       registros = datos.cuotas_anuales;
     } else if (Array.isArray(datos.cuotas)) {
@@ -1867,28 +1509,21 @@ function leerConfiguracionCuotas(datos) {
       "La estructura del archivo de configuración no es válida."
     );
   }
-
   return validarListaCuotas(registros);
 }
-
 async function importarCuotasJSON(evento) {
   const archivo = evento.target.files?.[0];
-
   if (!archivo) {
     return;
   }
-
   try {
     const contenido = await archivo.text();
     const datos = JSON.parse(contenido);
-
     /*
      * Se valida todo antes de modificar cuotasAnuales.
      * Si la validación falla, se conserva la configuración actual.
      */
-
     const cuotasValidadas = leerConfiguracionCuotas(datos);
-
     const confirmar = window.confirm(
       `El archivo contiene ${cuotasValidadas.length} cuota(s) anual(es).\n\n` +
       "La importación reemplazará la configuración de cuotas que está en memoria. " +
@@ -1896,18 +1531,14 @@ async function importarCuotasJSON(evento) {
       "Si tienes cambios de cuotas sin exportar, se perderán.\n\n" +
       "¿Deseas continuar?"
     );
-
     if (!confirmar) {
       return;
     }
-
     cuotasAnuales = cuotasValidadas;
     cuotasImportadas = true;
     cuotasPendientesExportar = false;
-
     limpiarFormularioCuota();
     renderizarCuotas();
-
     mostrarMensaje(
       `Configuración importada correctamente: ${cuotasAnuales.length} cuota(s) anual(es).`,
       "exito"
@@ -1925,10 +1556,8 @@ async function importarCuotasJSON(evento) {
 /* =========================================================
    EXPORTACIÓN DE CONFIGURACIÓN DE CUOTAS
    ========================================================= */
-
 function exportarCuotasJSON() {
   let cuotasValidadas;
-
   try {
     cuotasValidadas = validarListaCuotas(cuotasAnuales);
   } catch (error) {
@@ -1938,104 +1567,83 @@ function exportarCuotasJSON() {
     );
     return;
   }
-
   const documento = {
     formato: FORMATO_CUOTAS,
     version_formato: VERSION_FORMATO_CUOTAS,
     version_modulo: VERSION_MODULO,
     moneda: MONEDA_CUOTAS,
     exportado_en: new Date().toISOString(),
-
     reglas: {
       cuota_general_habilitada: true,
       cuotas_por_categoria_habilitadas: false,
       excepciones_individuales_habilitadas: false
     },
-
     cuotas_anuales: cuotasValidadas.map((cuota) => ({
       anio: cuota.anio,
       monto: cuota.monto,
       moneda: cuota.moneda
     }))
   };
-
   descargarJSON(
     documento,
     `configuracion-cuotas-${fechaLocalISO()}.json`
   );
-
   cuotasPendientesExportar = false;
   renderizarCuotas();
-
   mostrarMensaje(
     "Se generó la descarga de la configuración de cuotas. Verifica que el archivo quedó guardado en tu carpeta privada.",
     "exito"
   );
 }
-
-
 /* =========================================================
    JSON MAESTRO: VALIDACIÓN, IMPORTACIÓN Y EXPORTACIÓN
    ========================================================= */
-
 function abrirSelectorMaestro() {
   const selector = $("archivoMaestroJson");
-
   if (selector) {
     selector.value = "";
     selector.click();
   }
 }
-
 function validarIdentificadoresUnicos(registros, etiqueta) {
   const ids = registros.map((registro) => registro.id);
-
   if (ids.some((id) => !id)) {
     throw new Error(
       `${etiqueta}: todos los registros deben tener identificador.`
     );
   }
-
   if (new Set(ids).size !== ids.length) {
     throw new Error(
       `${etiqueta}: existen identificadores duplicados.`
     );
   }
 }
-
 function normalizarCuotaSocio(datos, personasValidas) {
   if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
     throw new Error("Una cuota individual tiene formato incorrecto.");
   }
-
   const id = textoSeguro(datos.id);
   const personaId = textoSeguro(datos.personaId);
   const anio = Number(datos.anio);
   const monto = Number(datos.monto);
   const moneda = textoSeguro(datos.moneda || MONEDA_CUOTAS);
-
   if (!id.startsWith("CUO-")) {
     throw new Error("Una cuota individual tiene un ID CUO- inválido.");
   }
-
   if (!personasValidas.has(personaId)) {
     throw new Error(
       `La cuota ${id} hace referencia a una persona inexistente: ${personaId}.`
     );
   }
-
   if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
     throw new Error(`La cuota ${id} tiene un año inválido.`);
   }
-
   if (!Number.isFinite(monto) || monto <= 0 || monto > 10000000) {
     throw new Error(`La cuota ${id} tiene un importe inválido.`);
   }
-
   if (moneda !== MONEDA_CUOTAS) {
     throw new Error(`La cuota ${id} debe estar expresada en MXN.`);
   }
-
   return {
     id,
     personaId,
@@ -2046,12 +1654,10 @@ function normalizarCuotaSocio(datos, personasValidas) {
     actualizadoEn: textoSeguro(datos.actualizadoEn)
   };
 }
-
 function normalizarMovimientoPago(datos, personasValidas) {
   if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
     throw new Error("Un movimiento de pago tiene formato incorrecto.");
   }
-
   const id = textoSeguro(datos.id);
   const personaId = textoSeguro(datos.personaId);
   const anio = Number(datos.anio);
@@ -2059,36 +1665,29 @@ function normalizarMovimientoPago(datos, personasValidas) {
   const fecha = textoSeguro(datos.fecha);
   const formaPago = textoSeguro(datos.formaPago);
   const estado = textoSeguro(datos.estado);
-
   if (!id.startsWith("PAG-")) {
     throw new Error("Un movimiento tiene un ID PAG- inválido.");
   }
-
   if (!personasValidas.has(personaId)) {
     throw new Error(
       `El movimiento ${id} hace referencia a una persona inexistente: ${personaId}.`
     );
   }
-
   if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
     throw new Error(`El movimiento ${id} tiene un año inválido.`);
   }
-
   if (!Number.isFinite(importe) || importe <= 0 || importe > 10000000) {
     throw new Error(`El movimiento ${id} tiene un importe inválido.`);
   }
-
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) ||
       Number.isNaN(Date.parse(`${fecha}T00:00:00`))) {
     throw new Error(`El movimiento ${id} tiene una fecha inválida.`);
   }
-
   if (!formaPago || !estado) {
     throw new Error(
       `El movimiento ${id} debe incluir forma de pago y estado.`
     );
   }
-
   return {
     id,
     personaId,
@@ -2102,31 +1701,26 @@ function normalizarMovimientoPago(datos, personasValidas) {
     creadoEn: textoSeguro(datos.creadoEn)
   };
 }
-
 function validarMaestro(datos) {
   if (!datos || typeof datos !== "object" || Array.isArray(datos)) {
     throw new Error("El contenido JSON no es un objeto válido.");
   }
-
   if (datos.formato !== FORMATO_MAESTRO) {
     throw new Error(
       `Formato incorrecto. Se esperaba "${FORMATO_MAESTRO}".`
     );
   }
-
   if (datos.version_formato !== VERSION_FORMATO_MAESTRO) {
     throw new Error(
       "La versión del formato maestro no es compatible con este módulo."
     );
   }
-
   const colecciones = [
     "personas",
     "cuotas_anuales",
     "cuotas_socio_anuales",
     "movimientos_pago"
   ];
-
   for (const nombre of colecciones) {
     if (!Array.isArray(datos[nombre])) {
       throw new Error(
@@ -2134,7 +1728,6 @@ function validarMaestro(datos) {
       );
     }
   }
-
 if (datos.personas.some(
   (persona) =>
     !persona ||
@@ -2148,51 +1741,39 @@ if (datos.personas.some(
     "Todas las personas deben tener ID, nombres y apellidos."
   );
 }
-
 const personasValidadas = datos.personas.map(normalizarPersona);
-
-  validarIdentificadoresUnicos(personasValidadas, "Personas");
-
+ validarIdentificadoresUnicos(personasValidadas, "Personas");
   const personasValidas = new Set(
     personasValidadas.map((persona) => persona.id)
   );
-
   const cuotasAnualesValidadas =
     validarListaCuotas(datos.cuotas_anuales);
-
   const cuotasSocioValidadas = datos.cuotas_socio_anuales.map(
     (cuota) => normalizarCuotaSocio(cuota, personasValidas)
   );
-
   validarIdentificadoresUnicos(
     cuotasSocioValidadas,
     "Cuotas individuales"
   );
-
   const movimientosValidados = datos.movimientos_pago.map(
     (movimiento) => normalizarMovimientoPago(
       movimiento,
       personasValidas
     )
   );
-
   validarIdentificadoresUnicos(
     movimientosValidados,
     "Movimientos de pago"
   );
-
   const reglas = datos.reglas;
-
   if (!reglas || typeof reglas !== "object" || Array.isArray(reglas)) {
     throw new Error("El maestro no contiene reglas de cuotas válidas.");
   }
-
   const camposReglas = [
     "cuota_general_habilitada",
     "cuotas_por_categoria_habilitadas",
     "excepciones_individuales_habilitadas"
   ];
-
   for (const campo of camposReglas) {
     if (typeof reglas[campo] !== "boolean") {
       throw new Error(
@@ -2200,7 +1781,6 @@ const personasValidadas = datos.personas.map(normalizarPersona);
       );
     }
   }
-
   /*
    * Se devuelve un conjunto temporal validado.
    * Hasta aquí no se ha cambiado ningún dato en memoria.
@@ -2219,19 +1799,14 @@ const personasValidadas = datos.personas.map(normalizarPersona);
     }
   };
 }
-
 async function importarMaestroJSON(evento) {
   const archivo = evento.target.files?.[0];
-
   if (!archivo) return;
-
   try {
     const contenido = await archivo.text();
     const datos = JSON.parse(contenido);
-
     // Validar todas las colecciones antes de modificar el estado.
     const validado = validarMaestro(datos);
-
     const confirmar = window.confirm(
       "El archivo maestro pasó las validaciones.\n\n" +
       `Personas: ${validado.personas.length}\n` +
@@ -2242,28 +1817,22 @@ async function importarMaestroJSON(evento) {
       "Los cambios no exportados se perderán.\n\n" +
       "¿Deseas continuar?"
     );
-
     if (!confirmar) return;
-
     // Reemplazo atómico: todos los datos ya fueron validados.
     personas = validado.personas;
     cuotasAnuales = validado.cuotas_anuales;
     cuotasSocioAnuales = validado.cuotas_socio_anuales;
     movimientosPago = validado.movimientos_pago;
     reglasCuotas = validado.reglas;
-
     maestroImportado = true;
     maestroPendienteExportar = false;
     cuotasImportadas = true;
     cuotasPendientesExportar = false;
-
     cerrarFormulario();
     cerrarDetalle();
     limpiarFormularioCuota();
-
     renderizarTodo();
     renderizarCuotas();
-
     const estado = $("estadoMaestro");
     if (estado) {
       estado.textContent =
@@ -2272,7 +1841,6 @@ async function importarMaestroJSON(evento) {
         `${cuotasSocioAnuales.length} cuotas individuales y ` +
         `${movimientosPago.length} movimientos de pago.`;
     }
-
     mostrarMensaje(
       "JSON maestro importado y validado correctamente.",
       "exito"
@@ -2286,7 +1854,6 @@ async function importarMaestroJSON(evento) {
     evento.target.value = "";
   }
 }
-
 function exportarMaestroJSON() {
   try {
     // Validar también antes de generar el respaldo.
@@ -2304,9 +1871,7 @@ function exportarMaestroJSON() {
       movimientos_pago:
         movimientosPago.map((movimiento) => ({ ...movimiento }))
     };
-
     const validado = validarMaestro(documentoActual);
-
     const documento = {
       formato: FORMATO_MAESTRO,
       version_formato: VERSION_FORMATO_MAESTRO,
@@ -2319,24 +1884,19 @@ function exportarMaestroJSON() {
       cuotas_socio_anuales: validado.cuotas_socio_anuales,
       movimientos_pago: validado.movimientos_pago
     };
-
     descargarJSON(
       documento,
       `comunidad-helenica-maestro-${fechaLocalISO()}.json`
     );
-
     maestroPendienteExportar = false;
     cuotasPendientesExportar = false;
-
     const estado = $("estadoMaestro");
     if (estado) {
       estado.textContent =
         "Se generó el respaldo maestro. Verifica que el archivo " +
         "se haya guardado en tu carpeta privada.";
     }
-
     renderizarCuotas();
-
     mostrarMensaje(
       "Se generó el JSON maestro. Verifica que quedó guardado.",
       "exito"
@@ -2348,37 +1908,27 @@ function exportarMaestroJSON() {
     );
   }
 }
-
-
 /* =========================================================
    DESCARGA COMÚN DE ARCHIVOS JSON
    ========================================================= */
-
 function descargarJSON(documento, nombreArchivo) {
   const contenido = JSON.stringify(documento, null, 2);
-
   const archivo = new Blob(
     [contenido],
     { type: "application/json;charset=utf-8" }
   );
-
   const url = URL.createObjectURL(archivo);
   const enlace = document.createElement("a");
-
   enlace.href = url;
   enlace.download = nombreArchivo;
-
   document.body.appendChild(enlace);
   enlace.click();
   enlace.remove();
-
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-
 /* =========================================================
    HISTÓRICO DE CUOTAS Y PAGOS DE SOCIOS
    ========================================================= */
-
 function esSocioParaPagos(persona) {
   return persona &&
     (
@@ -2386,7 +1936,6 @@ function esSocioParaPagos(persona) {
       textoSeguro(persona.categoria) === "Socio"
     );
 }
-
 function obtenerSociosParaPagos() {
   return personas
     .filter(esSocioParaPagos)
@@ -2394,14 +1943,11 @@ function obtenerSociosParaPagos() {
       nombreCompleto(a).localeCompare(nombreCompleto(b), "es-MX")
     );
 }
-
 function prepararSelectSociosPagos() {
   const select = $("pagoPersonaId");
   if (!select) return;
-
   const seleccionado = select.value;
   const socios = obtenerSociosParaPagos();
-
   select.innerHTML =
     '<option value="">Selecciona un socio</option>' +
     socios.map(persona => `
@@ -2409,87 +1955,67 @@ function prepararSelectSociosPagos() {
         ${escaparHTML(nombreCompleto(persona))}
       </option>
     `).join("");
-
   if (socios.some(persona => persona.id === seleccionado)) {
     select.value = seleccionado;
   }
 }
-
 function prepararEjercicioConsultaPagos() {
   const anioActual = new Date().getFullYear();
-
   if ($("pagoAnio") && !$("pagoAnio").value) {
     $("pagoAnio").value = anioActual;
   }
-
   if ($("pagosAnioConsulta") && !$("pagosAnioConsulta").value) {
     $("pagosAnioConsulta").value = anioActual;
   }
-
   if ($("pagoFecha") && !$("pagoFecha").value) {
     $("pagoFecha").value = fechaLocalISO();
   }
 }
-
 function obtenerClaveCuotaSocio(personaId, anio) {
   return cuotasSocioAnuales.find(cuota =>
     cuota.personaId === personaId &&
     cuota.anio === Number(anio)
   ) || null;
 }
-
 function obtenerCuotaGeneralParaAnio(anio) {
   return obtenerCuotaPorAnio(Number(anio));
 }
-
 function actualizarCuotaSugerida() {
   const personaId = valorCampo("pagoPersonaId");
   const anio = Number(valorCampo("pagoAnio"));
-
   if (!personaId || !Number.isInteger(anio)) return;
-
   const cuotaIndividual = obtenerClaveCuotaSocio(personaId, anio);
-
   if (cuotaIndividual) {
     asignarValor("pagoCuotaMonto", cuotaIndividual.monto);
     return;
   }
-
   const cuotaGeneral = obtenerCuotaGeneralParaAnio(anio);
-
   if (cuotaGeneral) {
     asignarValor("pagoCuotaMonto", cuotaGeneral.monto);
   } else {
     asignarValor("pagoCuotaMonto", "");
   }
 }
-
 function validarDatosCuotaIndividual(personaId, anio, monto) {
   if (!obtenerPersonaPorId(personaId) ||
       !esSocioParaPagos(obtenerPersonaPorId(personaId))) {
     throw new Error("Selecciona una persona registrada como socio.");
   }
-
   if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
     throw new Error("El ejercicio debe ser un año entre 2000 y 2100.");
   }
-
   if (!Number.isFinite(monto) || monto <= 0 || monto > 10000000) {
     throw new Error("La cuota individual debe ser mayor que cero.");
   }
 }
-
 function asignarCuotaIndividual() {
   const personaId = valorCampo("pagoPersonaId");
   const anio = Number(valorCampo("pagoAnio"));
   const monto = Number(valorCampo("pagoCuotaMonto"));
-
   try {
     validarDatosCuotaIndividual(personaId, anio, monto);
-
     const existente = obtenerClaveCuotaSocio(personaId, anio);
     const persona = obtenerPersonaPorId(personaId);
-
     if (existente) {
       const confirmar = window.confirm(
         `Ya existe una cuota individual para ${nombreCompleto(persona)} ` +
@@ -2498,9 +2024,7 @@ function asignarCuotaIndividual() {
         "Esta operación cambia la cuota asignada, pero no borra los pagos. " +
         "¿Deseas continuar?"
       );
-
       if (!confirmar) return;
-
       existente.monto = Math.round((monto + Number.EPSILON) * 100) / 100;
       existente.actualizadoEn = new Date().toISOString();
     } else {
@@ -2514,11 +2038,9 @@ function asignarCuotaIndividual() {
         actualizadoEn: new Date().toISOString()
       });
     }
-
     historicoPagosPendienteExportar = true;
     renderizarHistoricoPagos();
     renderizarMovimientosPagos();
-
     mostrarMensaje(
       `Cuota individual registrada para el ejercicio ${anio}.`,
       "exito"
@@ -2527,7 +2049,6 @@ function asignarCuotaIndividual() {
     mostrarMensaje(error.message, "error");
   }
 }
-
 function obtenerPagosAplicados(personaId, anio) {
   return movimientosPago.filter(pago =>
     pago.personaId === personaId &&
@@ -2535,70 +2056,54 @@ function obtenerPagosAplicados(personaId, anio) {
     pago.estado === "Aplicado"
   );
 }
-
 function obtenerTotalPagado(personaId, anio) {
   return obtenerPagosAplicados(personaId, anio)
     .reduce((total, pago) => total + pago.importe, 0);
 }
-
 function redondearImporte(monto) {
   return Math.round((monto + Number.EPSILON) * 100) / 100;
 }
-
 function obtenerSaldo(montoCuota, totalPagado) {
   return redondearImporte(Math.max(0, montoCuota - totalPagado));
 }
-
 function obtenerEstadoCuota(montoCuota, totalPagado) {
   if (totalPagado <= 0) return "Pendiente";
   if (totalPagado < montoCuota) return "Pago parcial";
   return "Liquidada";
 }
-
-
 function registrarMovimientoPago(evento) {
   evento.preventDefault();
-
   const personaId = valorCampo("pagoPersonaId");
   const anio = Number(valorCampo("pagoAnio"));
   const montoCuota = Number(valorCampo("pagoCuotaMonto"));
   const importe = Number(valorCampo("pagoImporte"));
   const fecha = valorCampo("pagoFecha") || fechaLocalISO();
-
   try {
     // 1. Validar los datos de la cuota y del socio.
     validarDatosCuotaIndividual(personaId, anio, montoCuota);
-
     // 2. Validar el importe antes de modificar cualquier dato.
     if (!Number.isFinite(importe) || importe <= 0 || importe > 10000000) {
       throw new Error(
         "El importe del pago debe ser mayor que cero y no exceder $10,000,000."
       );
     }
-
     const importeValidado = redondearImporte(importe);
-
     if (importeValidado <= 0) {
       throw new Error(
         "El importe del pago debe ser mayor que cero después del redondeo."
       );
     }
-
     // 3. Validar que la fecha exista realmente en el calendario.
     const coincidenciaFecha = /^(\d{4})-(\d{2})-(\d{2})$/.exec(fecha);
-
     if (!coincidenciaFecha) {
       throw new Error("La fecha del pago no tiene un formato válido.");
     }
-
     const anioFecha = Number(coincidenciaFecha[1]);
     const mesFecha = Number(coincidenciaFecha[2]);
     const diaFecha = Number(coincidenciaFecha[3]);
-
     const esBisiesto =
       anioFecha % 4 === 0 &&
       (anioFecha % 100 !== 0 || anioFecha % 400 === 0);
-
     const diasPorMes = [
       31,
       esBisiesto ? 29 : 28,
@@ -2613,7 +2118,6 @@ function registrarMovimientoPago(evento) {
       30,
       31
     ];
-
     if (
       anioFecha < 1 ||
       mesFecha < 1 ||
@@ -2625,18 +2129,14 @@ function registrarMovimientoPago(evento) {
         "La fecha del pago no existe en el calendario. Verifica el día, mes y año."
       );
     }
-
     // 4. Consultar la cuota existente sin modificar los datos.
     const persona = obtenerPersonaPorId(personaId);
-
     if (!persona) {
       throw new Error("No se encontró al socio seleccionado.");
     }
-
     const cuotaExistente = obtenerClaveCuotaSocio(personaId, anio);
     let cuota = cuotaExistente;
     let nuevaCuota = null;
-
     if (!cuotaExistente) {
       const confirmar = window.confirm(
         `No existe una cuota individual asignada para ${nombreCompleto(persona)} ` +
@@ -2644,12 +2144,9 @@ function registrarMovimientoPago(evento) {
         `Se asignará una cuota de ${formatoMoneda(montoCuota)} ` +
         "y después se registrará el pago. ¿Deseas continuar?"
       );
-
       if (!confirmar) return;
-
       // Preparar la cuota, pero todavía no agregarla al histórico.
       const ahora = new Date().toISOString();
-
       nuevaCuota = {
         id: crearId().replace(/^PER-/, "CUO-"),
         personaId,
@@ -2659,7 +2156,6 @@ function registrarMovimientoPago(evento) {
         creadoEn: ahora,
         actualizadoEn: ahora
       };
-
       cuota = nuevaCuota;
     } else if (
       redondearImporte(cuotaExistente.monto) !==
@@ -2670,7 +2166,6 @@ function registrarMovimientoPago(evento) {
         "Usa «Asignar o actualizar cuota» si existe una autorización para cambiarla."
       );
     }
-
     // 5. Preparar el pago antes de modificar los arreglos.
     const nuevoPago = {
       id: crearId().replace(/^PER-/, "PAG-"),
@@ -2684,26 +2179,20 @@ function registrarMovimientoPago(evento) {
       estado: "Aplicado",
       creadoEn: new Date().toISOString()
     };
-
     // 6. Aplicar los cambios solo después de validar todo.
     if (nuevaCuota) {
       cuotasSocioAnuales.push(nuevaCuota);
     }
-
     movimientosPago.push(nuevoPago);
     historicoPagosPendienteExportar = true;
-
     // 7. Actualizar el histórico y calcular el saldo.
     const totalPagado = obtenerTotalPagado(personaId, anio);
     const saldo = obtenerSaldo(cuota.monto, totalPagado);
-
     renderizarHistoricoPagos();
     renderizarMovimientosPagos();
-
     asignarValor("pagoImporte", "");
     asignarValor("pagoReferencia", "");
     asignarValor("pagoObservaciones", "");
-
     mostrarMensaje(
       `Pago registrado. Total pagado: ${formatoMoneda(totalPagado)}. ` +
       `Saldo pendiente: ${formatoMoneda(saldo)}.`,
@@ -2713,14 +2202,11 @@ function registrarMovimientoPago(evento) {
     mostrarMensaje(error.message, "error");
   }
 }
-
 function obtenerResumenHistorico() {
   const resumenPorSocio = new Map();
-
   cuotasSocioAnuales.forEach(cuota => {
     const persona = obtenerPersonaPorId(cuota.personaId);
     if (!persona) return;
-
     if (!resumenPorSocio.has(cuota.personaId)) {
       resumenPorSocio.set(cuota.personaId, {
         persona,
@@ -2730,16 +2216,13 @@ function obtenerResumenHistorico() {
         totalSaldo: 0
       });
     }
-
     const resumen = resumenPorSocio.get(cuota.personaId);
     const pagado = obtenerTotalPagado(cuota.personaId, cuota.anio);
-
     resumen.ejercicios.push(cuota.anio);
     resumen.totalCuotas += cuota.monto;
     resumen.totalPagado += pagado;
     resumen.totalSaldo += obtenerSaldo(cuota.monto, pagado);
   });
-
   return [...resumenPorSocio.values()]
     .map(resumen => ({
       ...resumen,
@@ -2756,33 +2239,25 @@ function obtenerResumenHistorico() {
       )
     );
 }
-
-
 function renderizarHistoricoPagos() {
   const tabla = $("tablaHistoricoPagos");
   const encabezado = $("encabezadoHistoricoPagos");
-
   if (!tabla || !encabezado) return;
-
   const vista = valorCampo("pagosVista") || "anio";
   const anio = Number(valorCampo("pagosAnioConsulta"));
   const busqueda = valorCampo("buscarSocioPagos")
     .toLocaleLowerCase("es-MX");
-
   const coincideBusqueda = (persona) =>
     nombreCompleto(persona)
       .toLocaleLowerCase("es-MX")
       .includes(busqueda);
-
   const dinero = (importe) => formatoMoneda(importe);
   const guion = "—";
-
   let filas = [];
   let totalCuotas = 0;
   let totalPagado = 0;
   let totalSaldo = 0;
   let sociosConRegistro = 0;
-
   /*
    * VISTA ANUAL
    * Incluye socios con cuota individual o movimientos de pago
@@ -2806,7 +2281,6 @@ function renderizarHistoricoPagos() {
       $("filtroAnioPagos").hidden = false;
       return;
     }
-
     encabezado.innerHTML = `
       <tr>
         <th>Socio</th>
@@ -2816,45 +2290,36 @@ function renderizarHistoricoPagos() {
         <th>Saldo</th>
         <th>Estado</th>
       </tr>`;
-
     const claves = new Set();
-
     cuotasSocioAnuales
       .filter(cuota => cuota.anio === anio)
       .forEach(cuota => claves.add(cuota.personaId));
-
     movimientosPago
       .filter(pago =>
         pago.anio === anio &&
         pago.estado === "Aplicado"
       )
       .forEach(pago => claves.add(pago.personaId));
-
     const socios = [...claves]
       .map(obtenerPersonaPorId)
       .filter(persona => persona && coincideBusqueda(persona))
       .sort((a, b) =>
         nombreCompleto(a).localeCompare(nombreCompleto(b), "es-MX")
       );
-
     filas = socios.map(persona => {
       const cuota = obtenerClaveCuotaSocio(persona.id, anio);
       const pagado = obtenerTotalPagado(persona.id, anio);
       const saldo = cuota
         ? obtenerSaldo(cuota.monto, pagado)
         : null;
-
       if (cuota) {
         totalCuotas += cuota.monto;
         totalSaldo += saldo;
       }
-
       totalPagado += pagado;
-
       const estado = cuota
         ? obtenerEstadoCuota(cuota.monto, pagado)
         : "Sin cuota asignada";
-
       return `
         <tr>
           <td>${escaparHTML(nombreCompleto(persona))}</td>
@@ -2865,13 +2330,10 @@ function renderizarHistoricoPagos() {
           <td>${escaparHTML(estado)}</td>
         </tr>`;
     });
-
     sociosConRegistro = socios.length;
-
     $("resultadoHistoricoPagos").textContent =
       `Ejercicio ${anio}: ${socios.length} socio(s) con cuota o pago registrado. ` +
       "Un guion en la cuota indica que no existe una cuota individual registrada.";
-
   } else {
     /*
      * VISTA ACUMULADA
@@ -2888,19 +2350,16 @@ function renderizarHistoricoPagos() {
         ejercicio <= 2100
       )
       .sort((a, b) => a - b);
-
     const idsSocios = new Set([
       ...cuotasSocioAnuales.map(cuota => cuota.personaId),
       ...movimientosPago.map(pago => pago.personaId)
     ]);
-
     const socios = [...idsSocios]
       .map(obtenerPersonaPorId)
       .filter(persona => persona && coincideBusqueda(persona))
       .sort((a, b) =>
         nombreCompleto(a).localeCompare(nombreCompleto(b), "es-MX")
       );
-
     encabezado.innerHTML = `
       <tr>
         <th rowspan="2">Socio</th>
@@ -2919,48 +2378,38 @@ function renderizarHistoricoPagos() {
         <th>Pagado</th>
         <th>Saldo</th>
       </tr>`;
-
     filas = socios.map(persona => {
       let cuotasSocio = 0;
       let pagosSocio = 0;
       let saldoSocio = 0;
-
       const celdasAnuales = anios.map(ejercicio => {
         const cuota = obtenerClaveCuotaSocio(
           persona.id,
           ejercicio
         );
-
         const pagado = obtenerTotalPagado(
           persona.id,
           ejercicio
         );
-
         const saldo = cuota
           ? obtenerSaldo(cuota.monto, pagado)
           : null;
-
         if (cuota) {
           cuotasSocio += cuota.monto;
           saldoSocio += saldo;
         }
-
         pagosSocio += pagado;
-
         return `
           <td>${cuota ? dinero(cuota.monto) : guion}</td>
           <td>${dinero(pagado)}</td>
           <td>${cuota ? dinero(saldo) : guion}</td>`;
       }).join("");
-
       cuotasSocio = redondearImporte(cuotasSocio);
       pagosSocio = redondearImporte(pagosSocio);
       saldoSocio = redondearImporte(saldoSocio);
-
       totalCuotas += cuotasSocio;
       totalPagado += pagosSocio;
       totalSaldo += saldoSocio;
-
       return `
         <tr>
           <td>${escaparHTML(nombreCompleto(persona))}</td>
@@ -2970,15 +2419,12 @@ function renderizarHistoricoPagos() {
           <td>${dinero(saldoSocio)}</td>
         </tr>`;
     });
-
     sociosConRegistro = socios.length;
-
     $("resultadoHistoricoPagos").textContent = anios.length
       ? `Histórico acumulado: ${anios.length} ejercicio(s) con registros. ` +
         "Los guiones indican que no hay una cuota individual registrada para ese año."
       : "Todavía no existen cuotas ni movimientos de pago registrados.";
   }
-
   tabla.innerHTML = filas.length
     ? filas.join("")
     : `<tr>
@@ -2987,39 +2433,30 @@ function renderizarHistoricoPagos() {
           No hay cuotas ni pagos para los filtros seleccionados.
         </td>
       </tr>`;
-
   $("filtroAnioPagos").hidden = vista !== "anio";
-
   $("pagosTotalCuotas").textContent = dinero(
     redondearImporte(totalCuotas)
   );
-
   $("pagosTotalPagado").textContent = dinero(
     redondearImporte(totalPagado)
   );
-
   $("pagosTotalSaldo").textContent = dinero(
     redondearImporte(totalSaldo)
   );
-
   $("pagosTotalSocios").textContent = String(sociosConRegistro);
 }
-
 function renderizarMovimientosPagos() {
   const tabla = $("tablaMovimientosPagos");
   if (!tabla) return;
-
   const ordenados = [...movimientosPago].sort((a, b) =>
     b.fecha.localeCompare(a.fecha)
   );
-
   tabla.innerHTML = ordenados.length
     ? ordenados.map(pago => {
         const persona = obtenerPersonaPorId(pago.personaId);
         const nombre = persona
           ? nombreCompleto(persona)
           : "Socio no encontrado";
-
         return `
           <tr>
             <td>${escaparHTML(pago.fecha)}</td>
@@ -3047,39 +2484,29 @@ function renderizarMovimientosPagos() {
         No hay movimientos registrados.
       </td></tr>`;
 }
-
 function manejarAccionPago(evento) {
   const boton = evento.target.closest("button[data-accion]");
   if (!boton) return;
-
   if (boton.dataset.accion !== "cancelar-pago") return;
-
   const pago = movimientosPago.find(item => item.id === boton.dataset.id);
   if (!pago || pago.estado !== "Aplicado") return;
-
   const confirmar = window.confirm(
     `Se cancelará el pago de ${formatoMoneda(pago.importe)} ` +
     `del ejercicio ${pago.anio}.\n\n` +
     "El movimiento se conservará en el histórico, pero dejará de contar " +
     "como pago aplicado. ¿Deseas continuar?"
   );
-
   if (!confirmar) return;
-
   pago.estado = "Cancelado";
   pago.canceladoEn = new Date().toISOString();
-
   historicoPagosPendienteExportar = true;
-
   renderizarHistoricoPagos();
   renderizarMovimientosPagos();
-
   mostrarMensaje(
     "Movimiento cancelado. El registro se conservó en el histórico.",
     "aviso"
   );
 }
-
 function exportarHistoricoPagos() {
   const documento = {
     formato: FORMATO_HISTORICO_PAGOS,
@@ -3090,26 +2517,20 @@ function exportarHistoricoPagos() {
     cuotas_socio_anuales: cuotasSocioAnuales,
     movimientos_pago: movimientosPago
   };
-
   descargarJSON(
     documento,
     `historico-pagos-socios-${fechaLocalISO()}.json`
   );
-
   historicoPagosPendienteExportar = false;
-
   mostrarMensaje(
     "Se generó el respaldo del histórico. Verifica que el archivo se haya guardado.",
     "exito"
   );
 }
-
 function importarHistoricoPagos(evento) {
   const archivo = evento.target.files?.[0];
   if (!archivo) return;
-
   const lector = new FileReader();
-
   lector.onload = () => {
     try {
       const documento = JSON.parse(lector.result);
@@ -3122,7 +2543,6 @@ function importarHistoricoPagos(evento) {
           "El archivo no corresponde a este formato de histórico de pagos."
         );
       }
-
       if (
         !Array.isArray(documento.cuotas_socio_anuales) ||
         !Array.isArray(documento.movimientos_pago)
@@ -3131,87 +2551,69 @@ function importarHistoricoPagos(evento) {
           "El archivo debe contener cuotas_socio_anuales y movimientos_pago."
         );
       }
-
       const cuotasValidadas = documento.cuotas_socio_anuales.map(cuota => {
         const persona = obtenerPersonaPorId(cuota.personaId);
         const anio = Number(cuota.anio);
         const monto = Number(cuota.monto);
-
         if (!persona || !esSocioParaPagos(persona)) {
           throw new Error(
             `No se encontró un socio válido para la cuota ${cuota.id || ""}.`
           );
         }
-
         if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
           throw new Error("Se encontró un ejercicio inválido en las cuotas.");
         }
-
         if (!Number.isFinite(monto) || monto <= 0 || monto > 10000000) {
           throw new Error("Se encontró un importe de cuota inválido.");
         }
-
         if (cuota.moneda !== MONEDA_CUOTAS) {
           throw new Error("Todas las cuotas deben estar expresadas en MXN.");
         }
-
         return {
           ...cuota,
           anio,
           monto: redondearImporte(monto)
         };
       });
-
       const clavesCuotas = cuotasValidadas.map(
         cuota => `${cuota.personaId}|${cuota.anio}`
       );
-
       if (new Set(clavesCuotas).size !== clavesCuotas.length) {
         throw new Error(
           "El archivo contiene cuotas duplicadas para un mismo socio y ejercicio."
         );
       }
-
       const movimientosValidados = documento.movimientos_pago.map(pago => {
         const persona = obtenerPersonaPorId(pago.personaId);
         const anio = Number(pago.anio);
         const importe = Number(pago.importe);
-
         if (!persona || !esSocioParaPagos(persona)) {
           throw new Error(
             `No se encontró un socio válido para el pago ${pago.id || ""}.`
           );
         }
-
         if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) {
           throw new Error("Se encontró un ejercicio inválido en los pagos.");
         }
-
         if (!Number.isFinite(importe) || importe <= 0 || importe > 10000000) {
           throw new Error("Se encontró un importe de pago inválido.");
         }
-
         if (!/^\d{4}-\d{2}-\d{2}$/.test(textoSeguro(pago.fecha))) {
           throw new Error("Se encontró una fecha inválida en los pagos.");
         }
-
         if (!["Aplicado", "Cancelado"].includes(pago.estado)) {
           throw new Error("Se encontró un estado de pago inválido.");
         }
-
         return {
           ...pago,
           anio,
           importe: redondearImporte(importe)
         };
       });
-
       const idsPagos = movimientosValidados.map(pago => pago.id);
-
       if (new Set(idsPagos).size !== idsPagos.length) {
         throw new Error("El archivo contiene identificadores de pago duplicados.");
       }
-
       const confirmar = window.confirm(
         `El archivo contiene ${cuotasValidadas.length} cuota(s) individual(es) ` +
         `y ${movimientosValidados.length} movimiento(s).\n\n` +
@@ -3219,17 +2621,13 @@ function importarHistoricoPagos(evento) {
         "No modificará el padrón ni la configuración general de cuotas.\n\n" +
         "¿Deseas continuar?"
       );
-
       if (!confirmar) return;
-
       cuotasSocioAnuales = cuotasValidadas;
       movimientosPago = movimientosValidados;
       historicoPagosImportado = true;
       historicoPagosPendienteExportar = false;
-
       renderizarHistoricoPagos();
       renderizarMovimientosPagos();
-
       mostrarMensaje(
         "Histórico de cuotas y pagos importado correctamente.",
         "exito"
@@ -3243,11 +2641,9 @@ function importarHistoricoPagos(evento) {
       evento.target.value = "";
     }
   };
-
   lector.onerror = () => {
     mostrarMensaje("No se pudo leer el archivo JSON.", "error");
     evento.target.value = "";
   };
-
   lector.readAsText(archivo, "UTF-8");
 }
