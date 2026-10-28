@@ -344,13 +344,15 @@
   display: none !important;
 }
 /* Resumen compacto: menos espacio por indicador */
+/* Resumen dividido en dos bloques */
 .resumen {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 7px;
   margin-bottom: 12px;
 }
 
+/* Tarjetas compactas */
 .resumen .tarjeta {
   display: flex;
   flex-direction: row;
@@ -363,12 +365,25 @@
   min-width: 0;
 }
 
+/* Indicadores normales: primer renglón */
+.resumen .tarjeta:not(.resumen-dinero) {
+  grid-row: 1;
+}
+
+/* Indicadores monetarios: segundo renglón */
+.resumen .tarjeta.resumen-dinero {
+  grid-row: 2;
+  grid-column: span 2;
+}
+
+/* Etiquetas */
 .resumen .etiqueta {
   font-size: 12px;
   line-height: 1.25;
   margin: 0;
 }
 
+/* Cantidades */
 .resumen .valor {
   font-size: 18px;
   line-height: 1.2;
@@ -378,6 +393,25 @@
   white-space: nowrap;
 }
 
+/* Pantallas pequeñas */
+@media (max-width: 600px) {
+  .resumen {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .resumen .tarjeta {
+    padding: 7px 8px;
+  }
+
+  .resumen .etiqueta {
+    font-size: 11px;
+  }
+
+  .resumen .valor {
+    font-size: 16px;
+  }
+}
 /* Ajustes para pantallas pequeñas */
 @media (max-width: 600px) {
   .resumen {
