@@ -1782,6 +1782,10 @@ async function importarMaestroJSON(evento) {
     limpiarFormularioCuota();
     renderizarTodo();
     renderizarCuotas();
+    actualizarEstadoPadron();
+    prepararSelectSociosPagos();
+    renderizarHistoricoPagos();
+    renderizarMovimientosPagos();
     const estado = $("estadoMaestro");
     if (estado) {
       estado.textContent =
