@@ -44,15 +44,13 @@ let cuotasPendientesExportar = true;
 
 const FORMATO_MAESTRO = "comunidad-helenica-maestro";
 const VERSION_FORMATO_MAESTRO = 1;
-const FORMATO_HISTORICO_PAGOS =
-  "comunidad-helenica-historico-pagos";
-let cuotasSocioAnuales = [];
-let movimientosPago = [];
+
 let reglasCuotas = {
   cuota_general_habilitada: true,
   cuotas_por_categoria_habilitadas: false,
   excepciones_individuales_habilitadas: false
 };
+
 let maestroImportado = false;
 let maestroPendienteExportar = true;
 const $ = (id) => document.getElementById(id);
