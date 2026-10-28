@@ -880,7 +880,6 @@ function construirPadron() {
   padron = resultado;
 }
 
-
 function construirMesas() {
   const mapa = new Map();
 
@@ -918,6 +917,12 @@ function construirMesas() {
 
   mesas = [...mapa.values()].sort((a, b) => a.numero - b.numero);
 }
+
+function mesaValida(r) {
+  const m = mesaNumero(r);
+  return Number.isInteger(m) && m >= 1;
+}
+
 function crearTarjeta(etiqueta, valor) {
   return `<div class="tarjeta">
     <span class="etiqueta">${escapar(etiqueta)}</span>
@@ -932,10 +937,7 @@ function renderizarResumen() {
   const asientos = reservaciones.reduce((s, r) => s + totalAsientos(r), 0);
   const pagado = reservaciones.reduce((s, r) => s + numero(r.pagado_excel), 0);
   const saldo = reservaciones.reduce((s, r) => s + numero(r.debe_excel), 0);
-  const sinMesa = reservaciones.filter(r => {
-    const m = mesaNumero(r);
-    return m === null || m < 1 || m > 10;
-  }).length;
+  const sinMesa = reservaciones.filter(r => !mesaValida(r)).length;
 
   $("resumen").innerHTML =
     crearTarjeta("Reservaciones", grupos) +
@@ -946,7 +948,6 @@ function renderizarResumen() {
     crearTarjeta("Saldo registrado", dinero(saldo)) +
     crearTarjeta("Reservaciones sin mesa", sinMesa);
 }
-
 function renderizarMesas() {
   $("tablaMesas").innerHTML = mesas.map(m => {
     const disponibles = capacidadMesa - m.total;
@@ -985,19 +986,27 @@ function renderizarPadron() {
 
   const filtrados = padron.filter(p => {
     const coincideTexto = !buscar ||
-      `${p.id} ${p.nombre} ${p.asistentes} ${p.mesa ?? ""}`.toLowerCase().includes(buscar);
+      `${p.id} ${p.nombre} ${p.asistentes} ${p.mesa ?? ""}`
+        .toLowerCase().includes(buscar);
 
     const coincideTipo = !tipo || p.tipo === tipo;
 
     const coincideMesa = !mesaFiltro ||
       (mesaFiltro === "sin-mesa"
-        ? p.mesa === null || p.mesa < 1 || p.mesa > 10
+        ? !Number.isInteger(p.mesa) || p.mesa < 1
         : String(p.mesa) === mesaFiltro);
 
     let coincidePago = true;
-    if (pagoFiltro === "pagado") coincidePago = p.clasePago === "pagado";
-    if (pagoFiltro === "pendiente") coincidePago = p.clasePago === "pendiente";
-    if (pagoFiltro === "sin-pago") coincidePago = p.clasePago === "sin-pago";
+
+    if (pagoFiltro === "pagado") {
+      coincidePago = p.clasePago === "pagado";
+    }
+    if (pagoFiltro === "pendiente") {
+      coincidePago = p.clasePago === "pendiente";
+    }
+    if (pagoFiltro === "sin-pago") {
+      coincidePago = p.clasePago === "sin-pago";
+    }
 
     return coincideTexto && coincideTipo && coincideMesa && coincidePago;
   });
@@ -1011,16 +1020,24 @@ function renderizarPadron() {
         <td class="numero">${p.adultos}</td>
         <td class="numero">${p.ninos}</td>
         <td class="numero">${p.total}</td>
-        <td>${p.mesa ? "Mesa " + p.mesa : "Sin mesa"}</td>
+        <td>${Number.isInteger(p.mesa) && p.mesa >= 1
+          ? "Mesa " + p.mesa
+          : "Sin mesa"}</td>
         <td><span class="badge ${p.clasePago}">${escapar(p.pago)}</span></td>
-        <td class="no-imprimir"><button type="button" class="secundario btn-editar-reservacion" data-id="${escapar(p.id)}">Editar</button></td>
+        <td class="no-imprimir">
+          <button type="button"
+            class="secundario btn-editar-reservacion"
+            data-id="${escapar(p.id)}">Editar</button>
+        </td>
       </tr>`).join("")
-    : `<tr><td colspan="10" class="vacio">No hay resultados para estos filtros.</td></tr>`;
+    : `<tr><td colspan="10" class="vacio">
+        No hay resultados para estos filtros.
+      </td></tr>`;
 
   $("totalesPadron").textContent =
-    `Mostrando ${filtrados.length} de ${padron.length} reservaciones. Si el JSON no contiene nombres individuales, se indicará en la columna de asistentes.`;
+    `Mostrando ${filtrados.length} de ${padron.length} reservaciones. ` +
+    `Si el JSON no contiene nombres individuales, se indicará en la columna de asistentes.`;
 }
-
 function renderizarGrupos() {
   const buscar = $("buscarGrupo").value.trim().toLowerCase();
 
@@ -1084,10 +1101,7 @@ function renderizarGrupos() {
 }
 
 function renderizarSinMesa() {
-  const lista = reservaciones.filter(r => {
-    const m = mesaNumero(r);
-    return m === null || m < 1 || m > 10;
-  });
+  const lista = reservaciones.filter(r => !mesaValida(r));
 
   $("tablaSinMesa").innerHTML = lista.length
     ? lista.map(r => `<tr>
@@ -1096,15 +1110,19 @@ function renderizarSinMesa() {
         <td class="numero">${adultos(r)}</td>
         <td class="numero">${ninos(r)}</td>
         <td class="numero">${totalAsientos(r)}</td>
-        <td><span class="badge ${clasePago(r)}">${escapar(etiquetaPago(r)[0])}</span></td>
+        <td><span class="badge ${clasePago(r)}">
+          ${escapar(etiquetaPago(r)[0])}
+        </span></td>
         <td class="no-imprimir">
-          <button type="button" class="secundario btn-editar-reservacion"
+          <button type="button"
+            class="secundario btn-editar-reservacion"
             data-id="${escapar(referencia(r))}">Asignar mesa</button>
         </td>
       </tr>`).join("")
-    : `<tr><td colspan="7" class="vacio">Todas las reservaciones tienen mesa asignada.</td></tr>`;
+    : `<tr><td colspan="7" class="vacio">
+        Todas las reservaciones tienen mesa asignada.
+      </td></tr>`;
 }
-
 function actualizarFiltroMesas() {
   const select = $("filtroMesa");
   const valorAnterior = select.value;
@@ -1112,13 +1130,14 @@ function actualizarFiltroMesas() {
   select.innerHTML =
     '<option value="">Todas las mesas</option>' +
     '<option value="sin-mesa">Sin mesa</option>' +
-    mesas.map(m => `<option value="${m.numero}">Mesa ${m.numero}</option>`).join("");
+    mesas.map(m =>
+      `<option value="${m.numero}">Mesa ${m.numero}</option>`
+    ).join("");
 
   if ([...select.options].some(o => o.value === valorAnterior)) {
     select.value = valorAnterior;
   }
 }
-
 function renderizarTodo() {
   construirPadron();
   construirMesas();
@@ -1215,6 +1234,7 @@ function iniciarEdicion(id) {
 
   $("formEditarReservacion").reset();
   $("estadoEdicion").hidden = true;
+
   $("editId").value = referencia(r);
   $("referenciaEdicion").textContent = "Referencia: " + referencia(r);
   $("editNombre").value = nombreGrupo(r);
@@ -1222,8 +1242,28 @@ function iniciarEdicion(id) {
   $("editAdultos").value = adultos(r);
   $("editNinos").value = ninos(r);
 
-  const m = mesaNumero(r);
-  $("editMesa").value = m && m >= 1 && m <= 10 ? String(m) : "";
+  const mesaActual = mesaNumero(r);
+  const mesasRegistradas = reservaciones
+    .map(mesaNumero)
+    .filter(m => Number.isInteger(m) && m >= 1);
+
+  const mayorMesa = Math.max(10, ...mesasRegistradas);
+  const limiteSelector = Math.max(
+    mayorMesa + 1,
+    Number.isInteger(mesaActual) && mesaActual >= 1 ? mesaActual : 0
+  );
+
+  const selectMesa = $("editMesa");
+  selectMesa.innerHTML =
+    '<option value="">Sin mesa asignada</option>' +
+    Array.from({ length: limiteSelector }, (_, i) => i + 1)
+      .map(m => `<option value="${m}">Mesa ${m}</option>`)
+      .join("");
+
+  selectMesa.value =
+    Number.isInteger(mesaActual) && mesaActual >= 1
+      ? String(mesaActual)
+      : "";
 
   $("editBeneficio").value = texto(r.beneficio_excel);
   $("editEstadoPago").value = estatusPago(r);
@@ -1237,9 +1277,11 @@ function iniciarEdicion(id) {
   $("editNotas").value = texto(r.notas ?? r.notas_excel);
 
   $("editorReservacion").hidden = false;
-  $("editorReservacion").scrollIntoView({ behavior: "smooth", block: "start" });
+  $("editorReservacion").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
 }
-
 function cancelarEdicion() {
   $("formEditarReservacion").reset();
   $("editorReservacion").hidden = true;
@@ -1254,17 +1296,24 @@ function guardarEdicion(evento) {
     const id = $("editId").value;
     const indice = reservaciones.findIndex(r => referencia(r) === id);
 
-    if (indice < 0) throw new Error("La reservación ya no existe en la lista.");
+    if (indice < 0) {
+      throw new Error("La reservación ya no existe en la lista.");
+    }
 
     const original = reservaciones[indice];
     const nombre = $("editNombre").value.trim();
 
-    if (!nombre) throw new Error("El nombre del grupo es obligatorio.");
+    if (!nombre) {
+      throw new Error("El nombre del grupo es obligatorio.");
+    }
 
-    const adultosNuevo = valorCampoNumerico("editAdultos", "Adultos", false);
-    const ninosNuevo = valorCampoNumerico("editNinos", "Niños", false);
+    const adultosNuevo =
+      valorCampoNumerico("editAdultos", "Adultos", false);
+    const ninosNuevo =
+      valorCampoNumerico("editNinos", "Niños", false);
 
-    if (!Number.isInteger(adultosNuevo) || !Number.isInteger(ninosNuevo)) {
+    if (!Number.isInteger(adultosNuevo) ||
+        !Number.isInteger(ninosNuevo)) {
       throw new Error("Adultos y niños deben ser números enteros.");
     }
 
@@ -1272,8 +1321,8 @@ function guardarEdicion(evento) {
     const mesaNueva = mesaValor === "" ? null : Number(mesaValor);
 
     if (mesaNueva !== null &&
-        (!Number.isInteger(mesaNueva) || mesaNueva < 1 || mesaNueva > 10)) {
-      throw new Error("La mesa debe ser un número entre 1 y 10.");
+        (!Number.isInteger(mesaNueva) || mesaNueva < 1)) {
+      throw new Error("Selecciona una mesa válida o deja Sin mesa asignada.");
     }
 
     const actualizado = {
@@ -1299,7 +1348,6 @@ function guardarEdicion(evento) {
       notas_excel: original.notas_excel ?? null
     };
 
-    // Conserva cualquier otro campo original que no se esté editando.
     reservaciones[indice] = actualizado;
     documentoActual.reservaciones = reservaciones;
 
@@ -1316,7 +1364,6 @@ function guardarEdicion(evento) {
     $("estadoEdicion").textContent = error.message;
   }
 }
-
 function descargarArchivo(nombre, contenido, tipo) {
   const blob = new Blob([contenido], { type: tipo });
   const url = URL.createObjectURL(blob);
@@ -1497,10 +1544,8 @@ function crearReporteMesas() {
     </section>`;
   }).join("");
 
-  const sinMesa = reservaciones.filter(r => {
-    const m = mesaNumero(r);
-    return m === null || m < 1 || m > 10;
-  }).sort((a, b) => nombreGrupo(a).localeCompare(nombreGrupo(b), "es", {sensitivity:"base"}));
+  const sinMesa = reservaciones.filter(r => !mesaValida(r))
+    .sort((a, b) => nombreGrupo(a).localeCompare(nombreGrupo(b), "es", {sensitivity:"base"}));
 
   const filasSinMesa = sinMesa.map(r => `<tr>
     <td>${escapar(nombreGrupo(r))}</td>
