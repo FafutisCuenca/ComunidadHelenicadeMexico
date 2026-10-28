@@ -874,5 +874,48 @@
     document.getElementById("anioActual").textContent =
       new Date().getFullYear();
   </script>
+
+  
+const botonFinanzas = document.getElementById("botonFinanzas");
+const opcionesFinanzas = document.getElementById("opcionesFinanzas");
+
+botonFinanzas.addEventListener("click", () => {
+  const abierto =
+    botonFinanzas.getAttribute("aria-expanded") === "true";
+
+  botonFinanzas.setAttribute("aria-expanded", String(!abierto));
+  opcionesFinanzas.classList.toggle("abierto", !abierto);
+});
+
+document.addEventListener("keydown", (evento) => {
+  if (evento.key === "Escape") {
+    opcionesFinanzas.classList.remove("abierto");
+    botonFinanzas.setAttribute("aria-expanded", "false");
+    botonFinanzas.focus();
+  }
+});
+
+document.addEventListener("click", (evento) => {
+  if (!evento.target.closest(".menu-finanzas")) {
+    opcionesFinanzas.classList.remove("abierto");
+    botonFinanzas.setAttribute("aria-expanded", "false");
+  }
+});
+
+const seccionActual =
+  new URLSearchParams(window.location.search).get("seccion");
+
+document.querySelectorAll("#opcionesFinanzas a").forEach((enlace) => {
+  const seccionEnlace =
+    new URL(enlace.href).searchParams.get("seccion");
+
+  if (seccionActual && seccionEnlace === seccionActual) {
+    enlace.setAttribute("aria-current", "page");
+  }
+});
+
+document.getElementById("anioActual").textContent =
+  new Date().getFullYear();
+
 </body>
 </html>
