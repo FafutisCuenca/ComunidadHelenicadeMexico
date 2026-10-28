@@ -57,6 +57,50 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
    </div>
   </header>
   <main>
+
+<section class="panel carga-inicial" id="pantallaCargaInicial">
+  <div class="panel-titulo">
+    <div>
+      <h3>Inicio de la sesión financiera</h3>
+      <p>
+        Selecciona el archivo JSON de Finanzas que utilizarás en esta sesión.
+        Los formularios y las operaciones estarán disponibles después de cargarlo
+        y validar su contenido.
+      </p>
+    </div>
+  </div>
+
+  <div class="contenido">
+    <div class="campo">
+      <label for="archivoTrabajoInicial">Archivo financiero de trabajo</label>
+      <input
+        accept=".json,application/json"
+        id="archivoTrabajoInicial"
+        type="file"
+        required
+      />
+      <span class="ayuda">
+        Selecciona tu respaldo financiero, por ejemplo:
+        finanzas_oxi_2026.json.
+      </span>
+    </div>
+
+    <div class="botones-form">
+      <button class="primario" id="cargarTrabajoInicial" type="button">
+        Cargar archivo y comenzar
+      </button>
+    </div>
+
+    <p
+      aria-live="polite"
+      class="aviso-estado"
+      id="estadoCargaInicial"
+    >
+      Esperando la selección del archivo financiero.
+    </p>
+  </div>
+</section>
+
    <div class="barra">
     <div>
      <h2>
