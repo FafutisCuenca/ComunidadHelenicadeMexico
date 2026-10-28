@@ -1,0 +1,981 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Comunidad Helénica de México | Portal Administrativo</title>
+
+  <meta
+    name="description"
+    content="Portal administrativo de la Comunidad Helénica de México. Acceso a reservaciones, proveedores, presupuesto y control financiero de eventos."
+  >
+
+  <meta name="theme-color" content="#12345a">
+
+  <style>
+    :root {
+      --azul: #12345a;
+      --azul-claro: #1d5687;
+      --azul-suave: #edf4fa;
+      --dorado: #c5a15a;
+      --fondo: #f4f7fb;
+      --texto: #263548;
+      --gris: #697789;
+      --borde: #dce4ed;
+      --blanco: #ffffff;
+      --radio: 16px;
+      --sombra: 0 8px 26px rgba(18, 52, 90, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--texto);
+      background: var(--fondo);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    .barra-superior {
+      height: 7px;
+      background: var(--dorado);
+    }
+
+    header {
+      color: var(--blanco);
+      background:
+        radial-gradient(
+          circle at 90% 10%,
+          rgba(255, 255, 255, 0.10),
+          transparent 30%
+        ),
+        linear-gradient(125deg, #102b4b, #1d5687);
+      padding: 38px 24px 46px;
+    }
+
+    .contenedor {
+      width: min(1160px, 100%);
+      margin: 0 auto;
+    }
+
+    .encabezado-derecha {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      width: 100%;
+    }
+
+    .identidad {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .logo-comunidad {
+      width: 124px;
+      height: 124px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid rgba(218, 185, 120, 0.9);
+      border-radius: 18px;
+      box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.28),
+        0 0 0 3px rgba(218, 185, 120, 0.16),
+        0 0 18px rgba(218, 185, 120, 0.22);
+      overflow: hidden;
+    }
+
+    .logo-comunidad img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .sobrelinea {
+      margin: 0;
+      color: #ffffff;
+      font-size: clamp(20px, 2.5vw, 32px);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: 0.3px;
+      overflow-wrap: anywhere;
+    }
+
+    .fundacion {
+      margin: 8px 0 0;
+      color: #e9d7a9;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      margin: 15px 0 0;
+      font-size: clamp(25px, 4vw, 38px);
+      line-height: 1.2;
+      letter-spacing: -0.7px;
+    }
+
+    .subtitulo {
+      margin: 12px 0 0;
+      max-width: 730px;
+      color: #e0e9f3;
+      font-size: 16px;
+    }
+
+    .etiqueta-evento {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 22px;
+      padding: 7px 13px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 13px;
+    }
+
+    /* Accesos del encabezado */
+
+    .acciones-encabezado {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .acceso-reservaciones,
+    .boton-finanzas {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 13px;
+      color: #ffffff;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .acceso-reservaciones svg {
+      display: block;
+      width: 19px;
+      height: 19px;
+      flex-shrink: 0;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .acceso-reservaciones:hover,
+    .boton-finanzas:hover,
+    .boton-finanzas[aria-expanded="true"] {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(233, 215, 169, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .acceso-reservaciones:focus-visible,
+    .boton-finanzas:focus-visible {
+      outline: 2px solid #e9d7a9;
+      outline-offset: 4px;
+    }
+
+    /* Menú desplegable de Finanzas */
+
+    .menu-finanzas {
+      position: relative;
+    }
+
+    .boton-finanzas {
+      cursor: pointer;
+    }
+
+    .flecha-finanzas {
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    .boton-finanzas[aria-expanded="true"] .flecha-finanzas {
+      transform: rotate(180deg);
+    }
+
+    .opciones-finanzas {
+      position: absolute;
+      top: calc(100% + 9px);
+      right: 0;
+      z-index: 1000;
+      display: none;
+      width: 255px;
+      max-width: calc(100vw - 32px);
+      padding: 7px;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: var(--sombra);
+    }
+
+    .opciones-finanzas.abierto {
+      display: block;
+    }
+
+    .opciones-finanzas a {
+      display: block;
+      padding: 10px 12px;
+      border-radius: 7px;
+      color: var(--texto);
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .opciones-finanzas a:hover,
+    .opciones-finanzas a:focus-visible {
+      background: var(--azul-suave);
+      outline: none;
+    }
+
+    .opciones-finanzas a[aria-current="page"] {
+      color: var(--azul);
+      background: #e2edf8;
+      font-weight: 750;
+      box-shadow: inset 3px 0 0 var(--dorado);
+    }
+
+    main {
+      padding: 34px 24px 56px;
+    }
+
+    .bienvenida {
+      margin-bottom: 26px;
+    }
+
+    .bienvenida h2 {
+      margin: 0 0 6px;
+      color: var(--azul);
+      font-size: 25px;
+    }
+
+    .bienvenida p {
+      margin: 0;
+      color: var(--gris);
+      max-width: 760px;
+    }
+
+    .seccion-titulo {
+      margin: 34px 0 15px;
+      color: var(--azul);
+      font-size: 17px;
+      font-weight: 750;
+    }
+
+    .modulos {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .modulo {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 255px;
+      padding: 23px;
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: var(--radio);
+      box-shadow: var(--sombra);
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+    }
+
+    .modulo.disponible:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 13px 30px rgba(18, 52, 90, 0.13);
+    }
+
+    .icono {
+      display: grid;
+      place-items: center;
+      width: 53px;
+      height: 53px;
+      margin-bottom: 16px;
+      border-radius: 14px;
+      color: var(--azul);
+      background: var(--azul-suave);
+    }
+
+    .icono svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .modulo h3 {
+      margin: 0 0 8px;
+      color: var(--azul);
+      font-size: 19px;
+      line-height: 1.3;
+    }
+
+    .modulo p {
+      margin: 0 0 20px;
+      color: var(--gris);
+      font-size: 14px;
+      flex: 1;
+    }
+
+    .accion {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 43px;
+      padding: 10px 15px;
+      border: 0;
+      border-radius: 9px;
+      text-decoration: none;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .accion-principal {
+      color: #ffffff;
+      background: var(--azul);
+    }
+
+    .accion-principal:hover {
+      background: var(--azul-claro);
+    }
+
+    .accion-secundaria {
+      color: var(--azul);
+      background: var(--azul-suave);
+    }
+
+    .estado {
+      display: inline-block;
+      align-self: flex-start;
+      margin-bottom: 12px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .estado-activo {
+      color: #17643b;
+      background: #e5f5eb;
+    }
+
+    .estado-proximo {
+      color: #735619;
+      background: #fbf2dc;
+    }
+
+    .modulo-futuro {
+      background: #fbfcfe;
+      box-shadow: none;
+    }
+
+    .modulo-futuro .icono {
+      color: #77879a;
+      background: #edf0f4;
+    }
+
+    .nota {
+      margin-top: 30px;
+      padding: 20px 22px;
+      border: 1px solid var(--borde);
+      border-left: 4px solid var(--dorado);
+      border-radius: 10px;
+      background: var(--blanco);
+    }
+
+    .nota h3 {
+      margin: 0 0 5px;
+      color: var(--azul);
+      font-size: 16px;
+    }
+
+    .nota p {
+      margin: 0;
+      color: var(--gris);
+      font-size: 14px;
+    }
+
+    footer {
+      padding: 24px;
+      color: #e2eaf2;
+      background: #102b4b;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    footer p {
+      margin: 4px 0;
+    }
+
+    .pie-secundario {
+      color: #b8c8d9;
+      font-size: 12px;
+    }
+
+    @media (max-width: 1000px) {
+      .encabezado-derecha {
+        flex-direction: column;
+      }
+
+      .acciones-encabezado {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .modulos {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 28px 18px 34px;
+      }
+
+      main {
+        padding: 27px 16px 40px;
+      }
+
+      .identidad {
+        align-items: flex-start;
+        gap: 13px;
+        width: 100%;
+      }
+
+      .logo-comunidad {
+        width: 70px;
+        height: 70px;
+        padding: 5px;
+        border-radius: 12px;
+      }
+
+      .sobrelinea {
+        font-size: clamp(17px, 4.5vw, 23px);
+      }
+
+      .fundacion {
+        font-size: 10px;
+      }
+
+      h1 {
+        margin-top: 12px;
+        font-size: 25px;
+      }
+
+      .subtitulo {
+        font-size: 14px;
+      }
+
+      .acciones-encabezado {
+        gap: 8px;
+      }
+
+      .acceso-reservaciones,
+      .boton-finanzas {
+        min-height: 40px;
+        padding: 8px 11px;
+      }
+
+      .acceso-reservaciones svg {
+        width: 19px;
+        height: 19px;
+      }
+
+      .opciones-finanzas {
+        right: 0;
+        left: auto;
+      }
+
+      .modulos {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .modulo {
+        min-height: 230px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+
+    @media print {
+      .acciones-encabezado,
+      .accion,
+      .menu-finanzas {
+        display: none !important;
+      }
+
+      body {
+        background: #ffffff;
+      }
+
+      .modulo {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="barra-superior"></div>
+
+  <header>
+    <div class="contenedor">
+
+      <div class="encabezado-derecha">
+
+        <div class="identidad">
+          <div class="logo-comunidad">
+            <img
+              src="./images/Logo%20COMHELMEX.jpg"
+              alt="Logotipo oficial de la Comunidad Helénica de México, A.C."
+            >
+          </div>
+
+          <div>
+            <p class="sobrelinea">
+              Comunidad Helénica de México, A.C.
+            </p>
+
+            <p class="fundacion">
+              Fundada el 13 de marzo de 1956
+            </p>
+
+            <h1>Portal Administrativo</h1>
+
+            <p class="subtitulo">
+              Un espacio centralizado para administrar eventos,
+              reservaciones, proveedores y recursos de nuestra comunidad.
+            </p>
+          </div>
+        </div>
+
+        <div class="acciones-encabezado">
+
+          <!-- Acceso a Reservaciones -->
+          <a
+            class="acceso-reservaciones"
+            href="./reservaciones/index.html"
+            aria-label="Ir al módulo de reservaciones"
+            title="Reservaciones OXI 2026"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <rect
+                x="3"
+                y="4"
+                width="18"
+                height="17"
+                rx="2"
+              ></rect>
+              <path d="M16 2v4M8 2v4M3 9h18"></path>
+              <path d="M8 13h3M8 17h2"></path>
+            </svg>
+            <span>Reservaciones</span>
+          </a>
+
+          <!-- Menú desplegable de Finanzas -->
+          <div class="menu-finanzas">
+            <button
+              class="boton-finanzas"
+              id="botonFinanzas"
+              type="button"
+              aria-expanded="false"
+              aria-controls="opcionesFinanzas"
+            >
+              <span>Finanzas</span>
+              <span class="flecha-finanzas" aria-hidden="true">▾</span>
+            </button>
+
+            <nav
+              class="opciones-finanzas"
+              id="opcionesFinanzas"
+              aria-label="Secciones financieras"
+              hidden
+            >
+              <a href="./finanzas/index.html?seccion=proveedores">
+                Proveedores y servicios
+              </a>
+
+              <a href="./finanzas/index.html?seccion=presupuesto">
+                Presupuesto del evento
+              </a>
+
+              <a href="./finanzas/index.html?seccion=gastos">
+                Gastos y pagos
+              </a>
+
+              <a href="./finanzas/index.html?seccion=estado-financiero">
+                Estado financiero
+              </a>
+
+              <a href="./finanzas/index.html?seccion=reportes">
+                Reportes ejecutivos
+              </a>
+            </nav>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="etiqueta-evento">
+        <span aria-hidden="true">◆</span>
+        <span>Administración de eventos y actividades</span>
+      </div>
+
+    </div>
+  </header>
+
+  <main>
+    <div class="contenedor">
+
+      <section class="bienvenida">
+        <h2>Bienvenido al portal</h2>
+
+        <p>
+          Selecciona el módulo que necesitas utilizar. Cada herramienta
+          contará con sus funciones y archivos independientes, facilitando
+          la administración y el seguimiento de las actividades.
+        </p>
+      </section>
+
+      <h2 class="seccion-titulo">Eventos y administración</h2>
+
+      <section
+        class="modulos"
+        aria-label="Módulos administrativos"
+      >
+
+        <!-- MÓDULO DE RESERVACIONES -->
+        <article class="modulo disponible">
+          <div class="icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="5" width="18" height="16" rx="2"></rect>
+              <path d="M16 3v4M8 3v4M3 10h18"></path>
+              <path d="m9 15 2 2 4-4"></path>
+            </svg>
+          </div>
+
+          <span class="estado estado-activo">Disponible</span>
+
+          <h3>Reservaciones</h3>
+
+          <p>
+            Consulta las reservaciones del evento, los grupos familiares,
+            la asignación de mesas, los asistentes provisionales y los
+            reportes relacionados con los ingresos.
+          </p>
+
+          <a
+            class="accion accion-principal"
+            href="./reservaciones/index.html"
+          >
+            Abrir reservaciones <span aria-hidden="true">→</span>
+          </a>
+        </article>
+
+        <!-- MÓDULO DE PROVEEDORES -->
+        <article class="modulo modulo-futuro">
+          <div class="icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 21h18"></path>
+              <path d="M5 21V7l7-4 7 4v14"></path>
+              <path d="M9 21v-5h6v5"></path>
+              <path d="M9 9h.01M15 9h.01M9 12h.01M15 12h.01"></path>
+            </svg>
+          </div>
+
+          <span class="estado estado-proximo">En desarrollo</span>
+
+          <h3>Proveedores y servicios</h3>
+
+          <p>
+            Catálogo de proveedores, contactos, servicios contratados,
+            cotizaciones, condiciones comerciales y antecedentes
+            de compras para los eventos.
+          </p>
+
+          <span class="accion accion-secundaria">
+            Próximamente
+          </span>
+        </article>
+
+        <!-- MÓDULO DE PRESUPUESTO -->
+        <article class="modulo modulo-futuro">
+          <div class="icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="5" width="18" height="15" rx="2"></rect>
+              <path d="M7 9h10M7 13h4M7 16h7"></path>
+              <path d="M7 5V3h10v2"></path>
+            </svg>
+          </div>
+
+          <span class="estado estado-proximo">En desarrollo</span>
+
+          <h3>Presupuesto del evento</h3>
+
+          <p>
+            Planeación de ingresos y gastos, registro de cotizaciones,
+            autorización de presupuestos y seguimiento de importes
+            comprometidos.
+          </p>
+
+          <span class="accion accion-secundaria">
+            Próximamente
+          </span>
+        </article>
+
+        <!-- MÓDULO DE ESTADO FINANCIERO -->
+        <article class="modulo modulo-futuro">
+          <div class="icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 3v18h18"></path>
+              <rect x="6" y="12" width="3" height="6" rx=".5"></rect>
+              <rect x="12" y="8" width="3" height="10" rx=".5"></rect>
+              <rect x="18" y="4" width="3" height="14" rx=".5"></rect>
+            </svg>
+          </div>
+
+          <span class="estado estado-proximo">En desarrollo</span>
+
+          <h3>Estado financiero</h3>
+
+          <p>
+            Consolidación de ingresos cobrados, cuentas por cobrar,
+            gastos reales, pagos efectuados, saldos pendientes
+            y utilidad del evento.
+          </p>
+
+          <span class="accion accion-secundaria">
+            Próximamente
+          </span>
+        </article>
+
+        <!-- MÓDULO DE PAGOS Y GASTOS -->
+        <article class="modulo modulo-futuro">
+          <div class="icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="6" width="18" height="14" rx="2"></rect>
+              <path d="M3 10h18"></path>
+              <path d="M7 15h4"></path>
+              <path d="M16 3v6"></path>
+            </svg>
+          </div>
+
+          <span class="estado estado-proximo">En desarrollo</span>
+
+          <h3>Gastos y pagos</h3>
+
+          <p>
+            Registro de anticipos, pagos parciales, liquidaciones,
+            comprobantes y obligaciones pendientes de los proveedores.
+          </p>
+
+          <span class="accion accion-secundaria">
+            Próximamente
+          </span>
+        </article>
+
+        <!-- MÓDULO DE REPORTES -->
+        <article class="modulo modulo-futuro">
+          <div class="icono" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 3h9l4 4v14H6z"></path>
+              <path d="M15 3v5h4M9 12h7M9 16h7"></path>
+            </svg>
+          </div>
+
+          <span class="estado estado-proximo">En desarrollo</span>
+
+          <h3>Reportes ejecutivos</h3>
+
+          <p>
+            Informes para el Consejo Directivo con resultados del evento,
+            comparativo presupuestal, variaciones de gastos y
+            documentación financiera.
+          </p>
+
+          <span class="accion accion-secundaria">
+            Próximamente
+          </span>
+        </article>
+
+      </section>
+
+      <section class="nota">
+        <h3>Administración responsable de la información</h3>
+
+        <p>
+          Este portal centraliza el acceso a las herramientas de gestión.
+          Los módulos financieros se desarrollarán de manera progresiva,
+          conservando la información de cada área separada y permitiendo
+          su integración mediante archivos JSON. El portal por sí solo
+          no constituye un sistema de autenticación ni restringe el acceso
+          a los archivos públicos del sitio.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>
+      <strong>Comunidad Helénica de México, A.C.</strong>
+    </p>
+
+    <p class="pie-secundario">
+      Portal de administración de eventos y actividades
+    </p>
+
+    <p class="pie-secundario">
+      © <span id="anioActual">2026</span> · Todos los derechos reservados
+    </p>
+  </footer>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const botonFinanzas = document.getElementById("botonFinanzas");
+      const opcionesFinanzas = document.getElementById("opcionesFinanzas");
+      const anioActual = document.getElementById("anioActual");
+
+      // Actualizar automáticamente el año del pie de página.
+      anioActual.textContent = new Date().getFullYear();
+
+      // Abrir y cerrar el menú de Finanzas.
+      function cerrarMenuFinanzas(devolverFoco = false) {
+        opcionesFinanzas.classList.remove("abierto");
+        opcionesFinanzas.hidden = true;
+        botonFinanzas.setAttribute("aria-expanded", "false");
+
+        if (devolverFoco) {
+          botonFinanzas.focus();
+        }
+      }
+
+      function alternarMenuFinanzas() {
+        const estaAbierto =
+          botonFinanzas.getAttribute("aria-expanded") === "true";
+
+        if (estaAbierto) {
+          cerrarMenuFinanzas();
+        } else {
+          opcionesFinanzas.hidden = false;
+          opcionesFinanzas.classList.add("abierto");
+          botonFinanzas.setAttribute("aria-expanded", "true");
+        }
+      }
+
+      botonFinanzas.addEventListener("click", alternarMenuFinanzas);
+
+      // Cerrar el menú al hacer clic fuera de él.
+      document.addEventListener("click", (evento) => {
+        if (
+          !evento.target.closest(".menu-finanzas") &&
+          !opcionesFinanzas.hidden
+        ) {
+          cerrarMenuFinanzas();
+        }
+      });
+
+      // Cerrar el menú con Escape.
+      document.addEventListener("keydown", (evento) => {
+        if (
+          evento.key === "Escape" &&
+          !opcionesFinanzas.hidden
+        ) {
+          cerrarMenuFinanzas(true);
+        }
+      });
+
+      // Resaltar la sección seleccionada cuando existe un parámetro.
+      const parametros = new URLSearchParams(window.location.search);
+      const seccionActual = parametros.get("seccion");
+
+      opcionesFinanzas.querySelectorAll("a").forEach((enlace) => {
+        const urlEnlace = new URL(enlace.href);
+        const seccionEnlace = urlEnlace.searchParams.get("seccion");
+
+        if (
+          seccionActual &&
+          seccionEnlace === seccionActual
+        ) {
+          enlace.setAttribute("aria-current", "page");
+        }
+      });
+
+      // Cerrar el menú cuando se selecciona una opción.
+      opcionesFinanzas.querySelectorAll("a").forEach((enlace) => {
+        enlace.addEventListener("click", () => {
+          cerrarMenuFinanzas();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
