@@ -24,14 +24,116 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 .tabla-contenedor table tbody tr:hover{background:#f8fbff}
 .pie-modulo{margin-top:28px;padding:18px;border-top:1px solid var(--borde);color:var(--gris);font-size:12px;line-height:1.6}
 @media(max-width:650px){.navegacion-modulo{position:static}.navegacion-modulo a{flex:1;text-align:center}.panel-titulo{display:block}.buscador-global{align-items:stretch}.buscador-global label{white-space:normal}.buscador-global input{max-width:none}}
-
-
 .seccion-estado{margin:0 0 26px}
 .estado-encabezado{margin:0 0 13px}
 .estado-encabezado h2{margin:0;color:var(--azul);font-size:22px;line-height:1.3}
 .estado-encabezado p{margin:6px 0 0;color:var(--gris);font-size:13px;line-height:1.5}
 .estado-columna.egresos h3,.estado-columna.gastos h3{background:#7b3340}
 @media(max-width:720px){.estado-financiero{grid-template-columns:1fr}.estado-encabezado h2{font-size:20px}}
+ 
+/* Inicio obligatorio: no mostrar operaciones antes de cargar el archivo */
+body.espera-archivo main > :not(#pantallaCargaInicial) {
+  display: none !important;
+}
+
+.carga-inicial {
+  margin-top: 24px;
+  border: 2px solid var(--dorado);
+  box-shadow: 0 8px 24px #102b4912;
+}
+
+.carga-inicial .panel-titulo {
+  display: block;
+  background: #f8fbff;
+}
+
+.carga-inicial .panel-titulo h3 {
+  margin: 0;
+  color: var(--azul);
+}
+
+.carga-inicial .contenido {
+  display: block;
+}
+
+#estadoCargaInicial {
+  font-weight: 600;
+}
+
+#archivoTrabajoInicial {
+  margin-top: 6px;
+}
+
+/* Menú desplegable de las secciones financieras */
+.panel.seccion-colapsable {
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.panel.seccion-colapsable.seccion-seleccionada {
+  border: 2px solid var(--dorado);
+  box-shadow: 0 0 0 3px #c5a15a25, 0 5px 18px #102b4910;
+}
+
+.panel-toggle {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--azul);
+  text-align: left;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.panel-toggle::after {
+  content: "+";
+  float: right;
+  margin-left: 12px;
+  color: var(--azul);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.panel-toggle[aria-expanded="true"]::after {
+  content: "−";
+  color: #8b6b24;
+}
+
+.panel-toggle:hover {
+  filter: none;
+  color: #8b6b24;
+}
+
+.panel-toggle:focus-visible {
+  outline: 3px solid #c5a15a88;
+  outline-offset: 5px;
+  border-radius: 4px;
+}
+
+.panel.seccion-colapsable:not(.seccion-abierta) > .contenido,
+.panel.seccion-colapsable:not(.seccion-abierta) > .tabla-contenedor {
+  display: none;
+}
+
+.navegacion-modulo a.seccion-activa {
+  background: var(--azul);
+  color: white;
+  box-shadow: inset 0 -3px 0 var(--dorado);
+}
+
+.navegacion-modulo a.seccion-activa::before {
+  content: "✓ ";
+  color: #e9d7a9;
+}
+
+@media (max-width: 650px) {
+  .panel-toggle {
+    font-size: 16px;
+  }
+}
+
   </style>
  </head>
  <body class="espera-archivo">
@@ -102,6 +204,7 @@ html{scroll-behavior:smooth;scroll-padding-top:86px}
 </section>
 
    
+
 /* Inicio obligatorio: no mostrar operaciones antes de cargar el archivo */
 body.espera-archivo main > :not(#pantallaCargaInicial) {
   display: none !important;
@@ -134,7 +237,6 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
 #archivoTrabajoInicial {
   margin-top: 6px;
 }
-
 
 /* Menú desplegable de las secciones financieras */
 .panel.seccion-colapsable {
@@ -184,10 +286,8 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
   border-radius: 4px;
 }
 
-.panel.seccion-colapsable:not(.seccion-abierta) >
-.contenido,
-.panel.seccion-colapsable:not(.seccion-abierta) >
-.tabla-contenedor {
+.panel.seccion-colapsable:not(.seccion-abierta) > .contenido,
+.panel.seccion-colapsable:not(.seccion-abierta) > .tabla-contenedor {
   display: none;
 }
 
@@ -207,7 +307,6 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
     font-size: 16px;
   }
 }
-
    
    <div class="barra">
     <div>
