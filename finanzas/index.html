@@ -1754,6 +1754,7 @@ let archivoTrabajoActual = '';
 
 configurarMenuFinanzas();
 
+
 $('cargarTrabajoInicial').addEventListener('click', async () => {
   const archivo = $('archivoTrabajoInicial').files[0];
   const mensaje = $('estadoCargaInicial');
@@ -1766,30 +1767,66 @@ $('cargarTrabajoInicial').addEventListener('click', async () => {
   }
 
   boton.disabled = true;
-  mensaje.textContent = 'Leyendo y validando el archivo...';
+  mensaje.textContent = 'Leyendo y validando el archivo financiero...';
 
   try {
     const contenido = await archivo.text();
-    const datos = validar(JSON.parse(contenido));
 
-    // El estado solo cambia después de validar el archivo completo.
-    estado = datos;
+    // Se conserva una copia independiente del archivo original.
+    const datosOriginales = validar(JSON.parse(contenido));
+
+    estado = JSON.parse(JSON.stringify(datosOriginales));
     archivoTrabajoActual = archivo.name;
+
+    let mensajeCatalogo = '';
+
+    try {
+      const resultado = await integrarCatalogoCentral(estado);
+
+      // Verifica que las relaciones sigan siendo válidas.
+      estado = validar(estado);
+
+      guardar();
+
+      mensajeCatalogo =
+        ' Catálogo central integrado. ' +
+        'Proveedores nuevos: ' +
+        resultado.proveedoresNuevos +
+        '; servicios nuevos: ' +
+        resultado.serviciosNuevos +
+        '; proveedores coincidentes: ' +
+        resultado.proveedoresCoincidentes +
+        '; servicios coincidentes: ' +
+        resultado.serviciosCoincidentes +
+        '.';
+    } catch (errorCatalogo) {
+      // Si falla el catálogo, se restaura el JSON financiero
+      // sin cambios de la integración.
+      estado = datosOriginales;
+
+      mensajeCatalogo =
+        ' No se pudo integrar el catálogo central: ' +
+        errorCatalogo.message +
+        ' El archivo financiero se cargó sin esa integración.';
+    }
 
     document.body.classList.remove('espera-archivo');
 
-    mensaje.textContent = 'Archivo validado correctamente.';
-
     $('estadoCarga').textContent =
-      'Archivo de trabajo cargado: ' + archivoTrabajoActual +
-      '. Los cambios de esta sesión se guardan en este navegador.';
+      'Archivo de trabajo cargado: ' +
+      archivoTrabajoActual +
+      '.' +
+      mensajeCatalogo +
+      ' Los movimientos financieros se conservan.';
 
     const etiqueta = document.createElement('p');
     etiqueta.className = 'ayuda';
     etiqueta.id = 'nombreArchivoTrabajo';
-    etiqueta.textContent = 'Archivo de trabajo: ' + archivoTrabajoActual;
+    etiqueta.textContent =
+      'Archivo de trabajo: ' + archivoTrabajoActual;
 
     const barra = document.querySelector('main > .barra');
+
     if (barra && !$('nombreArchivoTrabajo')) {
       barra.insertAdjacentElement('afterend', etiqueta);
     } else if ($('nombreArchivoTrabajo')) {
@@ -1800,16 +1837,16 @@ $('cargarTrabajoInicial').addEventListener('click', async () => {
     render();
 
     mensaje.textContent =
-      'Archivo cargado correctamente. Ya puedes comenzar a trabajar.';
+      'Archivo cargado correctamente.' + mensajeCatalogo;
 
   } catch (error) {
     estado = null;
     archivoTrabajoActual = '';
 
     mensaje.textContent =
-      'No se pudo cargar el archivo: ' + error.message +
+      'No se pudo cargar el archivo: ' +
+      error.message +
       '. Verifica que sea un JSON financiero válido.';
-
   } finally {
     boton.disabled = false;
   }
