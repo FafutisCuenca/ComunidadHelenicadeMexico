@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102b49">
+  <title>Administrar catálogo | Comunidad Helénica de México</title>
+
+  <style>
+    :root {
+      --azul: #102b49;
+      --azul2: #183d63;
+      --dorado: #c5a15a;
+      --fondo: #f4f6f8;
+      --borde: #dce3e9;
+      --texto: #263442;
+      --secundario: #687583;
+      --verde: #23764c;
+      --rojo: #942626;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    .contenedor {
+      width: min(1000px, calc(100% - 28px));
+      margin: auto;
+    }
+
+    header {
+      background: var(--azul);
+      color: white;
+      border-bottom: 4px solid var(--dorado);
+    }
+
+    .encabezado {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    .logo {
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      background: white;
+      padding: 5px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(21px, 3vw, 29px);
+      line-height: 1.25;
+    }
+
+    .fundacion {
+      color: #e8d7b1;
+      margin: 6px 0 0;
+      font-size: 13px;
+    }
+
+    .subtitulo {
+      margin: 7px 0 0;
+      font-size: 12px;
+      color: #e1e9f1;
+    }
+
+    nav {
+      background: white;
+      border-bottom: 1px solid var(--borde);
+      padding: 12px 0;
+    }
+
+    a {
+      color: var(--azul2);
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    main { padding-top: 26px; padding-bottom: 36px; }
+
+    h2 { color: var(--azul); font-size: 25px; margin: 0 0 8px; }
+    h3 { color: var(--azul); font-size: 18px; margin: 0 0 12px; }
+
+    .introduccion {
+      color: var(--secundario);
+      margin: 0 0 22px;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 3px 12px rgba(16,43,73,.05);
+    }
+
+    .nota {
+      font-size: 13px;
+      color: var(--secundario);
+    }
+
+    .acciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button, .boton-archivo {
+      display: inline-block;
+      padding: 11px 16px;
+      min-height: 42px;
+      border-radius: 7px;
+      border: 1px solid transparent;
+      background: var(--azul);
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    button:hover, .boton-archivo:hover { background: var(--azul2); }
+
+    button.secundario {
+      background: white;
+      color: var(--azul);
+      border-color: var(--borde);
+    }
+
+    button.secundario:hover { background: #edf2f6; }
+
+    button:disabled { opacity: .55; cursor: wait; }
+
+    input[type="file"] {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px dashed #bdc9d4;
+      border-radius: 8px;
+      background: #f9fafb;
+    }
+
+    .estado {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #edf2f6;
+      overflow-wrap: anywhere;
+    }
+
+    .estado.ok {
+      background: #e8f5ed;
+      color: #205d3d;
+    }
+
+    .estado.error {
+      background: #fff0f0;
+      color: var(--rojo);
+    }
+
+    .estado.aviso {
+      background: #fff7df;
+      color: #795600;
+    }
+
+    .resumen {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .dato {
+      padding: 14px;
+      border: 1px solid var(--borde);
+      border-top: 3px solid var(--dorado);
+      border-radius: 8px;
+    }
+
+    .dato strong {
+      display: block;
+      color: var(--azul);
+      font-size: 26px;
+    }
+
+    .dato span {
+      color: var(--secundario);
+      font-size: 12px;
+    }
+
+    ul { padding-left: 22px; }
+    li { margin-bottom: 7px; overflow-wrap: anywhere; }
+
+    footer {
+      background: var(--azul);
+      border-top: 3px solid var(--dorado);
+      color: #e5eaf0;
+      text-align: center;
+      padding: 17px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 580px) {
+      .encabezado { gap: 12px; }
+      .logo { width: 68px; height: 68px; }
+      .panel { padding: 15px; }
+      .resumen { grid-template-columns: 1fr 1fr; }
+      .acciones button, .acciones .boton-archivo { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="contenedor encabezado">
+      <img
+        class="logo"
+        src="./images/Logo%20COMHELMEX.jpg"
+        alt="Logotipo de la Comunidad Helénica de México"
+        onerror="this.style.display='none'"
+      >
+      <div>
+        <h1>Comunidad Helénica de México, A.C.</h1>
+        <p class="fundacion">Fundada el 13 de marzo de 1956</p>
+        <p class="subtitulo">PORTAL ADMINISTRATIVO INSTITUCIONAL</p>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <div class="contenedor">
+      <a href="./index.html">← Volver al portal</a>
+      &nbsp; | &nbsp;
+      <a href="./proveedores.html">Consultar proveedores</a>
+    </div>
+  </nav>
+
+  <main class="contenedor">
+    <h2>Administración del catálogo</h2>
+    <p class="introduccion">
+      Importación, validación y exportación del catálogo institucional
+      de proveedores y servicios.
+    </p>
+
+    <section class="panel">
+      <h3>Estado del catálogo</h3>
+      <p>
+        El catálogo se carga desde <code>data/proveedores.json</code>.
+        Puedes revisar su contenido y descargar una copia JSON.
+      </p>
+
+      <div class="resumen">
+        <div class="dato">
+          <strong id="totalProveedores">—</strong>
+          <span>Proveedores</span>
+        </div>
+        <div class="dato">
+          <strong id="totalServicios">—</strong>
+          <span>Servicios</span>
+        </div>
+        <div class="dato">
+          <strong id="totalActivos">—</strong>
+          <span>Proveedores activos</span>
+        </div>
+      </div>
+
+      <div class="acciones">
+        <button id="btnCargar" type="button">Cargar catálogo publicado</button>
+        <button id="btnExportar" class="secundario" type="button" disabled>
+          Exportar JSON
+        </button>
+      </div>
+
+      <div id="estadoCarga" class="estado" role="status" aria-live="polite">
+        Cargando catálogo...
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Importar archivo JSON</h3>
+      <p>
+        Selecciona un archivo JSON del catálogo. Se comprobará su estructura
+        y sus relaciones antes de aceptarlo para esta sesión.
+      </p>
+
+      <label for="archivoJson"><strong>Archivo del catálogo</strong></label>
+      <input id="archivoJson" type="file" accept=".json,application/json">
+
+      <div class="acciones">
+        <button id="btnImportar" type="button">Validar e importar archivo</button>
+      </div>
+
+      <div id="estadoImportacion" class="estado" role="status" aria-live="polite">
+        No se ha importado ningún archivo.
+      </div>
+
+      <div class="nota">
+        La importación solo cambia los datos en memoria de esta página.
+        No modifica el archivo publicado en GitHub.
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Resultado de validación</h3>
+      <p id="resultadoValidacion">Todavía no se ha validado un archivo importado.</p>
+      <div id="listaErrores"></div>
+    </section>
+
+    <section class="panel">
+      <h3>Cómo guardar los cambios en el proyecto</h3>
+      <ol>
+        <li>Importa y valida el JSON que quieras revisar.</li>
+        <li>Exporta el catálogo validado desde esta página.</li>
+        <li>En GitHub, abre <code>data/proveedores.json</code>.</li>
+        <li>Reemplaza su contenido por el JSON exportado y guarda el cambio.</li>
+        <li>Vuelve a cargar el catálogo publicado para comprobar el resultado.</li>
+      </ol>
+      <p class="nota">
+        No subas información confidencial de proveedores a un repositorio público.
+        Antes de reemplazar el archivo publicado, conserva una copia del JSON anterior.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Comunidad Helénica de México, A.C. · Portal Administrativo Institucional
+  </footer>
+
+  <script type="module">
+    import {
+      cargarCatalogoProveedores,
+      validarCatalogoProveedores
+    } from "./js/proveedores.js";
+
+    let catalogoActual = null;
+
+    const estadoCarga = document.getElementById("estadoCarga");
+    const estadoImportacion = document.getElementById("estadoImportacion");
+    const resultadoValidacion = document.getElementById("resultadoValidacion");
+    const listaErrores = document.getElementById("listaErrores");
+    const btnExportar = document.getElementById("btnExportar");
+
+    function mostrarEstado(elemento, texto, tipo = "") {
+      elemento.className = "estado" + (tipo ? " " + tipo : "");
+      elemento.textContent = texto;
+    }
+
+    function mostrarResumen(catalogo) {
+      document.getElementById("totalProveedores").textContent =
+        catalogo.proveedores.length;
+
+      document.getElementById("totalServicios").textContent =
+        catalogo.servicios.length;
+
+      document.getElementById("totalActivos").textContent =
+        catalogo.proveedores.filter(
+          (proveedor) => proveedor.estado === "activo"
+        ).length;
+
+      btnExportar.disabled = false;
+    }
+
+    function mostrarErrores(errores) {
+      listaErrores.replaceChildren();
+
+      if (errores.length === 0) {
+        listaErrores.textContent = "No se encontraron errores.";
+        return;
+      }
+
+      const lista = document.createElement("ul");
+
+      errores.forEach((error) => {
+        const item = document.createElement("li");
+        item.textContent = error;
+        lista.appendChild(item);
+      });
+
+      listaErrores.appendChild(lista);
+    }
+
+    async function cargarPublicado() {
+      document.getElementById("btnCargar").disabled = true;
+      mostrarEstado(estadoCarga, "Cargando catálogo publicado...");
+
+      try {
+        catalogoActual = await cargarCatalogoProveedores({
+          recargar: true
+        });
+
+        mostrarResumen(catalogoActual);
+        mostrarEstado(
+          estadoCarga,
+          "Catálogo publicado cargado correctamente.",
+          "ok"
+        );
+
+        resultadoValidacion.textContent =
+          "El catálogo publicado pasó las validaciones del módulo.";
+        mostrarErrores([]);
+      } catch (error) {
+        mostrarEstado(
+          estadoCarga,
+          error instanceof Error ? error.message : String(error),
+          "error"
+        );
+      } finally {
+        document.getElementById("btnCargar").disabled = false;
+      }
+    }
+
+    async function importarArchivo() {
+      const entrada = document.getElementById("archivoJson");
+      const archivo = entrada.files?.[0];
+
+      if (!archivo) {
+        mostrarEstado(
+          estadoImportacion,
+          "Selecciona un archivo JSON antes de continuar.",
+          "aviso"
+        );
+        return;
+      }
+
+      try {
+        const texto = await archivo.text();
+        const importado = JSON.parse(texto);
+        const errores = validarCatalogoProveedores(importado);
+
+        if (errores.length > 0) {
+          mostrarEstado(
+            estadoImportacion,
+            "El archivo tiene errores y no fue aceptado.",
+            "error"
+          );
+          resultadoValidacion.textContent =
+            "Corrige los siguientes problemas y vuelve a importar el archivo:";
+          mostrarErrores(errores);
+          return;
+        }
+
+        // El catálogo importado sustituye al actual solo en la memoria
+        // de esta página. No se escribe en GitHub ni en el servidor.
+        catalogoActual = importado;
+
+        mostrarResumen(catalogoActual);
+        mostrarEstado(
+          estadoImportacion,
+          `Archivo "${archivo.name}" validado e importado en esta sesión.`,
+          "ok"
+        );
+
+        resultadoValidacion.textContent =
+          "Validación correcta: el archivo importado pasó las comprobaciones estructurales y de relaciones.";
+        mostrarErrores([]);
+      } catch (error) {
+        mostrarEstado(
+          estadoImportacion,
+          "No se pudo leer el archivo. Verifica que sea JSON válido.",
+          "error"
+        );
+
+        resultadoValidacion.textContent =
+          error instanceof Error ? error.message : String(error);
+        mostrarErrores([]);
+      }
+    }
+
+    function exportarJson() {
+      if (!catalogoActual) {
+        mostrarEstado(
+          estadoCarga,
+          "No hay un catálogo cargado para exportar.",
+          "aviso"
+        );
+        return;
+      }
+
+      const errores = validarCatalogoProveedores(catalogoActual);
+
+      if (errores.length > 0) {
+        mostrarEstado(
+          estadoCarga,
+          "No se exportó el archivo porque el catálogo tiene errores.",
+          "error"
+        );
+        resultadoValidacion.textContent =
+          "Corrige el catálogo antes de exportarlo.";
+        mostrarErrores(errores);
+        return;
+      }
+
+      const contenido = JSON.stringify(catalogoActual, null, 2);
+      const archivo = new Blob(
+        [contenido],
+        { type: "application/json;charset=utf-8" }
+      );
+
+      const url = URL.createObjectURL(archivo);
+      const enlace = document.createElement("a");
+
+      enlace.href = url;
+      enlace.download = "proveedores.json";
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      URL.revokeObjectURL(url);
+
+      mostrarEstado(
+        estadoCarga,
+        "Exportación iniciada. Revisa la carpeta de descargas del navegador.",
+        "ok"
+      );
+    }
+
+    document.getElementById("btnCargar").addEventListener(
+      "click",
+      cargarPublicado
+    );
+
+    document.getElementById("btnImportar").addEventListener(
+      "click",
+      importarArchivo
+    );
+
+    btnExportar.addEventListener("click", exportarJson);
+
+    cargarPublicado();
+  </script>
+</body>
+</html>
