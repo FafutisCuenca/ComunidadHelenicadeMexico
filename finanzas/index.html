@@ -2273,8 +2273,7 @@ mensaje.textContent = 'La carga está en curso. Espera, por favor.';
     archivoTrabajoActual = eventoCatalogo.archivo_datos;
 
     actualizarEncabezadoEvento(datos);
-    
-
+  
     document.body.classList.remove('espera-archivo');
     $('estadoCarga').textContent = origenLocal
       ? 'Evento cargado desde el almacenamiento local de este navegador.'
@@ -2305,7 +2304,6 @@ mensaje.textContent = 'La carga está en curso. Espera, por favor.';
   progreso.hidden = true;
   boton.disabled = false;
   $('eventoCatalogo').disabled = false;
-}
   }
 }
 
