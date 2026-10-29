@@ -2248,14 +2248,33 @@ mensaje.textContent = 'La carga está en curso. Espera, por favor.';
       datos = validar(await respuesta.json());
     }
 
-    if (datos.evento.id !== eventoCatalogo.id) {
-      throw new Error(
-        'El identificador del archivo financiero no coincide con el evento del catálogo.'
-      );
-    }
+if (datos.evento.id !== eventoCatalogo.id) {
+  throw new Error(
+    'El identificador del archivo financiero no coincide con el evento del catálogo.'
+  );
+}
 
-    estado = datos;
-    archivoTrabajoActual = eventoCatalogo.archivo_datos;
+// Integrar el catálogo institucional al abrir el evento.
+mensaje.textContent = 'Sincronizando proveedores y servicios institucionales...';
+
+const integracion = await integrarCatalogoInstitucional(datos);
+
+// Validar nuevamente después de la integración.
+datos = validar(datos);
+
+estado = datos;
+archivoTrabajoActual = eventoCatalogo.archivo_datos;
+
+// Guardar únicamente en el almacenamiento local del navegador.
+const guardadoLocal = guardar();
+
+if (!guardadoLocal) {
+  throw new Error(
+    'El evento se sincronizó, pero no fue posible guardar la copia local. Exporta un respaldo.'
+  );
+}
+
+actualizarEncabezadoEvento(datos);
 
     actualizarEncabezadoEvento(datos);
   
