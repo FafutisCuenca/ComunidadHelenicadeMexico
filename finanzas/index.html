@@ -2015,7 +2015,7 @@ async function integrarCatalogoInstitucional(datos) {
     );
 
     for (const central of catalogo.proveedores) {
-      if (!central?.id || !central.nombre || !central.categoria) continue;
+     if (!central?.id || !central.nombre) continue;
 
       const indice = indicesProveedores.get(central.id);
 
