@@ -1538,14 +1538,30 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
   </footer>
   <script>
    (()=>{'use strict';
-const CLAVE='comunidadHelenicaFinanzasOXI2026_v2';
+
+function claveEvento(id) {
+  const identificador = String(id || 'SIN-ID')
+    .replace(/[^a-zA-Z0-9_-]/g, '_');
+
+  // Conserva la clave utilizada por el OXI 2026.
+  if (identificador === 'OXI-2026') {
+    return 'comunidadHelenicaFinanzasOXI2026_v2';
+  }
+
+  return 'comunidadHelenicaFinanzas_' + identificador;
+}
+
 const JSON_INICIAL='./finanzas_oxi_2026.json';
 const $=id=>document.getElementById(id);const dinero=v=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(Number(v)||0);const hoy=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};const nuevoId=p=>p+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7).toUpperCase();const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let estado=null;
 function plantilla(){return {metadata:{archivo:'finanzas_oxi_2026.json',sistema:'Portal Administrativo - Comunidad Helenica de Mexico, A.C.',evento_id:'OXI-2026',version_esquema:'1.0.0',moneda:'MXN',fecha_creacion:new Date().toISOString(),ultima_actualizacion:new Date().toISOString(),notas:'Datos administrados por el modulo financiero.'},evento:{id:'OXI-2026',nombre:'Celebracion del OXI 2026',fecha_evento:'2026-10-25',estado:'planeacion',responsable_finanzas:'',observaciones:''},catalogos:{categorias_proveedor:['Alimentos','Bebidas','Carpas y montaje','Musica y entretenimiento','Meseros y personal','Hielo','Insumos','Decoracion','Renta de equipo','Transporte','Otros']},presupuesto:{id:'PRES-OXI-2026-001',moneda:'MXN',importe_autorizado:0,fecha_autorizacion:null,autorizado_por:'',rubros:[{id:'RUB-001',nombre:'Alimentos',importe_autorizado:0,observaciones:''},{id:'RUB-002',nombre:'Bebidas',importe_autorizado:0,observaciones:''},{id:'RUB-003',nombre:'Carpas y montaje',importe_autorizado:0,observaciones:''},{id:'RUB-004',nombre:'Musica y entretenimiento',importe_autorizado:0,observaciones:''},{id:'RUB-005',nombre:'Personal y meseros',importe_autorizado:0,observaciones:''},{id:'RUB-006',nombre:'Otros egresos',importe_autorizado:0,observaciones:''}]},proveedores:[],servicios:[],cotizaciones:[],compromisos:[],gastos_adicionales:[],pagos:[],ingresos:[],ajustes_presupuesto:[],calculos:{reglas:{}},integraciones:{reservaciones:{habilitada:false,sistema_origen:'modulo_reservaciones',ultima_sincronizacion:null,regla_identificador_externo:'reservacion_id',observaciones:'Pendiente revisar el esquema real de reservaciones.'}},auditoria:{creado_por:'',actualizado_por:'',historial:[]}}}
 function normalizar(d){const base=plantilla();if(!d||typeof d!=='object')throw Error('El archivo no contiene un objeto JSON.');if(!Array.isArray(d.proveedores)||!Array.isArray(d.compromisos)||!Array.isArray(d.pagos))throw Error('Faltan las listas proveedores, compromisos o pagos.');for(const k of ['servicios','cotizaciones','gastos_adicionales','ingresos','ajustes_presupuesto'])if(!Array.isArray(d[k]))d[k]=[];d.metadata={...base.metadata,...(d.metadata||{})};d.evento={...base.evento,...(d.evento||{})};d.catalogos={...base.catalogos,...(d.catalogos||{})};d.presupuesto={...base.presupuesto,...(typeof d.presupuesto==='object'?d.presupuesto:{importe_autorizado:Number(d.presupuesto)||0})};d.presupuesto.rubros=Array.isArray(d.presupuesto.rubros)?d.presupuesto.rubros:base.presupuesto.rubros;d.calculos=d.calculos||base.calculos;d.integraciones=d.integraciones||base.integraciones;d.auditoria=d.auditoria||base.auditoria;return d}
 function validar(d){d=normalizar(d);const unique=(arr,label)=>{const ids=arr.map(x=>x.id);if(ids.some(x=>!x)||new Set(ids).size!==ids.length)throw Error('Hay identificadores vacíos o duplicados en '+label+'.')};['proveedores','servicios','cotizaciones','compromisos','gastos_adicionales','pagos','ingresos','ajustes_presupuesto'].forEach(k=>unique(d[k],k));const prov=new Set(d.proveedores.map(x=>x.id)),serv=new Set(d.servicios.map(x=>x.id)),comp=new Set(d.compromisos.map(x=>x.id)),gastos=new Set(d.gastos_adicionales.map(x=>x.id));for(const p of d.proveedores)if(!p.nombre||!p.categoria)throw Error('Hay un proveedor sin nombre o categoría.');for(const s of d.servicios)if(!s.nombre||!prov.has(s.proveedor_id))throw Error('Hay un servicio sin nombre o con proveedor inexistente.');for(const c of d.cotizaciones)if(!c.id||!prov.has(c.proveedor_id)||!Number.isFinite(Number(c.importe))||Number(c.importe)<0)throw Error('Hay una cotización inválida.');for(const c of d.compromisos)if(!prov.has(c.proveedor_id)||!Number.isFinite(Number(c.importe_confirmado))||Number(c.importe_confirmado)<=0)throw Error('Hay un compromiso inválido o con proveedor inexistente.');for(const g of d.gastos_adicionales)if(!g.concepto||!Number.isFinite(Number(g.importe))||Number(g.importe)<=0)throw Error('Hay un gasto adicional inválido.');for(const p of d.pagos){if(!Number.isFinite(Number(p.importe))||Number(p.importe)<=0)throw Error('Hay un pago con importe inválido.');if(p.compromiso_id&&!comp.has(p.compromiso_id))throw Error('Un pago referencia un compromiso inexistente.');if(p.gasto_adicional_id&&!gastos.has(p.gasto_adicional_id))throw Error('Un pago referencia un gasto inexistente.');if(!p.compromiso_id&&!p.gasto_adicional_id)throw Error('Cada pago debe asociarse a un compromiso o gasto.')}for(const i of d.ingresos)if(!i.id||!Number.isFinite(Number(i.importe_esperado||0))||!Number.isFinite(Number(i.importe_cobrado||0)))throw Error('Hay un ingreso inválido.');return d}
-function guardar(){try{estado.metadata.ultima_actualizacion=new Date().toISOString();localStorage.setItem(CLAVE,JSON.stringify(estado));return true}catch(e){alert('No se pudieron guardar los datos en este navegador. Exporta un respaldo.');return false}}
+function guardar(){try{estado.metadata.ultima_actualizacion=new Date().toISOString();localStorage.setItem(
+  claveEvento(estado.evento.id),
+  JSON.stringify(estado)
+);
+                       return true}catch(e){alert('No se pudieron guardar los datos en este navegador. Exporta un respaldo.');return false}}
 
 // Integra el catálogo institucional sin reemplazar movimientos financieros.
 // Sincroniza proveedores y servicios del catálogo institucional.
