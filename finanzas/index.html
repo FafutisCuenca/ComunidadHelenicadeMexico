@@ -1504,17 +1504,19 @@ function validar(d){d=normalizar(d);const unique=(arr,label)=>{const ids=arr.map
 function guardar(){try{estado.metadata.ultima_actualizacion=new Date().toISOString();localStorage.setItem(CLAVE,JSON.stringify(estado));return true}catch(e){alert('No se pudieron guardar los datos en este navegador. Exporta un respaldo.');return false}}
 
 // Integra el catálogo institucional sin reemplazar movimientos financieros.
-// Integra el catálogo institucional sin reemplazar movimientos financieros.
+// Sincroniza proveedores y servicios del catálogo institucional.
+// Conserva los movimientos financieros y los identificadores existentes.
 async function integrarCatalogoInstitucional(datos) {
   const resultado = {
     proveedoresAgregados: 0,
+    proveedoresActualizados: 0,
     serviciosAgregados: 0,
+    serviciosActualizados: 0,
     estado: 'error',
     error: ''
   };
 
   try {
-    // Ruta al catálogo central del repositorio.
     const catalogoUrl = new URL(
       '../data/proveedores.json',
       window.location.href
@@ -1527,14 +1529,10 @@ async function integrarCatalogoInstitucional(datos) {
     if (!respuesta.ok) {
       throw new Error(
         'No se pudo consultar el catálogo central. HTTP ' +
-        respuesta.status +
-        '. Ruta consultada: ' +
-        catalogoUrl.href
+        respuesta.status + '. Ruta: ' + catalogoUrl.href
       );
     }
 
-    // Leer la respuesta como texto para mostrar un diagnóstico útil
-    // si el servidor entrega HTML u otro contenido en lugar de JSON.
     const contenido = await respuesta.text();
     let catalogo;
 
@@ -1542,9 +1540,8 @@ async function integrarCatalogoInstitucional(datos) {
       catalogo = JSON.parse(contenido);
     } catch (errorJSON) {
       throw new Error(
-        'La respuesta de data/proveedores.json no es JSON válido. ' +
-        'Verifica que el archivo publicado contenga JSON y no HTML o JavaScript. ' +
-        'Detalle: ' + errorJSON.message
+        'El catálogo central no contiene JSON válido: ' +
+        errorJSON.message
       );
     }
 
@@ -1554,114 +1551,166 @@ async function integrarCatalogoInstitucional(datos) {
       !Array.isArray(catalogo.servicios)
     ) {
       throw new Error(
-        'El catálogo central debe contener las listas proveedores y servicios.'
+        'El catálogo debe incluir las listas proveedores y servicios.'
       );
     }
 
-    // No reemplazar registros financieros existentes.
-    const idsProveedores = new Set(
-      datos.proveedores.map(function (p) {
-        return p.id;
+    // Sincronizar proveedores por ID, sin borrar proveedores históricos.
+    const indiceProveedores = new Map(
+      datos.proveedores.map(function (p, indice) {
+        return [p.id, indice];
       })
     );
 
-    // Incorporar proveedores activos que aún no existan por ID.
-    catalogo.proveedores.forEach(function (p) {
-      const activo =
-        p.estado === 'activo' ||
-        p.activo === true;
-
-      if (!activo || !p.id || idsProveedores.has(p.id)) {
-        return;
+    for (const central of catalogo.proveedores) {
+      if (!central || !central.id || !central.nombre) {
+        continue;
       }
 
-      datos.proveedores.push({
-        ...p,
-        contacto_nombre:
-          p.contacto_nombre ||
-          p.contacto ||
-          '',
-        telefono: p.telefono || '',
-        correo: p.correo || '',
-        rfc: p.rfc || '',
-        datos_fiscales: p.datos_fiscales || '',
-        estado: p.estado || 'activo',
-        observaciones: p.observaciones || ''
-      });
+      const indice = indiceProveedores.get(central.id);
 
-      idsProveedores.add(p.id);
-      resultado.proveedoresAgregados++;
-    });
+      if (indice === undefined) {
+        datos.proveedores.push({
+          ...central,
+          contacto_nombre:
+            central.contacto_nombre || central.nombre,
+          telefono: central.telefono || '',
+          correo: central.correo || '',
+          rfc: central.rfc || '',
+          datos_fiscales: central.datos_fiscales || '',
+          estado: central.estado || 'activo',
+          observaciones: central.observaciones || ''
+        });
 
-    // Incorporar servicios activos de proveedores existentes.
-    const idsServicios = new Set(
-      datos.servicios.map(function (s) {
-        return s.id;
+        indiceProveedores.set(
+          central.id,
+          datos.proveedores.length - 1
+        );
+
+        resultado.proveedoresAgregados++;
+      } else {
+        const anterior = datos.proveedores[indice];
+
+        // El catálogo central actualiza los datos del proveedor.
+        // Se mantiene el mismo ID para no romper sus relaciones financieras.
+        datos.proveedores[indice] = {
+          ...anterior,
+          ...central,
+          id: anterior.id,
+          contacto_nombre:
+            central.contacto_nombre ||
+            anterior.contacto_nombre ||
+            central.nombre,
+          telefono: central.telefono ?? anterior.telefono ?? '',
+          correo: central.correo ?? anterior.correo ?? '',
+          rfc: central.rfc ?? anterior.rfc ?? '',
+          datos_fiscales:
+            central.datos_fiscales ??
+            anterior.datos_fiscales ??
+            '',
+          observaciones:
+            central.observaciones ??
+            anterior.observaciones ??
+            ''
+        };
+
+        resultado.proveedoresActualizados++;
+      }
+    }
+
+    // Sincronizar servicios por ID y conservar sus relaciones con proveedores.
+    const indiceServicios = new Map(
+      datos.servicios.map(function (s, indice) {
+        return [s.id, indice];
       })
     );
 
-    catalogo.servicios.forEach(function (s) {
-      const activo =
-        s.estado === 'activo' ||
-        s.activo === true;
-
-      if (!activo || !s.id || idsServicios.has(s.id)) {
-        return;
+    for (const central of catalogo.servicios) {
+      if (
+        !central ||
+        !central.id ||
+        !central.nombre ||
+        !indiceProveedores.has(central.proveedor_id)
+      ) {
+        continue;
       }
 
-      if (!idsProveedores.has(s.proveedor_id)) {
-        return;
+      const indice = indiceServicios.get(central.id);
+
+      if (indice === undefined) {
+        datos.servicios.push({
+          ...central,
+          descripcion: central.descripcion || '',
+          unidad: central.unidad || 'servicio',
+          precio_referencial:
+            central.precio_referencial ?? 0,
+          observaciones: central.observaciones || ''
+        });
+
+        indiceServicios.set(
+          central.id,
+          datos.servicios.length - 1
+        );
+
+        resultado.serviciosAgregados++;
+      } else {
+        const anterior = datos.servicios[indice];
+
+        datos.servicios[indice] = {
+          ...anterior,
+          ...central,
+          id: anterior.id,
+          proveedor_id: central.proveedor_id,
+          descripcion:
+            central.descripcion ?? anterior.descripcion ?? '',
+          unidad: central.unidad ?? anterior.unidad ?? 'servicio',
+          precio_referencial:
+            central.precio_referencial ??
+            anterior.precio_referencial ??
+            0,
+          observaciones:
+            central.observaciones ??
+            anterior.observaciones ??
+            ''
+        };
+
+        resultado.serviciosActualizados++;
       }
+    }
 
-      datos.servicios.push({
-        ...s,
-        descripcion: s.descripcion || '',
-        unidad: s.unidad || 'servicio',
-        precio_referencial:
-          s.precio_referencial == null
-            ? 0
-            : s.precio_referencial,
-        observaciones: s.observaciones || ''
-      });
-
-      idsServicios.add(s.id);
-      resultado.serviciosAgregados++;
-    });
-
-    // Añadir categorías sin borrar las que ya usa Finanzas.
+    // Incorporar nuevas categorías sin eliminar las existentes.
     if (!datos.catalogos) {
       datos.catalogos = {};
     }
 
-    const categoriasExistentes = Array.isArray(
-      datos.catalogos.categorias_proveedor
-    )
-      ? datos.catalogos.categorias_proveedor
-      : [];
+    const categorias = new Set(
+      Array.isArray(datos.catalogos.categorias_proveedor)
+        ? datos.catalogos.categorias_proveedor
+        : []
+    );
 
-    const categorias = new Set(categoriasExistentes);
-
-    const categoriasCentrales =
-      catalogo.catalogos &&
-      Array.isArray(catalogo.catalogos.categorias_proveedor)
-        ? catalogo.catalogos.categorias_proveedor
-        : [];
-
-    categoriasCentrales.forEach(function (categoria) {
+    for (
+      const categoria of
+      (catalogo.catalogos?.categorias_proveedor || [])
+    ) {
       categorias.add(categoria);
-    });
+    }
 
-    datos.catalogos.categorias_proveedor = Array.from(categorias);
+    datos.catalogos.categorias_proveedor =
+      Array.from(categorias);
 
     resultado.estado = 'correcto';
   } catch (error) {
-    resultado.estado = 'error';
+    console.error(
+      'Error al sincronizar el catálogo central:',
+      error
+    );
+
     resultado.error = error.message || String(error);
   }
 
   return resultado;
-}
-         async function cargar(){const local=localStorage.getItem(CLAVE);if(local){try{estado=validar(JSON.parse(local));$('estadoCarga').textContent='Datos cargados desde el almacenamiento de este navegador.';return}catch(e){alert('Los datos locales de la nueva versión no pudieron leerse: '+e.message)}}try{const r=await fetch(JSON_INICIAL,{cache:'no-store'});if(!r.ok)throw Error('No se pudo leer el JSON publicado (HTTP '+r.status+').');estado=validar(await r.json());$('estadoCarga').textContent='Plantilla inicial cargada desde finanzas_oxi_2026.json. Los cambios se guardarán localmente.'}catch(e){estado=plantilla();$('estadoCarga').textContent='No se pudo cargar la plantilla publicada; se inició una estructura vacía. '+e.message}guardar()}
+}         async function cargar(){const local=localStorage.getItem(CLAVE);if(local){try{estado=validar(JSON.parse(local));$('estadoCarga').textContent='Datos cargados desde el almacenamiento de este navegador.';return}catch(e){alert('Los datos locales de la nueva versión no pudieron leerse: '+e.message)}}try{const r=await fetch(JSON_INICIAL,{cache:'no-store'});if(!r.ok)throw Error('No se pudo leer el JSON publicado (HTTP '+r.status+').');estado=validar(await r.json());$('estadoCarga').textContent='Plantilla inicial cargada desde finanzas_oxi_2026.json. Los cambios se guardarán localmente.'}catch(e){estado=plantilla();$('estadoCarga').textContent='No se pudo cargar la plantilla publicada; se inició una estructura vacía. '+e.message}guardar()}
 const proveedor=id=>estado.proveedores.find(x=>x.id===id);const compromiso=id=>estado.compromisos.find(x=>x.id===id);const gasto=id=>estado.gastos_adicionales.find(x=>x.id===id);const pagosValidos=()=>estado.pagos.filter(p=>p.estado!=='cancelado');const totalPagosComp=id=>pagosValidos().filter(p=>p.compromiso_id===id&&p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);const totalPagosGasto=id=>pagosValidos().filter(p=>p.gasto_adicional_id===id&&p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);const comprometido=()=>estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe_confirmado||0),0)+estado.gastos_adicionales.filter(g=>g.estado==='confirmado').reduce((s,g)=>s+Number(g.importe||0),0);const autorizado=()=>Number(estado.presupuesto.importe_autorizado||0)+estado.ajustes_presupuesto.filter(a=>a.estado==='aprobado').reduce((s,a)=>s+(a.tipo==='reduccion'?-1:1)*Number(a.importe||0),0);const pagado=()=>pagosValidos().filter(p=>p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);
 function selectOpts(id,items,placeholder,labelFn){const el=$(id),old=el.value;el.innerHTML=`<option value="">${esc(placeholder)}</option>`+items.map(x=>`<option value="${esc(x.id)}">${esc(labelFn(x))}</option>`).join('');if(items.some(x=>x.id===old))el.value=old}
 function actualizarSelects(){selectOpts('servProveedor',estado.proveedores,'Selecciona proveedor',p=>p.nombre);selectOpts('compProveedor',estado.proveedores,'Selecciona proveedor',p=>p.nombre);selectOpts('gastoProveedor',estado.proveedores,'Sin proveedor',p=>p.nombre);selectOpts('compServicio',estado.servicios,'Sin servicio asociado',s=>`${s.nombre} — ${(proveedor(s.proveedor_id)||{}).nombre||'Proveedor'}`);selectOpts('compRubro',estado.presupuesto.rubros,'Selecciona rubro',r=>r.nombre);selectOpts('gastoRubro',estado.presupuesto.rubros,'Selecciona rubro',r=>r.nombre);actualizarDestinoPago()}
