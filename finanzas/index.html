@@ -134,6 +134,34 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
   }
 }
 
+/* Ocultar visualmente las funciones relacionadas con presupuesto.
+   No elimina datos del JSON ni desactiva los cálculos internos. */
+
+/* Acceso de navegación y formulario de presupuesto */
+.navegacion-modulo a[href="#panel-presupuesto"],
+#panel-presupuesto {
+  display: none !important;
+}
+
+/* Indicadores de presupuesto autorizado y disponible */
+.resumen .indicador:has(#totalPresupuesto),
+.resumen .indicador:has(#disponible) {
+  display: none !important;
+}
+
+/* Campos de rubro en compromisos y egresos */
+.campo:has(#compRubro),
+.campo:has(#gastoRubro) {
+  display: none !important;
+}
+
+/* Columna Rubro de la tabla de egresos adicionales */
+#panel-gastos th:nth-child(3),
+#panel-gastos td:nth-child(3) {
+  display: none !important;
+}
+
+   
   </style>
  </head>
  <body class="espera-archivo">
@@ -153,7 +181,7 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
       Administración Financiera
      </h2>
      <p class="subtitulo">
-      Control de proveedores, servicios, presupuesto, egresos e ingresos
+      Control de proveedores, servicios, egresos e ingresos
      </p>
     </div>
    </div>
