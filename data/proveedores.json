@@ -1,1 +1,153 @@
-
+{
+  "metadata": {
+    "archivo": "proveedores.json",
+    "sistema": "Portal Administrativo - Comunidad Helenica de Mexico, A.C.",
+    "version_esquema": "1.0.0",
+    "moneda": "MXN",
+    "fecha_creacion": null,
+    "ultima_actualizacion": null,
+    "notas": "Catalogo institucional central de proveedores y servicios. Las fechas no documentadas se mantienen en null para evitar inventar datos historicos."
+  },
+  "catalogos": {
+    "categorias_proveedor": [
+      "Alimentos",
+      "Bebidas",
+      "Carpas y montaje",
+      "Musica y entretenimiento",
+      "Meseros y personal",
+      "Hielo",
+      "Insumos",
+      "Decoracion",
+      "Renta de equipo",
+      "Transporte",
+      "Otros"
+    ]
+  },
+  "proveedores": [
+    {
+      "id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Jesus Elenis",
+      "categoria": "Alimentos",
+      "contacto_nombre": "Jesus Elenis",
+      "telefono": "",
+      "correo": "",
+      "rfc": "",
+      "datos_fiscales": "",
+      "estado": "activo",
+      "observaciones": "Persona que proporcionará el menu griego para la fiesta del OXI",
+      "fecha_alta": null,
+      "ultima_actualizacion": null,
+      "fecha_baja": null,
+      "fecha_reactivacion": null,
+      "notas_internas": ""
+    },
+    {
+      "id": "PROV-mvlbt3e2-0QV5J",
+      "nombre": "Armando Ramírez",
+      "categoria": "Musica y entretenimiento",
+      "contacto_nombre": "Armando Ramírez",
+      "telefono": "",
+      "correo": "",
+      "rfc": "",
+      "datos_fiscales": "",
+      "estado": "activo",
+      "observaciones": "",
+      "fecha_alta": null,
+      "ultima_actualizacion": null,
+      "fecha_baja": null,
+      "fecha_reactivacion": null,
+      "notas_internas": ""
+    },
+    {
+      "id": "PROV-mvlh88lc-EBND0",
+      "nombre": "Alicia Fafutis",
+      "categoria": "Alimentos",
+      "contacto_nombre": "Alicia Fafutis",
+      "telefono": "",
+      "correo": "",
+      "rfc": "",
+      "datos_fiscales": "",
+      "estado": "activo",
+      "observaciones": "",
+      "fecha_alta": null,
+      "ultima_actualizacion": null,
+      "fecha_baja": null,
+      "fecha_reactivacion": null,
+      "notas_internas": ""
+    },
+    {
+      "id": "PROV-mvlh8x7s-CKQ4S",
+      "nombre": "Tienda González",
+      "categoria": "Bebidas",
+      "contacto_nombre": "Tienda González",
+      "telefono": "",
+      "correo": "",
+      "rfc": "",
+      "datos_fiscales": "",
+      "estado": "activo",
+      "observaciones": "",
+      "fecha_alta": null,
+      "ultima_actualizacion": null,
+      "fecha_baja": null,
+      "fecha_reactivacion": null,
+      "notas_internas": ""
+    }
+  ],
+  "servicios": [
+    {
+      "id": "SERV-mvlhara8-7KATH",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Carpas",
+      "categoria": "Carpas y montaje",
+      "descripcion": "2 Modulos de Carpa",
+      "unidad": "servicio",
+      "precio_referencial": 9500,
+      "activo": true,
+      "observaciones": "2 Modulos de Carpa"
+    },
+    {
+      "id": "SERV-mvsnzgx9-Y651I",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Montaje 1 Modulos de Carpa Extra",
+      "categoria": "Carpas y montaje",
+      "descripcion": "",
+      "unidad": "Servicio de Carpas",
+      "precio_referencial": 1500,
+      "activo": true,
+      "observaciones": ""
+    },
+    {
+      "id": "SERV-mvso07hc-A9MMN",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "120 Platillos",
+      "categoria": "Alimentos",
+      "descripcion": "",
+      "unidad": "servicio",
+      "precio_referencial": 22800,
+      "activo": true,
+      "observaciones": ""
+    },
+    {
+      "id": "SERV-mvso0ufh-I63XK",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Montaje Carpas",
+      "categoria": "Carpas y montaje",
+      "descripcion": "",
+      "unidad": "servicio",
+      "precio_referencial": 3000,
+      "activo": true,
+      "observaciones": ""
+    },
+    {
+      "id": "SERV-mvso1ij4-91YYH",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Servicio de Meseros y Personal en Acceso",
+      "categoria": "Meseros y personal",
+      "descripcion": "",
+      "unidad": "servicio",
+      "precio_referencial": 4800,
+      "activo": true,
+      "observaciones": ""
+    }
+  ]
+}
