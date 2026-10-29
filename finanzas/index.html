@@ -1888,9 +1888,18 @@ $('cargarTrabajoInicial').addEventListener('click', async () => {
     render();
 
     if (integracion.estado === 'correcto') {
-      const detalle = `Catálogo central integrado: ${integracion.proveedoresAgregados} proveedor(es) nuevo(s) y ${integracion.serviciosAgregados} servicio(s) nuevo(s).`;
-      mensaje.textContent = 'Archivo cargado correctamente. ' + detalle + ' Ya puedes comenzar a trabajar.';
-      $('estadoCarga').textContent = 'Archivo de trabajo cargado: ' + archivoTrabajoActual + '. ' + detalle + ' Los cambios se guardan en este navegador.';
+      const detalle =
+  `Catálogo central: ${integracion.proveedoresAgregados} proveedor(es) agregado(s), ` +
+  `${integracion.proveedoresActualizados} actualizado(s), ` +
+  `${integracion.serviciosAgregados} servicio(s) agregado(s) y ` +
+  `${integracion.serviciosActualizados} actualizado(s).`;
+
+mensaje.textContent =
+  'Archivo cargado correctamente. ' +
+  detalle +
+  ' Ya puedes comenzar a trabajar.';
+     
+    $('estadoCarga').textContent = 'Archivo de trabajo cargado: ' + archivoTrabajoActual + '. ' + detalle + ' Los cambios se guardan en este navegador.';
     } else {
       mensaje.textContent = 'Archivo financiero cargado, pero no se pudo consultar el catálogo central. ' + (integracion.error || 'Revisa la ruta y la publicación de js/proveedores.js y data/proveedores.json.') + ' Los datos financieros se conservaron.';
       $('estadoCarga').textContent = 'Archivo de trabajo cargado: ' + archivoTrabajoActual + '. Catálogo central pendiente de conexión: ' + (integracion.error || 'sin detalles') + '.';
