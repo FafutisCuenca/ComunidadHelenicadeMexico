@@ -1831,6 +1831,150 @@ function configurarMenuFinanzas() {
 
          const renderOriginal=render;render=function(){renderOriginal();aplicarBusqueda()};
 
+// Catálogo institucional central: fuente principal de proveedores y servicios.
+async function integrarCatalogoInstitucional(datos) {
+  const resultado = {
+    proveedoresAgregados: 0,
+    proveedoresActualizados: 0,
+    serviciosAgregados: 0,
+    serviciosActualizados: 0,
+    estado: 'error',
+    error: ''
+  };
+
+  try {
+    const url = new URL('../data/proveedores.json', location.href);
+    const respuesta = await fetch(url.href, { cache: 'no-store' });
+
+    if (!respuesta.ok) {
+      throw new Error('Error HTTP ' + respuesta.status + ' al leer ' + url.href);
+    }
+
+    const catalogo = JSON.parse(await respuesta.text());
+
+    if (
+      !catalogo ||
+      !Array.isArray(catalogo.proveedores) ||
+      !Array.isArray(catalogo.servicios)
+    ) {
+      throw new Error('El JSON central no contiene proveedores y servicios.');
+    }
+
+    // Sincronizar proveedores por ID.
+    const indicesProveedores = new Map(
+      datos.proveedores.map((p, i) => [p.id, i])
+    );
+
+    for (const central of catalogo.proveedores) {
+      if (!central?.id || !central.nombre || !central.categoria) continue;
+
+      const indice = indicesProveedores.get(central.id);
+
+      if (indice === undefined) {
+        datos.proveedores.push({
+          ...central,
+          contacto_nombre: central.contacto_nombre || central.nombre,
+          telefono: central.telefono || '',
+          correo: central.correo || '',
+          rfc: central.rfc || '',
+          datos_fiscales: central.datos_fiscales || '',
+          estado: central.estado || 'activo',
+          observaciones: central.observaciones || ''
+        });
+
+        indicesProveedores.set(central.id, datos.proveedores.length - 1);
+        resultado.proveedoresAgregados++;
+      } else {
+        const anterior = datos.proveedores[indice];
+
+        datos.proveedores[indice] = {
+          ...anterior,
+          ...central,
+          id: anterior.id,
+          contacto_nombre:
+            central.contacto_nombre ||
+            anterior.contacto_nombre ||
+            central.nombre,
+          telefono: central.telefono || anterior.telefono || '',
+          correo: central.correo || anterior.correo || '',
+          rfc: central.rfc || anterior.rfc || '',
+          datos_fiscales:
+            central.datos_fiscales || anterior.datos_fiscales || '',
+          observaciones:
+            central.observaciones ?? anterior.observaciones ?? ''
+        };
+
+        resultado.proveedoresActualizados++;
+      }
+    }
+
+    // Sincronizar servicios por ID.
+    const indicesServicios = new Map(
+      datos.servicios.map((s, i) => [s.id, i])
+    );
+
+    for (const central of catalogo.servicios) {
+      if (
+        !central?.id ||
+        !central.nombre ||
+        !indicesProveedores.has(central.proveedor_id)
+      ) continue;
+
+      const indice = indicesServicios.get(central.id);
+
+      if (indice === undefined) {
+        datos.servicios.push({
+          ...central,
+          descripcion: central.descripcion || '',
+          unidad: central.unidad || 'servicio',
+          precio_referencial: central.precio_referencial ?? 0,
+          observaciones: central.observaciones || ''
+        });
+
+        indicesServicios.set(central.id, datos.servicios.length - 1);
+        resultado.serviciosAgregados++;
+      } else {
+        const anterior = datos.servicios[indice];
+
+        datos.servicios[indice] = {
+          ...anterior,
+          ...central,
+          id: anterior.id,
+          descripcion: central.descripcion ?? anterior.descripcion ?? '',
+          unidad: central.unidad ?? anterior.unidad ?? 'servicio',
+          precio_referencial:
+            central.precio_referencial ??
+            anterior.precio_referencial ??
+            0,
+          observaciones:
+            central.observaciones ?? anterior.observaciones ?? ''
+        };
+
+        resultado.serviciosActualizados++;
+      }
+    }
+
+    // Incorporar categorías centrales sin eliminar las existentes.
+    datos.catalogos = datos.catalogos || {};
+    const categorias = new Set(
+      datos.catalogos.categorias_proveedor || []
+    );
+
+    for (const categoria of catalogo.catalogos?.categorias_proveedor || []) {
+      categorias.add(categoria);
+    }
+
+    datos.catalogos.categorias_proveedor = [...categorias];
+    resultado.estado = 'correcto';
+
+  } catch (error) {
+    resultado.error = error.message || String(error);
+    console.error('Error al integrar el catálogo central:', error);
+  }
+
+  return resultado;
+}         
+         
 let archivoTrabajoActual = '';
 
 ['compFecha', 'gastoFecha', 'pagoFecha', 'ingFecha'].forEach(
