@@ -2299,9 +2299,15 @@ actualizarEncabezadoEvento(datos);
 
     render();
 
-    mensaje.textContent =
-      'Evento abierto correctamente. Ya puedes consultar su información.';
-
+   mensaje.textContent =
+  integracion.estado === 'correcto'
+    ? 'Evento abierto y catálogo institucional sincronizado. ' +
+      integracion.proveedoresAgregados + ' proveedor(es) agregado(s), ' +
+      integracion.proveedoresActualizados + ' actualizado(s), ' +
+      integracion.serviciosAgregados + ' servicio(s) agregado(s) y ' +
+      integracion.serviciosActualizados + ' actualizado(s).'
+    : 'Evento abierto, pero no se pudo sincronizar el catálogo institucional: ' +
+      integracion.error;
   } catch (error) {
     mensaje.textContent = 'No se pudo abrir el evento: ' + error.message;
   } finally {
