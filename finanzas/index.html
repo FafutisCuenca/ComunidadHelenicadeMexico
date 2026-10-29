@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="es">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="#102b49" name="theme-color"/>
+  <title>
+   Administración Financiera | Comunidad Helénica
+  </title>
+  <style>
+   :root{--azul:#102b49;--azul2:#183d63;--dorado:#c5a15a;--fondo:#f3f6fa;--texto:#25364a;--gris:#66768a;--borde:#dce4ed;--verde:#18794e;--rojo:#b42318}*{box-sizing:border-box}body{margin:0;background:var(--fondo);color:var(--texto);font-family:Arial,Helvetica,sans-serif}header{background:linear-gradient(125deg,var(--azul),var(--azul2));color:white;padding:28px 22px;border-bottom:4px solid var(--dorado)}.encabezado{max-width:1250px;margin:auto;display:flex;align-items:center;gap:20px}.logo{width:95px;height:95px;background:white;border:1px solid var(--dorado);border-radius:15px;padding:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 20px #0003,0 0 0 3px #c5a15a22}.logo img{width:100%;height:100%;object-fit:contain}.identidad{min-width:0}.nombre-comunidad,.titulo-modulo{margin:0;color:#fff;font-size:clamp(23px,3vw,34px);font-weight:800;line-height:1.2;letter-spacing:.3px}.fundacion{margin:5px 0 13px;color:#e9d7a9;font-size:12px;font-weight:500;letter-spacing:.4px}.subtitulo{margin:9px 0 0;color:#e1eaf3;font-size:15px}main{max-width:1250px;padding:25px 18px 45px;margin:auto}.barra{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px}.barra h2{color:var(--azul);margin:0;font-size:23px}.acciones,.botones-form{display:flex;flex-wrap:wrap;gap:8px}button,.boton{border:0;border-radius:7px;padding:10px 14px;font-weight:bold;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}.primario{background:var(--azul);color:white}.secundario{background:#e5edf5;color:var(--azul)}.dorado{background:var(--dorado);color:#172b41}.peligro{background:#fde8e7;color:var(--rojo)}button:hover,.boton:hover{filter:brightness(.96)}.nota{padding:13px 15px;background:#fff9e9;border:1px solid #ead9a9;border-radius:8px;font-size:13px;line-height:1.5;margin-bottom:20px}.resumen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:24px}.indicador{background:white;padding:19px;border-radius:11px;border:1px solid var(--borde);box-shadow:0 3px 10px #102b4908;min-width:0}.etiqueta{color:var(--gris);font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px}.valor{display:block;margin-top:11px;color:var(--azul);font-size:clamp(19px,2vw,27px);font-weight:bold;overflow-wrap:anywhere}.indicador small{display:block;margin-top:7px;color:var(--gris);font-size:12px}.panel{background:white;border:1px solid var(--borde);border-radius:11px;margin-bottom:22px;overflow:hidden;box-shadow:0 3px 10px #102b4908}.panel-titulo{padding:17px 20px;background:#fafdff;border-bottom:1px solid var(--borde)}.panel-titulo h3{margin:0;color:var(--azul);font-size:18px}.panel-titulo p{margin:6px 0 0;color:var(--gris);font-size:13px;line-height:1.4}.contenido{padding:20px}.formulario{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.campo{display:flex;flex-direction:column;gap:6px;min-width:0}.campo.completo{grid-column:1/-1}label{font-size:13px;font-weight:bold;color:#34485e}input,select,textarea{width:100%;min-width:0;padding:11px;border:1px solid #cbd5e1;border-radius:7px;background:white;color:var(--texto);font:inherit;font-size:14px}input:focus,select:focus,textarea:focus{outline:2px solid #c5a15a66;border-color:var(--dorado)}.ayuda{color:var(--gris);font-size:12px;line-height:1.4}.botones-form{margin-top:18px}.tabla-contenedor{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:12px 14px;border-bottom:1px solid #e8edf3;vertical-align:top}th{color:#52647a;background:#f8fafc;font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}td{line-height:1.45}td strong{color:var(--azul)}.numerico{text-align:right;white-space:nowrap}.estado{display:inline-block;border-radius:20px;padding:4px 8px;background:#e9f5ee;color:var(--verde);font-size:11px;font-weight:bold}.estado-pendiente{background:#fff4d6;color:#805b00}.vacio{text-align:center;color:var(--gris);padding:22px 15px}.oculto{display:none!important}.aviso-estado{margin:14px 0 0;font-size:13px;line-height:1.5}.dos-columnas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.estado-financiero{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 24px}.estado-columna{background:#fff;border:1px solid var(--borde);border-radius:11px;overflow:hidden;box-shadow:0 3px 10px #102b4908}.estado-columna h3{margin:0;padding:16px 18px;color:white;font-size:17px}.estado-columna.gastos h3{background:#7b3340}.estado-columna.ingresos h3{background:#17664b}.estado-cuerpo{padding:16px 18px}.linea-resumen{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #e8edf3;font-size:13px}.linea-resumen:last-child{border-bottom:0}.linea-resumen span{color:var(--gris)}.linea-resumen strong{color:var(--azul);white-space:nowrap;text-align:right}.linea-resumen.total{margin-top:4px;padding-top:14px;font-size:14px;font-weight:bold}.subtitulo-resumen{margin:14px 0 4px;color:var(--azul);font-size:12px;text-transform:uppercase;letter-spacing:.45px;font-weight:bold}.nota-resumen{font-size:11px;color:var(--gris);line-height:1.45;margin:12px 0 0}.donacion-linea{background:#f0f8f3;margin:6px -8px;padding:10px 8px;border-radius:6px}.ingreso-fuente-ayuda{display:block;font-size:11px;color:var(--gris);margin-top:3px}@media(max-width:720px){.estado-financiero{grid-template-columns:1fr}}@media(max-width:850px){.resumen{grid-template-columns:repeat(2,minmax(0,1fr))}.formulario{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:540px){header{padding:20px 15px}.encabezado{align-items:flex-start;gap:13px}.logo{width:68px;height:68px;padding:5px}.nombre-comunidad,.titulo-modulo{font-size:23px}.fundacion{font-size:10px;margin-bottom:11px}.subtitulo{font-size:13px}main{padding:20px 12px 30px}.resumen{gap:9px}.indicador{padding:13px}.etiqueta{font-size:10px}.formulario,.dos-columnas{grid-template-columns:1fr}.campo.completo{grid-column:auto}.contenido{padding:14px}.barra{align-items:flex-start}}
+
+/* Mejoras de navegación y lectura: no modifican las reglas contables. */
+html{scroll-behavior:smooth;scroll-padding-top:86px}
+.barra{gap:16px}.barra>div:first-child{min-width:220px}
+.navegacion-modulo{position:sticky;top:0;z-index:20;background:#fff;border:1px solid var(--borde);border-radius:10px;padding:10px 12px;margin:0 0 20px;box-shadow:0 5px 18px #102b4910;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.navegacion-modulo a{color:var(--azul);text-decoration:none;font-size:12px;font-weight:700;padding:8px 10px;border-radius:6px;background:#f1f5f9;white-space:nowrap}
+.navegacion-modulo a:hover,.navegacion-modulo a:focus{background:#e4edf7;outline:2px solid #c5a15a66}
+.buscador-global{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#edf3f9;border:1px solid var(--borde);border-radius:10px;padding:12px 14px;margin-bottom:20px}
+.buscador-global label{white-space:nowrap}.buscador-global input{max-width:520px}.resultado-busqueda{font-size:12px;color:var(--gris)}
+.panel{scroll-margin-top:82px}.panel-titulo{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.panel-titulo h3{line-height:1.35}.panel-titulo p{max-width:850px}
+.indicador{transition:transform .15s ease,box-shadow .15s ease}.indicador:hover{transform:translateY(-2px);box-shadow:0 7px 18px #102b4912}
+.acciones button,.acciones .boton,.botones-form button{min-height:40px}
+.tabla-contenedor table tbody tr:hover{background:#f8fbff}
+.pie-modulo{margin-top:28px;padding:18px;border-top:1px solid var(--borde);color:var(--gris);font-size:12px;line-height:1.6}
+@media(max-width:650px){.navegacion-modulo{position:static}.navegacion-modulo a{flex:1;text-align:center}.panel-titulo{display:block}.buscador-global{align-items:stretch}.buscador-global label{white-space:normal}.buscador-global input{max-width:none}}
+.seccion-estado{margin:0 0 26px}
+.estado-encabezado{margin:0 0 13px}
+.estado-encabezado h2{margin:0;color:var(--azul);font-size:22px;line-height:1.3}
+.estado-encabezado p{margin:6px 0 0;color:var(--gris);font-size:13px;line-height:1.5}
+.estado-columna.egresos h3,.estado-columna.gastos h3{background:#7b3340}
+@media(max-width:720px){.estado-financiero{grid-template-columns:1fr}.estado-encabezado h2{font-size:20px}}
+ 
+/* Inicio obligatorio: no mostrar operaciones antes de cargar el archivo */
+body.espera-archivo main > :not(#pantallaCargaInicial) {
+  display: none !important;
+}
+
+.carga-inicial {
+  margin-top: 24px;
+  border: 2px solid var(--dorado);
+  box-shadow: 0 8px 24px #102b4912;
+}
+
+.carga-inicial .panel-titulo {
+  display: block;
+  background: #f8fbff;
+}
+
+.carga-inicial .panel-titulo h3 {
+  margin: 0;
+  color: var(--azul);
+}
+
+.carga-inicial .contenido {
+  display: block;
+}
+
+#estadoCargaInicial {
+  font-weight: 600;
+}
+
+#archivoTrabajoInicial {
+  margin-top: 6px;
+}
+
+/* Menú desplegable de las secciones financieras */
+.panel.seccion-colapsable {
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.panel.seccion-colapsable.seccion-seleccionada {
+  border: 2px solid var(--dorado);
+  box-shadow: 0 0 0 3px #c5a15a25, 0 5px 18px #102b4910;
+}
+
+.panel-toggle {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--azul);
+  text-align: left;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.panel-toggle::after {
+  content: "+";
+  float: right;
+  margin-left: 12px;
+  color: var(--azul);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.panel-toggle[aria-expanded="true"]::after {
+  content: "−";
+  color: #8b6b24;
+}
+
+.panel-toggle:hover {
+  filter: none;
+  color: #8b6b24;
+}
+
+.panel-toggle:focus-visible {
+  outline: 3px solid #c5a15a88;
+  outline-offset: 5px;
+  border-radius: 4px;
+}
+
+.panel.seccion-colapsable:not(.seccion-abierta) > .contenido,
+.panel.seccion-colapsable:not(.seccion-abierta) > .tabla-contenedor {
+  display: none;
+}
+
+.navegacion-modulo a.seccion-activa {
+  background: var(--azul);
+  color: white;
+  box-shadow: inset 0 -3px 0 var(--dorado);
+}
+
+.navegacion-modulo a.seccion-activa::before {
+  content: "✓ ";
+  color: #e9d7a9;
+}
+
+@media (max-width: 650px) {
+  .panel-toggle {
+    font-size: 16px;
+  }
+}
+
+  </style>
+ </head>
+ <body class="espera-archivo">
+  <header>
+   <div class="encabezado">
+    <div class="logo">
+     <img alt="Logotipo oficial de la Comunidad Helénica de México" onerror="this.style.display='none'" src="../images/Logo%20COMHELMEX.jpg"/>
+    </div>
+    <div class="identidad">
+     <h1 class="nombre-comunidad">
+      Comunidad Helénica de México, A.C.
+     </h1>
+     <p class="fundacion">
+      Fundada el 13 de marzo de 1956
+     </p>
+     <h2 class="titulo-modulo">
+      Administración Financiera
+     </h2>
+     <p class="subtitulo">
+      Control de proveedores, servicios, presupuesto, egresos e ingresos
+     </p>
+    </div>
+   </div>
+  </header>
+  <main>
+
+<section class="panel carga-inicial" id="pantallaCargaInicial">
+  <div class="panel-titulo">
+    <div>
+      <h3>Inicio de la sesión financiera</h3>
+      <p>
+        Selecciona el archivo JSON de Finanzas que utilizarás en esta sesión.
+        Los formularios y las operaciones estarán disponibles después de cargarlo
+        y validar su contenido.
+      </p>
+    </div>
+  </div>
+
+  <div class="contenido">
+    <div class="campo">
+      <label for="archivoTrabajoInicial">Archivo financiero de trabajo</label>
+      <input
+        accept=".json,application/json"
+        id="archivoTrabajoInicial"
+        type="file"
+        required
+      />
+      <span class="ayuda">
+        Selecciona tu respaldo financiero, por ejemplo:
+        finanzas_oxi_2026.json.
+      </span>
+    </div>
+
+    <div class="botones-form">
+      <button class="primario" id="cargarTrabajoInicial" type="button">
+        Cargar archivo y comenzar
+      </button>
+    </div>
+
+    <p
+      aria-live="polite"
+      class="aviso-estado"
+      id="estadoCargaInicial"
+    >
+      Esperando la selección del archivo financiero.
+    </p>
+  </div>
+</section>
+
+   
+   <div class="barra">
+    <div>
+     <h2>
+      Control financiero · OXI 2026
+     </h2>
+     <p class="ayuda">
+      Datos locales con estructura JSON. Independiente del módulo de reservaciones.
+     </p>
+    </div>
+    <div class="acciones">
+     <a class="boton secundario" href="../index.html">
+      ← Volver al portal
+     </a>
+     <button class="secundario" id="exportar">
+      Exportar JSON
+     </button>
+     <button class="secundario" id="importar">
+      Importar JSON
+     </button>
+     <input accept=".json,application/json" class="oculto" id="archivoImportar" type="file"/>
+    </div>
+   </div>
+   <nav aria-label="Accesos rápidos del módulo financiero" class="navegacion-modulo">
+    <a href="#panel-presupuesto">
+     Presupuesto
+    </a>
+    <a href="#panel-proveedores">
+     Proveedores
+    </a>
+    <a href="#panel-servicios">
+     Servicios
+    </a>
+    <a href="#panel-compromisos">
+     Cotizaciones y compromisos
+    </a>
+    <a href="#panel-gastos">
+     Egresos adicionales
+    </a>
+    <a href="#panel-pagos">
+     Pagos
+    </a>
+    <a href="#panel-reservaciones">
+     Reservaciones
+    </a>
+    <a href="#panel-ingresos">
+     Ingresos y donativos
+    </a>
+    <a href="#panel-control">
+     Control y respaldo
+    </a>
+   </nav>
+   <div class="buscador-global">
+    <label for="buscarRegistros">
+     Buscar en las tablas del módulo
+    </label>
+    <input autocomplete="off" id="buscarRegistros" placeholder="Ej. proveedor, donativo, concepto, referencia…" type="search"/>
+    <span aria-live="polite" class="resultado-busqueda" id="resultadoBusqueda">
+     Muestra todos los registros.
+    </span>
+    <button class="secundario" id="limpiarBusqueda" type="button">
+     Limpiar búsqueda
+    </button>
+   </div>
+<div class="nota">
+  <strong>Archivo de trabajo obligatorio:</strong>
+  selecciona y valida un JSON financiero antes de registrar movimientos.
+  Los cambios se conservan localmente en este navegador. Utiliza
+  “Exportar JSON” para crear un respaldo actualizado y evita trabajar
+  simultáneamente con distintas copias del archivo.
+</div>
+   <section class="resumen">
+    <div class="indicador">
+     <span class="etiqueta">
+      Presupuesto autorizado
+     </span>
+     <strong class="valor" id="totalPresupuesto">
+      $0.00
+     </strong>
+     <small>
+      Presupuesto base más ajustes aprobados
+     </small>
+    </div>
+    <div class="indicador">
+     <span class="etiqueta">
+      Egresos comprometidos
+     </span>
+     <strong class="valor" id="totalCompromisos">
+      $0.00
+     </strong>
+     <small>
+      Compromisos confirmados y egresos adicionales
+     </small>
+    </div>
+    <div class="indicador">
+     <span class="etiqueta">
+      Egresos pagados
+     </span>
+     <strong class="valor" id="totalPagado">
+      $0.00
+     </strong>
+     <small>
+      Pagos aplicados a compromisos y egresos
+     </small>
+    </div>
+    <div class="indicador">
+     <span class="etiqueta">
+      Egresos pendientes de pago
+     </span>
+     <strong class="valor" id="totalSaldo">
+      $0.00
+     </strong>
+     <small>
+      Compromisos y egresos adicionales menos pagos aplicados
+     </small>
+    </div>
+   </section>
+   <section class="resumen">
+    <div class="indicador">
+     <span class="etiqueta">
+      Presupuesto disponible
+     </span>
+     <strong class="valor" id="disponible">
+      $0.00
+     </strong>
+     <small>
+      Autorizado menos compromisos
+     </small>
+    </div>
+    <div class="indicador">
+     <span class="etiqueta">
+      Cotizaciones
+     </span>
+     <strong class="valor" id="totalCotizaciones">
+      $0.00
+     </strong>
+     <small>
+      No son egresos confirmados
+     </small>
+    </div>
+    <div class="indicador">
+     <span class="etiqueta">
+      Ingresos esperados pendientes
+     </span>
+     <strong class="valor" id="ingresosEsperados">
+      $0.00
+     </strong>
+     <small>
+      Por cobrar según los registros
+     </small>
+    </div>
+    <div class="indicador">
+     <span class="etiqueta">
+      Ingresos cobrados
+     </span>
+     <strong class="valor" id="ingresosCobrados">
+      $0.00
+     </strong>
+     <small>
+      Importes registrados como recibidos
+     </small>
+    </div>
+   </section>
+   <section class="resumen">
+    <div class="indicador">
+     <span class="etiqueta">
+      Egresos registrados
+     </span>
+     <strong class="valor" id="gastosRegistrados">
+      $0.00
+     </strong>
+     <small>
+      Compromisos confirmados y egresos adicionales
+     </small>
+    </div>
+    <div class="indicador">
+     <span class="etiqueta">
+      Egresos pagados
+     </span>
+     <strong class="valor" id="gastosPagados">
+      $0.00
+     </strong>
+     <small>
+      Pagos aplicados menos reembolsos
+     </small>
+    </div>
+    <div class="indicador">
+     <span class="etiqueta">
+      Resultado estimado
+     </span>
+     <strong class="valor" id="utilidadEstimada">
+      $0.00
+     </strong>
+     <small>
+      Ingresos previstos totales menos egresos registrados
+     </small>
+    </div>
+    <div class="indicador">
+     <span class="etiqueta">
+      Saldo de caja
+     </span>
+     <strong class="valor" id="saldoCaja">
+      $0.00
+     </strong>
+     <small>
+      Ingresos cobrados menos egresos pagados
+     </small>
+    </div>
+   </section>
+   <section aria-labelledby="tituloEstadoFinanciero" class="seccion-estado">
+    <div class="estado-encabezado">
+     <h2 id="tituloEstadoFinanciero">
+      Estado financiero: ingresos vs. egresos
+     </h2>
+     <p>
+      Vista consolidada del OXI 2026. Los importes se calculan a partir de los registros de este módulo.
+     </p>
+    </div>
+    <section aria-label="Estado financiero resumido del evento" class="estado-financiero">
+     <div class="estado-columna egresos">
+      <h3>
+       EGRESOS DEL EVENTO
+      </h3>
+      <div class="estado-cuerpo">
+       <div class="linea-resumen">
+        <span>
+         Egresos comprometidos / registrados
+        </span>
+        <strong id="reporteGastosRegistrados">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen">
+        <span>
+         Egresos pagados
+        </span>
+        <strong id="reporteGastosPagados">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen">
+        <span>
+         Saldo de egresos pendiente de pago
+        </span>
+        <strong id="reporteGastosPendientes">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen">
+        <span>
+         Cotizaciones de egresos (no comprometidas)
+        </span>
+        <strong id="reporteCotizaciones">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen total">
+        <span>
+         Total de egresos registrados
+        </span>
+        <strong id="reporteGastosTotal">
+         $0.00
+        </strong>
+       </div>
+       <p class="nota-resumen">
+        Las cotizaciones se muestran por separado y no forman parte de los egresos comprometidos. Los pagos representan flujo de efectivo y no un egreso adicional.
+       </p>
+      </div>
+     </div>
+     <div class="estado-columna ingresos">
+      <h3>
+       INGRESOS DEL EVENTO
+      </h3>
+      <div class="estado-cuerpo">
+       <div class="subtitulo-resumen">
+        Desglose por concepto
+       </div>
+       <div class="linea-resumen">
+        <span>
+         Reservaciones
+        </span>
+        <strong id="reporteReservaciones">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen donacion-linea">
+        <span>
+         Donaciones recibidas
+        </span>
+        <strong id="reporteDonaciones">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen">
+        <span>Donaciones pendientes de cobro</span>
+        <strong id="reporteDonacionesPendientes">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen">
+        <span>
+         Patrocinios
+        </span>
+        <strong id="reportePatrocinios">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen">
+        <span>
+         Ventas / participación comercial
+        </span>
+        <strong id="reporteVentas">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen">
+        <span>
+         Otros ingresos
+        </span>
+        <strong id="reporteOtrosIngresos">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen total">
+        <span>
+         Total de ingresos cobrados
+        </span>
+        <strong id="reporteIngresosCobrados">
+         $0.00
+        </strong>
+       </div>
+       <div class="linea-resumen">
+        <span>
+         Ingresos esperados por cobrar
+        </span>
+        <strong id="reporteIngresosPendientes">
+         $0.00
+        </strong>
+       </div>
+       <p class="nota-resumen">
+        Las donaciones pueden provenir de socios, asistentes o participantes comerciales como FAGE. Registra en “Persona o entidad” quién aporta y en “Concepto” el motivo. Las categorías principales muestran importes efectivamente recibidos; las donaciones pendientes se muestran por separado y también forman parte del total general de ingresos pendientes.
+       </p>
+      </div>
+     </div>
+    </section>
+   </section>
+   <section class="panel" id="panel-presupuesto">
+    <div class="panel-titulo">
+     <h3>
+      1. Presupuesto general
+     </h3>
+     <p>
+      Importe autorizado para el evento. Los cambios al presupuesto pueden documentarse mediante ajustes.
+     </p>
+    </div>
+    <div class="contenido">
+     <form id="formPresupuesto">
+      <div class="formulario">
+       <div class="campo">
+        <label for="presupuesto">
+         Presupuesto autorizado (MXN)
+        </label>
+        <input id="presupuesto" min="0" required="" step="0.01" type="number"/>
+       </div>
+       <div class="campo">
+        <label for="eventoNombre">
+         Evento
+        </label>
+        <input id="eventoNombre" required=""/>
+       </div>
+       <div class="campo">
+        <label for="eventoFecha">
+         Fecha del evento
+        </label>
+        <input id="eventoFecha" type="date"/>
+       </div>
+      </div>
+      <div class="botones-form">
+       <button class="primario" type="submit">
+        Guardar presupuesto
+       </button>
+      </div>
+      <p aria-live="polite" class="aviso-estado" id="estadoPresupuesto">
+      </p>
+     </form>
+    </div>
+   </section>
+   <section class="panel" id="panel-proveedores">
+    <div class="panel-titulo">
+     <h3>
+      2. Proveedores
+     </h3>
+     <p>
+      Directorio de personas y empresas proveedoras.
+     </p>
+    </div>
+    <div class="contenido">
+     <form id="formProveedor">
+      <div class="formulario">
+       <div class="campo">
+        <label for="provNombre">
+         Nombre del proveedor *
+        </label>
+        <input id="provNombre" maxlength="120" required=""/>
+       </div>
+       <div class="campo">
+        <label for="provCategoria">
+         Categoría *
+        </label>
+        <select id="provCategoria" required="">
+         <option value="">
+          Selecciona
+         </option>
+         <option>
+          Alimentos
+         </option>
+         <option>
+          Bebidas
+         </option>
+         <option>
+          Carpas y montaje
+         </option>
+         <option>
+          Música y entretenimiento
+         </option>
+         <option>
+          Meseros y personal
+         </option>
+         <option>
+          Hielo
+         </option>
+         <option>
+          Insumos
+         </option>
+         <option>
+          Decoración
+         </option>
+         <option>
+          Renta de equipo
+         </option>
+         <option>
+          Transporte
+         </option>
+         <option>
+          Otros
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="provContacto">
+         Persona de contacto
+        </label>
+        <input id="provContacto" maxlength="120"/>
+       </div>
+       <div class="campo">
+        <label for="provTelefono">
+         Teléfono
+        </label>
+        <input id="provTelefono" maxlength="40" type="tel"/>
+       </div>
+       <div class="campo">
+        <label for="provCorreo">
+         Correo
+        </label>
+        <input id="provCorreo" maxlength="120" type="email"/>
+       </div>
+       <div class="campo">
+        <label for="provRfc">
+         RFC (opcional)
+        </label>
+        <input id="provRfc" maxlength="20"/>
+       </div>
+       <div class="campo completo">
+        <label for="provNotas">
+         Observaciones
+        </label>
+        <input id="provNotas" maxlength="250"/>
+       </div>
+      </div>
+      <div class="botones-form">
+       <button class="primario" type="submit">
+        Agregar proveedor
+       </button>
+       <button class="secundario" type="reset">
+        Limpiar
+       </button>
+      </div>
+     </form>
+    </div>
+    <div class="tabla-contenedor">
+     <table>
+      <thead>
+       <tr>
+        <th>
+         Proveedor
+        </th>
+        <th>
+         Categoría
+        </th>
+        <th>
+         Contacto
+        </th>
+        <th>
+         Teléfono / correo
+        </th>
+        <th>
+         Acciones
+        </th>
+       </tr>
+      </thead>
+      <tbody id="tablaProveedores">
+      </tbody>
+     </table>
+     <div class="vacio" id="vacioProveedores">
+      Todavía no hay proveedores.
+     </div>
+    </div>
+   </section>
+   <section class="panel" id="panel-servicios">
+    <div class="panel-titulo">
+     <h3>
+      3. Servicios
+     </h3>
+     <p>
+      Catálogo de servicios o productos ofrecidos por los proveedores.
+     </p>
+    </div>
+    <div class="contenido">
+     <form id="formServicio">
+      <div class="formulario">
+       <div class="campo">
+        <label for="servProveedor">
+         Proveedor *
+        </label>
+        <select id="servProveedor" required="">
+        </select>
+       </div>
+       <div class="campo">
+        <label for="servNombre">
+         Nombre del servicio *
+        </label>
+        <input id="servNombre" maxlength="140" required=""/>
+       </div>
+       <div class="campo">
+        <label for="servCategoria">
+         Categoría
+        </label>
+        <select id="servCategoria">
+         <option>
+          Alimentos
+         </option>
+         <option>
+          Bebidas
+         </option>
+         <option>
+          Carpas y montaje
+         </option>
+         <option>
+          Música y entretenimiento
+         </option>
+         <option>
+          Meseros y personal
+         </option>
+         <option>
+          Hielo
+         </option>
+         <option>
+          Insumos
+         </option>
+         <option>
+          Decoración
+         </option>
+         <option>
+          Renta de equipo
+         </option>
+         <option>
+          Transporte
+         </option>
+         <option>
+          Otros
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="servUnidad">
+         Unidad
+        </label>
+        <input id="servUnidad" maxlength="40" value="servicio"/>
+       </div>
+       <div class="campo">
+        <label for="servPrecio">
+         Precio referencial (MXN)
+        </label>
+        <input id="servPrecio" min="0" step="0.01" type="number" value="0"/>
+       </div>
+       <div class="campo">
+        <label for="servNotas">
+         Descripción / notas
+        </label>
+        <input id="servNotas" maxlength="200"/>
+       </div>
+      </div>
+      <div class="botones-form">
+       <button class="primario" type="submit">
+        Agregar servicio
+       </button>
+      </div>
+     </form>
+    </div>
+    <div class="tabla-contenedor">
+     <table>
+      <thead>
+       <tr>
+        <th>
+         Servicio
+        </th>
+        <th>
+         Proveedor
+        </th>
+        <th>
+         Categoría
+        </th>
+        <th>
+         Unidad
+        </th>
+        <th class="numerico">
+         Precio ref.
+        </th>
+        <th>
+         Acciones
+        </th>
+       </tr>
+      </thead>
+      <tbody id="tablaServicios">
+      </tbody>
+     </table>
+     <div class="vacio" id="vacioServicios">
+      Todavía no hay servicios.
+     </div>
+    </div>
+   </section>
+   <section class="panel" id="panel-compromisos">
+    <div class="panel-titulo">
+     <h3>
+      4. Cotizaciones y compromisos
+     </h3>
+     <p>
+      Las cotizaciones son propuestas; solo los compromisos confirmados afectan el presupuesto disponible.
+     </p>
+    </div>
+    <div class="contenido">
+     <form id="formCompromiso">
+      <div class="formulario">
+       <div class="campo">
+        <label for="compProveedor">
+         Proveedor *
+        </label>
+        <select id="compProveedor" required="">
+        </select>
+       </div>
+       <div class="campo">
+        <label for="compServicio">
+         Servicio relacionado
+        </label>
+        <select id="compServicio">
+         <option value="">
+          Sin servicio asociado
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="compTipo">
+         Tipo de registro *
+        </label>
+        <select id="compTipo">
+         <option value="cotizacion">
+          Cotización
+         </option>
+         <option value="compromiso">
+          Compromiso confirmado
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="compDescripcion">
+         Concepto *
+        </label>
+        <input id="compDescripcion" maxlength="160" required=""/>
+       </div>
+       <div class="campo">
+        <label for="compMonto">
+         Importe (MXN) *
+        </label>
+        <input id="compMonto" min="0.01" required="" step="0.01" type="number"/>
+       </div>
+       <div class="campo">
+        <label for="compFecha">
+         Fecha
+        </label>
+        <input id="compFecha" type="date"/>
+       </div>
+       <div class="campo">
+        <label for="compRubro">
+         Rubro presupuestal
+        </label>
+        <select id="compRubro">
+         <option value="RUB-006">
+          Otros egresos
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="compAutorizado">
+         Autorizado por
+        </label>
+        <input id="compAutorizado" maxlength="100"/>
+       </div>
+       <div class="campo">
+        <label for="compNotas">
+         Observaciones
+        </label>
+        <input id="compNotas" maxlength="250"/>
+       </div>
+      </div>
+      <div class="botones-form">
+       <button class="primario" type="submit">
+        Registrar
+       </button>
+      </div>
+     </form>
+    </div>
+    <div class="tabla-contenedor">
+     <table>
+      <thead>
+       <tr>
+        <th>
+         Proveedor / concepto
+        </th>
+        <th>
+         Tipo
+        </th>
+        <th>
+         Fecha
+        </th>
+        <th class="numerico">
+         Importe
+        </th>
+        <th class="numerico">
+         Pagado
+        </th>
+        <th class="numerico">
+         Saldo
+        </th>
+        <th>
+         Acciones
+        </th>
+       </tr>
+      </thead>
+      <tbody id="tablaCompromisos">
+      </tbody>
+     </table>
+     <div class="vacio" id="vacioCompromisos">
+      Todavía no hay cotizaciones ni compromisos.
+     </div>
+    </div>
+   </section>
+   <section class="panel" id="panel-gastos">
+    <div class="panel-titulo">
+     <h3>
+      5. Egresos adicionales
+     </h3>
+     <p>
+      Registra egresos confirmados que no estén asociados a un compromiso de proveedor.
+     </p>
+    </div>
+    <div class="contenido">
+     <form id="formGasto">
+      <div class="formulario">
+       <div class="campo">
+        <label for="gastoConcepto">
+         Concepto *
+        </label>
+        <input id="gastoConcepto" maxlength="160" required=""/>
+       </div>
+       <div class="campo">
+        <label for="gastoRubro">
+         Rubro
+        </label>
+        <select id="gastoRubro">
+         <option value="RUB-006">
+          Otros egresos
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="gastoFecha">
+         Fecha *
+        </label>
+        <input id="gastoFecha" required="" type="date"/>
+       </div>
+       <div class="campo">
+        <label for="gastoProveedor">
+         Proveedor (opcional)
+        </label>
+        <select id="gastoProveedor">
+         <option value="">
+          Sin proveedor
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="gastoImporte">
+         Importe (MXN) *
+        </label>
+        <input id="gastoImporte" min="0.01" required="" step="0.01" type="number"/>
+       </div>
+       <div class="campo">
+        <label for="gastoComprobante">
+         Referencia de comprobante
+        </label>
+        <input id="gastoComprobante" maxlength="120"/>
+       </div>
+       <div class="campo completo">
+        <label for="gastoNotas">
+         Observaciones
+        </label>
+        <input id="gastoNotas" maxlength="250"/>
+       </div>
+      </div>
+      <div class="botones-form">
+       <button class="primario" type="submit">
+        Registrar egreso
+       </button>
+      </div>
+     </form>
+    </div>
+    <div class="tabla-contenedor">
+     <table>
+      <thead>
+       <tr>
+        <th>
+         Fecha
+        </th>
+        <th>
+         Concepto
+        </th>
+        <th>
+         Rubro
+        </th>
+        <th class="numerico">
+         Importe
+        </th>
+        <th class="numerico">
+         Pagado
+        </th>
+        <th class="numerico">
+         Saldo
+        </th>
+        <th>
+         Acciones
+        </th>
+       </tr>
+      </thead>
+      <tbody id="tablaGastos">
+      </tbody>
+     </table>
+     <div class="vacio" id="vacioGastos">
+      Todavía no hay egresos adicionales.
+     </div>
+    </div>
+   </section>
+   <section class="panel" id="panel-pagos">
+    <div class="panel-titulo">
+     <h3>
+      6. Pagos y anticipos de egresos
+     </h3>
+     <p>
+      Registra un movimiento y asígnalo a un compromiso o egreso adicional. No dupliques un pago en ambos registros.
+     </p>
+    </div>
+    <div class="contenido">
+     <form id="formPago">
+      <div class="formulario">
+       <div class="campo">
+        <label for="pagoDestinoTipo">
+         Aplicar a *
+        </label>
+        <select id="pagoDestinoTipo">
+         <option value="compromiso">
+          Compromiso confirmado
+         </option>
+         <option value="gasto">
+          Egreso adicional
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="pagoDestino">
+         Compromiso / egreso *
+        </label>
+        <select id="pagoDestino" required="">
+        </select>
+       </div>
+       <div class="campo">
+        <label for="pagoMonto">
+         Importe (MXN) *
+        </label>
+        <input id="pagoMonto" min="0.01" required="" step="0.01" type="number"/>
+       </div>
+       <div class="campo">
+        <label for="pagoFecha">
+         Fecha de pago *
+        </label>
+        <input id="pagoFecha" required="" type="date"/>
+       </div>
+       <div class="campo">
+        <label for="pagoTipo">
+         Tipo de movimiento
+        </label>
+        <select id="pagoTipo">
+         <option value="anticipo">
+          Anticipo
+         </option>
+         <option value="parcialidad">
+          Abono
+         </option>
+         <option value="liquidacion">
+          Liquidación
+         </option>
+         <option value="reembolso">
+          Reembolso
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="pagoMetodo">
+         Forma de pago
+        </label>
+        <select id="pagoMetodo">
+         <option value="transferencia">
+          Transferencia
+         </option>
+         <option value="efectivo">
+          Efectivo
+         </option>
+         <option value="tarjeta">
+          Tarjeta
+         </option>
+         <option value="cheque">
+          Cheque
+         </option>
+         <option value="otro">
+          Otro
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="pagoReferencia">
+         Referencia / comprobante
+        </label>
+        <input id="pagoReferencia" maxlength="120"/>
+       </div>
+       <div class="campo">
+        <label for="pagoNotas">
+         Observaciones
+        </label>
+        <input id="pagoNotas" maxlength="200"/>
+       </div>
+      </div>
+      <div class="botones-form">
+       <button class="primario" type="submit">
+        Registrar pago
+       </button>
+      </div>
+      <p aria-live="polite" class="aviso-estado" id="estadoPago">
+      </p>
+     </form>
+    </div>
+    <div class="tabla-contenedor">
+     <table>
+      <thead>
+       <tr>
+        <th>
+         Fecha
+        </th>
+        <th>
+         Destino
+        </th>
+        <th>
+         Tipo
+        </th>
+        <th>
+         Método
+        </th>
+        <th>
+         Referencia
+        </th>
+        <th class="numerico">
+         Importe
+        </th>
+        <th>
+         Acciones
+        </th>
+       </tr>
+      </thead>
+      <tbody id="tablaPagos">
+      </tbody>
+     </table>
+     <div class="vacio" id="vacioPagos">
+      Todavía no hay pagos.
+     </div>
+    </div>
+   </section>
+   <section class="panel" id="panel-reservaciones">
+    <div class="panel-titulo">
+     <h3>
+      7. Integración de reservaciones
+     </h3>
+     <p>
+      Importa el JSON v2 generado por el módulo de reservaciones. La importación es de solo lectura respecto al archivo original y puede repetirse sin duplicar registros.
+     </p>
+    </div>
+    <div class="contenido">
+     <div class="dos-columnas">
+      <div class="campo">
+       <label for="archivoReservaciones">
+        Archivo JSON de reservaciones
+       </label>
+       <input accept=".json,application/json" id="archivoReservaciones" type="file"/>
+       <span class="ayuda">
+        Selecciona el JSON v2 de OXI-2026. No selecciones el CSV ni el archivo de Finanzas.
+       </span>
+      </div>
+      <div class="campo">
+       <label>
+        Reglas aplicadas
+       </label>
+       <div class="ayuda">
+        La importación conserva los datos que vienen del registro de reservaciones. Si después se ajusta el precio, se aplica un descuento o se corrige un abono, actualiza primero el registro de origen y vuelve a importar. Las cortesías institucionales se mantienen separadas de los ingresos ordinarios; las notas se conservan como observaciones.
+       </div>
+      </div>
+     </div>
+     <div class="botones-form">
+      <button class="primario" id="importarReservaciones" type="button">
+       Importar / actualizar reservaciones
+      </button>
+     </div>
+     <p aria-live="polite" class="aviso-estado" id="estadoReservaciones">
+      Aún no se ha importado un JSON de reservaciones.
+     </p>
+    </div>
+   </section>
+   <section class="panel" id="panel-ingresos">
+    <div class="panel-titulo">
+     <h3>
+      8. Ingresos y donativos
+     </h3>
+     <p>
+      Registra ingresos previstos y cobros recibidos. Los ingresos importados conservan la referencia original de la reservación para evitar duplicados.
+     </p>
+    </div>
+    <div class="contenido">
+     <form id="formIngreso">
+      <div class="formulario">
+       <div class="campo">
+        <label for="ingFuente">
+         Fuente *
+        </label>
+        <select id="ingFuente">
+         <option value="reservacion">
+          Reservación
+         </option>
+         <option value="donativo">
+          Donación
+         </option>
+         <option value="patrocinio">
+          Patrocinio
+         </option>
+         <option value="venta">
+          Venta / participación comercial
+         </option>
+         <option value="otro">
+          Otros ingresos
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="ingConcepto">
+         Concepto *
+        </label>
+        <input id="ingConcepto" maxlength="160" required=""/>
+       </div>
+       <div class="campo">
+        <label for="ingEstado">
+         Estado *
+        </label>
+        <select id="ingEstado">
+         <option value="esperado">
+          Esperado
+         </option>
+         <option value="cobrado">
+          Cobrado
+         </option>
+        </select>
+       </div>
+       <div class="campo">
+        <label for="ingEsperado">
+         Importe esperado (MXN)
+        </label>
+        <input id="ingEsperado" min="0" step="0.01" type="number" value="0"/>
+       </div>
+       <div class="campo">
+        <label for="ingCobrado">
+         Importe cobrado (MXN)
+        </label>
+        <input id="ingCobrado" min="0" step="0.01" type="number" value="0"/>
+       </div>
+       <div class="campo">
+        <label for="ingFecha">
+         Fecha prevista / cobro
+        </label>
+        <input id="ingFecha" type="date"/>
+       </div>
+       <div class="campo">
+        <label for="ingEntidad">
+         Persona o entidad
+        </label>
+        <input id="ingEntidad" maxlength="120"/>
+       </div>
+       <div class="campo">
+        <label for="ingReferencia">
+         Referencia externa (opcional)
+        </label>
+        <input id="ingReferencia" maxlength="120"/>
+       </div>
+       <div class="campo">
+        <label for="ingMetodo">
+         Método de cobro
+        </label>
+        <select id="ingMetodo">
+         <option value="">
+          No definido
+         </option>
+         <option value="transferencia">
+          Transferencia
+         </option>
+         <option value="efectivo">
+          Efectivo
+         </option>
+         <option value="tarjeta">
+          Tarjeta
+         </option>
+         <option value="otro">
+          Otro
+         </option>
+        </select>
+       </div>
+      </div>
+      <p class="ayuda" style="margin-top:12px">
+       Para donaciones, selecciona “Donación”, escribe el concepto y registra en “Persona o entidad” al socio, asistente o empresa que aporta. Si FAGE entrega una parte de sus ventas, registra “Venta / participación comercial” o “Donación” según cómo el Consejo reciba y clasifique el importe.
+      </p>
+      <div class="botones-form">
+       <button class="primario" type="submit">
+        Registrar ingreso
+       </button>
+      </div>
+     </form>
+    </div>
+    <div class="tabla-contenedor">
+     <table>
+      <thead>
+       <tr>
+        <th>
+         Fuente / concepto
+        </th>
+        <th>
+         Estado
+        </th>
+        <th>
+         Entidad
+        </th>
+        <th class="numerico">
+         Esperado
+        </th>
+        <th class="numerico">
+         Cobrado
+        </th>
+        <th>
+         Acciones
+        </th>
+       </tr>
+      </thead>
+      <tbody id="tablaIngresos">
+      </tbody>
+     </table>
+     <div class="vacio" id="vacioIngresos">
+      Todavía no hay ingresos.
+     </div>
+    </div>
+   </section>
+   <section class="panel" id="panel-control">
+    <div class="panel-titulo">
+     <h3>
+      9. Resumen y control de datos
+     </h3>
+     <p>
+      Indicadores calculados con los movimientos registrados.
+     </p>
+    </div>
+    <div class="contenido">
+     <div class="dos-columnas">
+      <div>
+       <label>
+        Utilidad estimada del evento
+       </label>
+       <strong class="valor" id="resultadoEstimado">
+        $0.00
+       </strong>
+       <p class="ayuda">
+        Ingresos previstos totales menos egresos registrados/comprometidos. No equivale a efectivo disponible.
+       </p>
+      </div>
+      <div>
+       <label>
+        Saldo de caja del evento
+       </label>
+       <strong class="valor" id="resultadoCaja">
+        $0.00
+       </strong>
+       <p class="ayuda">
+        Ingresos cobrados menos egresos pagados, incluyendo reembolsos como importes negativos.
+       </p>
+      </div>
+     </div>
+     <p class="ayuda" style="margin-top:20px">
+      Las cotizaciones no son compromisos; los anticipos se registran como pagos y no se suman otra vez como egreso. Los egresos registrados muestran obligaciones confirmadas y egresos adicionales; los egresos pagados muestran flujo de efectivo. Los importes importados de reservaciones conservan su referencia externa para evitar duplicados. El archivo publicado en GitHub se usa como plantilla inicial, no como base de datos compartida.
+     </p>
+     <div class="panel" style="margin-top:20px;box-shadow:none;background:#f8fbff">
+      <div class="panel-titulo">
+       <h3>
+        Ruta de evolución del sistema
+       </h3>
+       <p>
+        Preparar el módulo financiero para crecer sin perder trazabilidad ni duplicar registros.
+       </p>
+      </div>
+      <div class="contenido">
+       <div class="dos-columnas">
+        <div>
+         <strong>
+          Base común de movimientos
+         </strong>
+         <p class="ayuda">
+          Cada ingreso, egreso, compromiso o pago tendrá identificador estable, fecha, periodo, categoría, origen, referencia relacionada y estado. Se distinguirán importes previstos, comprometidos y efectivamente cobrados o pagados.
+         </p>
+        </div>
+        <div>
+         <strong>
+          Próximos módulos por etapas
+         </strong>
+         <p class="ayuda">
+          1. Mejoras de reportes y conciliación. 2. Cuotas y padrón de socios. 3. Costos fijos y variables de instalaciones. 4. Consolidado por evento, periodo y Consejo Directivo.
+         </p>
+        </div>
+       </div>
+       <p class="ayuda">
+        Por ahora, este panel es una guía de trabajo; no crea módulos nuevos ni cambia el cálculo de los movimientos existentes.
+       </p>
+      </div>
+     </div>
+     <p aria-live="polite" class="aviso-estado" id="estadoCarga">
+     </p>
+    </div>
+   </section>
+   <div class="pie-modulo">
+    Comunidad Helénica de México, A.C. · Administración Financiera · OXI 2026
+    <br/>
+    Recomendación operativa: exportar un respaldo JSON después de cada sesión importante y antes de importar información.
+   </div>
+  </main>
+  <footer>
+   <strong>
+    Comunidad Helénica de México, A.C.
+   </strong>
+   <br/>
+   Administración financiera · OXI 2026
+   <br/>
+   Herramienta administrativa preliminar. Conserva respaldos y verifica los movimientos.
+  </footer>
+  <script>
+   (()=>{'use strict';
+const CLAVE='comunidadHelenicaFinanzasOXI2026_v2';
+const JSON_INICIAL='./finanzas_oxi_2026.json';
+const $=id=>document.getElementById(id);const dinero=v=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(Number(v)||0);const hoy=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};const nuevoId=p=>p+'-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7).toUpperCase();const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let estado=null;
+function plantilla(){return {metadata:{archivo:'finanzas_oxi_2026.json',sistema:'Portal Administrativo - Comunidad Helenica de Mexico, A.C.',evento_id:'OXI-2026',version_esquema:'1.0.0',moneda:'MXN',fecha_creacion:new Date().toISOString(),ultima_actualizacion:new Date().toISOString(),notas:'Datos administrados por el modulo financiero.'},evento:{id:'OXI-2026',nombre:'Celebracion del OXI 2026',fecha_evento:'2026-10-25',estado:'planeacion',responsable_finanzas:'',observaciones:''},catalogos:{categorias_proveedor:['Alimentos','Bebidas','Carpas y montaje','Musica y entretenimiento','Meseros y personal','Hielo','Insumos','Decoracion','Renta de equipo','Transporte','Otros']},presupuesto:{id:'PRES-OXI-2026-001',moneda:'MXN',importe_autorizado:0,fecha_autorizacion:null,autorizado_por:'',rubros:[{id:'RUB-001',nombre:'Alimentos',importe_autorizado:0,observaciones:''},{id:'RUB-002',nombre:'Bebidas',importe_autorizado:0,observaciones:''},{id:'RUB-003',nombre:'Carpas y montaje',importe_autorizado:0,observaciones:''},{id:'RUB-004',nombre:'Musica y entretenimiento',importe_autorizado:0,observaciones:''},{id:'RUB-005',nombre:'Personal y meseros',importe_autorizado:0,observaciones:''},{id:'RUB-006',nombre:'Otros egresos',importe_autorizado:0,observaciones:''}]},proveedores:[],servicios:[],cotizaciones:[],compromisos:[],gastos_adicionales:[],pagos:[],ingresos:[],ajustes_presupuesto:[],calculos:{reglas:{}},integraciones:{reservaciones:{habilitada:false,sistema_origen:'modulo_reservaciones',ultima_sincronizacion:null,regla_identificador_externo:'reservacion_id',observaciones:'Pendiente revisar el esquema real de reservaciones.'}},auditoria:{creado_por:'',actualizado_por:'',historial:[]}}}
+function normalizar(d){const base=plantilla();if(!d||typeof d!=='object')throw Error('El archivo no contiene un objeto JSON.');if(!Array.isArray(d.proveedores)||!Array.isArray(d.compromisos)||!Array.isArray(d.pagos))throw Error('Faltan las listas proveedores, compromisos o pagos.');for(const k of ['servicios','cotizaciones','gastos_adicionales','ingresos','ajustes_presupuesto'])if(!Array.isArray(d[k]))d[k]=[];d.metadata={...base.metadata,...(d.metadata||{})};d.evento={...base.evento,...(d.evento||{})};d.catalogos={...base.catalogos,...(d.catalogos||{})};d.presupuesto={...base.presupuesto,...(typeof d.presupuesto==='object'?d.presupuesto:{importe_autorizado:Number(d.presupuesto)||0})};d.presupuesto.rubros=Array.isArray(d.presupuesto.rubros)?d.presupuesto.rubros:base.presupuesto.rubros;d.calculos=d.calculos||base.calculos;d.integraciones=d.integraciones||base.integraciones;d.auditoria=d.auditoria||base.auditoria;return d}
+function validar(d){d=normalizar(d);const unique=(arr,label)=>{const ids=arr.map(x=>x.id);if(ids.some(x=>!x)||new Set(ids).size!==ids.length)throw Error('Hay identificadores vacíos o duplicados en '+label+'.')};['proveedores','servicios','cotizaciones','compromisos','gastos_adicionales','pagos','ingresos','ajustes_presupuesto'].forEach(k=>unique(d[k],k));const prov=new Set(d.proveedores.map(x=>x.id)),serv=new Set(d.servicios.map(x=>x.id)),comp=new Set(d.compromisos.map(x=>x.id)),gastos=new Set(d.gastos_adicionales.map(x=>x.id));for(const p of d.proveedores)if(!p.nombre||!p.categoria)throw Error('Hay un proveedor sin nombre o categoría.');for(const s of d.servicios)if(!s.nombre||!prov.has(s.proveedor_id))throw Error('Hay un servicio sin nombre o con proveedor inexistente.');for(const c of d.cotizaciones)if(!c.id||!prov.has(c.proveedor_id)||!Number.isFinite(Number(c.importe))||Number(c.importe)<0)throw Error('Hay una cotización inválida.');for(const c of d.compromisos)if(!prov.has(c.proveedor_id)||!Number.isFinite(Number(c.importe_confirmado))||Number(c.importe_confirmado)<=0)throw Error('Hay un compromiso inválido o con proveedor inexistente.');for(const g of d.gastos_adicionales)if(!g.concepto||!Number.isFinite(Number(g.importe))||Number(g.importe)<=0)throw Error('Hay un gasto adicional inválido.');for(const p of d.pagos){if(!Number.isFinite(Number(p.importe))||Number(p.importe)<=0)throw Error('Hay un pago con importe inválido.');if(p.compromiso_id&&!comp.has(p.compromiso_id))throw Error('Un pago referencia un compromiso inexistente.');if(p.gasto_adicional_id&&!gastos.has(p.gasto_adicional_id))throw Error('Un pago referencia un gasto inexistente.');if(!p.compromiso_id&&!p.gasto_adicional_id)throw Error('Cada pago debe asociarse a un compromiso o gasto.')}for(const i of d.ingresos)if(!i.id||!Number.isFinite(Number(i.importe_esperado||0))||!Number.isFinite(Number(i.importe_cobrado||0)))throw Error('Hay un ingreso inválido.');return d}
+function guardar(){try{estado.metadata.ultima_actualizacion=new Date().toISOString();localStorage.setItem(CLAVE,JSON.stringify(estado));return true}catch(e){alert('No se pudieron guardar los datos en este navegador. Exporta un respaldo.');return false}}
+
+// Integra el catálogo institucional sin reemplazar movimientos financieros.
+async function integrarCatalogoInstitucional(datos){
+  const resultado={proveedoresAgregados:0,serviciosAgregados:0,estado:'no disponible'};
+  try{
+    const moduloUrl=new URL('../js/proveedores.js',window.location.href);
+    const modulo=await import(moduloUrl.href);
+    const catalogo=await modulo.cargarCatalogoProveedores({recargar:true});
+    if(!catalogo||!Array.isArray(catalogo.proveedores)||!Array.isArray(catalogo.servicios))throw Error('El catálogo central no contiene las listas esperadas.');
+    const idsProveedores=new Set(datos.proveedores.map(p=>p.id));
+    for(const p of catalogo.proveedores){
+      if(p.estado!=='activo'||idsProveedores.has(p.id))continue;
+      datos.proveedores.push({...p,contacto_nombre:p.contacto_nombre||p.nombre,telefono:p.telefono||'',correo:p.correo||'',rfc:p.rfc||'',datos_fiscales:p.datos_fiscales||'',estado:p.estado||'activo',observaciones:p.observaciones||''});
+      idsProveedores.add(p.id);resultado.proveedoresAgregados++;
+    }
+    const idsServicios=new Set(datos.servicios.map(s=>s.id));
+    for(const s of catalogo.servicios){
+      if(s.activo!==true||idsServicios.has(s.id))continue;
+      if(!idsProveedores.has(s.proveedor_id))continue;
+      datos.servicios.push({...s,descripcion:s.descripcion||'',unidad:s.unidad||'servicio',precio_referencial:s.precio_referencial??0,observaciones:s.observaciones||''});
+      idsServicios.add(s.id);resultado.serviciosAgregados++;
+    }
+    // Incluye categorías nuevas sin borrar las existentes.
+    const categorias=new Set(datos.catalogos.categorias_proveedor||[]);
+    for(const categoria of (catalogo.catalogos?.categorias_proveedor||[]))categorias.add(categoria);
+    datos.catalogos.categorias_proveedor=[...categorias];
+    resultado.estado='correcto';
+  }catch(error){
+    console.error('No se pudo integrar el catálogo institucional:',error);
+    resultado.error=error.message||String(error);
+  }
+  return resultado;
+}
+async function cargar(){const local=localStorage.getItem(CLAVE);if(local){try{estado=validar(JSON.parse(local));$('estadoCarga').textContent='Datos cargados desde el almacenamiento de este navegador.';return}catch(e){alert('Los datos locales de la nueva versión no pudieron leerse: '+e.message)}}try{const r=await fetch(JSON_INICIAL,{cache:'no-store'});if(!r.ok)throw Error('No se pudo leer el JSON publicado (HTTP '+r.status+').');estado=validar(await r.json());$('estadoCarga').textContent='Plantilla inicial cargada desde finanzas_oxi_2026.json. Los cambios se guardarán localmente.'}catch(e){estado=plantilla();$('estadoCarga').textContent='No se pudo cargar la plantilla publicada; se inició una estructura vacía. '+e.message}guardar()}
+const proveedor=id=>estado.proveedores.find(x=>x.id===id);const compromiso=id=>estado.compromisos.find(x=>x.id===id);const gasto=id=>estado.gastos_adicionales.find(x=>x.id===id);const pagosValidos=()=>estado.pagos.filter(p=>p.estado!=='cancelado');const totalPagosComp=id=>pagosValidos().filter(p=>p.compromiso_id===id&&p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);const totalPagosGasto=id=>pagosValidos().filter(p=>p.gasto_adicional_id===id&&p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);const comprometido=()=>estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe_confirmado||0),0)+estado.gastos_adicionales.filter(g=>g.estado==='confirmado').reduce((s,g)=>s+Number(g.importe||0),0);const autorizado=()=>Number(estado.presupuesto.importe_autorizado||0)+estado.ajustes_presupuesto.filter(a=>a.estado==='aprobado').reduce((s,a)=>s+(a.tipo==='reduccion'?-1:1)*Number(a.importe||0),0);const pagado=()=>pagosValidos().filter(p=>p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);
+function selectOpts(id,items,placeholder,labelFn){const el=$(id),old=el.value;el.innerHTML=`<option value="">${esc(placeholder)}</option>`+items.map(x=>`<option value="${esc(x.id)}">${esc(labelFn(x))}</option>`).join('');if(items.some(x=>x.id===old))el.value=old}
+function actualizarSelects(){selectOpts('servProveedor',estado.proveedores,'Selecciona proveedor',p=>p.nombre);selectOpts('compProveedor',estado.proveedores,'Selecciona proveedor',p=>p.nombre);selectOpts('gastoProveedor',estado.proveedores,'Sin proveedor',p=>p.nombre);selectOpts('compServicio',estado.servicios,'Sin servicio asociado',s=>`${s.nombre} — ${(proveedor(s.proveedor_id)||{}).nombre||'Proveedor'}`);selectOpts('compRubro',estado.presupuesto.rubros,'Selecciona rubro',r=>r.nombre);selectOpts('gastoRubro',estado.presupuesto.rubros,'Selecciona rubro',r=>r.nombre);actualizarDestinoPago()}
+function actualizarDestinoPago(){const tipo=$('pagoDestinoTipo').value;if(tipo==='gasto'){selectOpts('pagoDestino',estado.gastos_adicionales.filter(g=>g.estado==='confirmado'),'Selecciona gasto',g=>`${g.concepto} (saldo ${dinero(Number(g.importe)-totalPagosGasto(g.id))})`)}else{selectOpts('pagoDestino',estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)),'Selecciona compromiso',c=>`${(proveedor(c.proveedor_id)||{}).nombre||'Proveedor'} — ${c.concepto} (saldo ${dinero(Number(c.importe_confirmado)-totalPagosComp(c.id))})`)}}
+function render(){if(!estado)return;$('presupuesto').value=estado.presupuesto.importe_autorizado||0;$('eventoNombre').value=estado.evento.nombre||'Celebracion del OXI 2026';$('eventoFecha').value=estado.evento.fecha_evento||'';const comp=comprometido(),pg=pagado(),saldo=estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe_confirmado)-totalPagosComp(c.id),0)+estado.gastos_adicionales.filter(g=>g.estado==='confirmado').reduce((s,g)=>s+Number(g.importe)-totalPagosGasto(g.id),0);const cot=estado.cotizaciones.filter(c=>!['rechazada','vencida'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe||0),0);const ingresosActivos=estado.ingresos.filter(i=>i.estado!=='cancelado'&&i.fuente!=='cortesia_institucional');const ie=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_esperado||0)-Number(i.importe_cobrado||0)),0);const ic=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_cobrado||0)),0);const ingresosPrevistos=ie+ic;const utilidad=ingresosPrevistos-comp;const caja=ic-pg;$('totalPresupuesto').textContent=dinero(autorizado());$('totalCompromisos').textContent=dinero(comp);$('totalPagado').textContent=dinero(pg);$('totalSaldo').textContent=dinero(saldo);$('disponible').textContent=dinero(autorizado()-comp);$('totalCotizaciones').textContent=dinero(cot);$('ingresosEsperados').textContent=dinero(ie);$('ingresosCobrados').textContent=dinero(ic);$('gastosRegistrados').textContent=dinero(comp);$('gastosPagados').textContent=dinero(pg);$('utilidadEstimada').textContent=dinero(utilidad);$('saldoCaja').textContent=dinero(caja);$('resultadoEstimado').textContent=dinero(utilidad);$('resultadoCaja').textContent=dinero(caja);
+// Estado financiero por rubro: solo cobros registrados; cortesías y registros cancelados no cuentan como ingreso.
+const cobradoFuente=(fuente)=>ingresosActivos.filter(i=>i.fuente===fuente).reduce((s,i)=>s+Math.max(0,Number(i.importe_cobrado||0)),0);
+const esperadoPendiente=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_esperado||0)-Number(i.importe_cobrado||0)),0);
+$('reporteGastosRegistrados').textContent=dinero(comp);$('reporteGastosPagados').textContent=dinero(pg);$('reporteGastosPendientes').textContent=dinero(saldo);$('reporteCotizaciones').textContent=dinero(cot);$('reporteGastosTotal').textContent=dinero(comp);
+$('reporteReservaciones').textContent=dinero(cobradoFuente('reservacion'));$('reporteDonaciones').textContent=dinero(cobradoFuente('donativo'));$('reporteDonacionesPendientes').textContent=dinero(ingresosActivos.filter(i=>i.fuente==='donativo').reduce((s,i)=>s+Math.max(0,Number(i.importe_esperado||0)-Number(i.importe_cobrado||0)),0));$('reportePatrocinios').textContent=dinero(cobradoFuente('patrocinio'));$('reporteVentas').textContent=dinero(cobradoFuente('venta'));$('reporteOtrosIngresos').textContent=dinero(ingresosActivos.filter(i=>!['reservacion','donativo','patrocinio','venta'].includes(i.fuente)).reduce((s,i)=>s+Math.max(0,Number(i.importe_cobrado||0)),0));$('reporteIngresosCobrados').textContent=dinero(ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_cobrado||0)),0));$('reporteIngresosPendientes').textContent=dinero(esperadoPendiente);
+$('tablaProveedores').innerHTML=estado.proveedores.map(p=>`<tr><td><strong>${esc(p.nombre)}</strong><br><span class="ayuda">${esc(p.observaciones||'')}</span></td><td>${esc(p.categoria)}</td><td>${esc(p.contacto_nombre||'—')}</td><td>${esc(p.telefono||'—')}<br>${esc(p.correo||'')}</td><td><button class="peligro" data-del="proveedor" data-id="${esc(p.id)}">Eliminar</button></td></tr>`).join('');$('vacioProveedores').classList.toggle('oculto',!!estado.proveedores.length);
+$('tablaServicios').innerHTML=estado.servicios.map(s=>`<tr><td><strong>${esc(s.nombre)}</strong><br><span class="ayuda">${esc(s.descripcion||s.observaciones||'')}</span></td><td>${esc((proveedor(s.proveedor_id)||{}).nombre||'—')}</td><td>${esc(s.categoria||'Otros')}</td><td>${esc(s.unidad||'servicio')}</td><td class="numerico">${dinero(s.precio_referencial)}</td><td><button class="peligro" data-del="servicio" data-id="${esc(s.id)}">Eliminar</button></td></tr>`).join('');$('vacioServicios').classList.toggle('oculto',!!estado.servicios.length);
+const filas=[...estado.cotizaciones.map(c=>({id:c.id,tipo:'cotizacion',proveedor_id:c.proveedor_id,concepto:c.concepto,fecha:c.fecha_recepcion||c.fecha_solicitud,importe:Number(c.importe),estado:c.estado})),...estado.compromisos.map(c=>({id:c.id,tipo:'compromiso',proveedor_id:c.proveedor_id,concepto:c.concepto,fecha:c.fecha_confirmacion,importe:Number(c.importe_confirmado),estado:c.estado}))];$('tablaCompromisos').innerHTML=filas.map(c=>{const isC=c.tipo==='compromiso',pago=isC?totalPagosComp(c.id):0,s=isC?c.importe-pago:c.importe;return `<tr><td><strong>${esc((proveedor(c.proveedor_id)||{}).nombre||'Proveedor')}</strong><br>${esc(c.concepto)}</td><td>${isC?'<span class="estado">Confirmado</span>':'<span class="estado-pendiente">Cotización</span>'}</td><td>${esc(c.fecha||'—')}</td><td class="numerico">${dinero(c.importe)}</td><td class="numerico">${isC?dinero(pago):'—'}</td><td class="numerico">${isC?dinero(s):'—'}</td><td><button class="peligro" data-del="${c.tipo}" data-id="${esc(c.id)}">Eliminar</button></td></tr>`}).join('');$('vacioCompromisos').classList.toggle('oculto',!!filas.length);
+$('tablaGastos').innerHTML=estado.gastos_adicionales.map(g=>`<tr><td>${esc(g.fecha||'—')}</td><td><strong>${esc(g.concepto)}</strong><br><span class="ayuda">${esc(g.comprobante_referencia||'')}</span></td><td>${esc((estado.presupuesto.rubros.find(r=>r.id===g.rubro_id)||{}).nombre||'Otros egresos')}</td><td class="numerico">${dinero(g.importe)}</td><td class="numerico">${dinero(totalPagosGasto(g.id))}</td><td class="numerico">${dinero(Number(g.importe)-totalPagosGasto(g.id))}</td><td><button class="peligro" data-del="gasto" data-id="${esc(g.id)}">Eliminar</button></td></tr>`).join('');$('vacioGastos').classList.toggle('oculto',!!estado.gastos_adicionales.length);
+$('tablaPagos').innerHTML=estado.pagos.map(p=>{const c=p.compromiso_id?compromiso(p.compromiso_id):null,g=p.gasto_adicional_id?gasto(p.gasto_adicional_id):null;return `<tr><td>${esc(p.fecha||'—')}</td><td><strong>${esc(c?(proveedor(c.proveedor_id)||{}).nombre:g?'Gasto adicional':'—')}</strong><br>${esc(c?c.concepto:g?g.concepto:'Registro no disponible')}</td><td>${esc(p.tipo)}</td><td>${esc(p.metodo||'—')}</td><td>${esc(p.referencia||p.comprobante_referencia||'—')}</td><td class="numerico">${dinero(p.importe)}</td><td><button class="peligro" data-del="pago" data-id="${esc(p.id)}">Eliminar</button></td></tr>`}).join('');$('vacioPagos').classList.toggle('oculto',!!estado.pagos.length);
+$('tablaIngresos').innerHTML=estado.ingresos.map(i=>`<tr><td><strong>${esc(i.fuente)}</strong><br>${esc(i.concepto)}${i.referencia_externa&&i.origen_sistema==='reservaciones_oxi_2026'?'<br><span class="ayuda">ID: '+esc(i.referencia_externa)+' · '+esc(i.observaciones||'')+'</span>':''}</td><td>${i.estado==='cobrado'?'<span class="estado">Cobrado</span>':'<span class="estado-pendiente">'+esc(i.estado)+'</span>'}${i.origen_sistema==='reservaciones_oxi_2026'?'<br><span class="ayuda">Importado de reservaciones</span>':''}</td><td>${esc(i.persona_o_entidad||'—')}</td><td class="numerico">${dinero(i.importe_esperado)}</td><td class="numerico">${dinero(i.importe_cobrado)}</td><td><button class="peligro" data-del="ingreso" data-id="${esc(i.id)}">Eliminar</button></td></tr>`).join('');$('vacioIngresos').classList.toggle('oculto',!!estado.ingresos.length);actualizarSelects()}
+$('formPresupuesto').addEventListener('submit',e=>{e.preventDefault();const n=Number($('presupuesto').value);if(!Number.isFinite(n)||n<0)return alert('Captura un presupuesto válido.');estado.presupuesto.importe_autorizado=n;estado.evento.nombre=$('eventoNombre').value.trim();estado.evento.fecha_evento=$('eventoFecha').value||null;estado.presupuesto.fecha_autorizacion=hoy();if(guardar()){render();$('estadoPresupuesto').textContent='Presupuesto guardado en este navegador.'}});
+$('formProveedor').addEventListener('submit',e=>{e.preventDefault();const p={id:nuevoId('PROV'),nombre:$('provNombre').value.trim(),categoria:$('provCategoria').value,contacto_nombre:$('provContacto').value.trim(),telefono:$('provTelefono').value.trim(),correo:$('provCorreo').value.trim(),rfc:$('provRfc').value.trim(),datos_fiscales:'',estado:'activo',observaciones:$('provNotas').value.trim()};if(!p.nombre||!p.categoria)return alert('Completa nombre y categoría.');estado.proveedores.push(p);if(guardar()){e.target.reset();render()}});
+$('formServicio').addEventListener('submit',e=>{e.preventDefault();const s={id:nuevoId('SERV'),proveedor_id:$('servProveedor').value,nombre:$('servNombre').value.trim(),categoria:$('servCategoria').value,descripcion:$('servNotas').value.trim(),unidad:$('servUnidad').value.trim()||'servicio',precio_referencial:Number($('servPrecio').value)||0,activo:true,observaciones:$('servNotas').value.trim()};if(!proveedor(s.proveedor_id))return alert('Registra y selecciona un proveedor.');if(!s.nombre)return alert('Indica el nombre del servicio.');estado.servicios.push(s);if(guardar()){e.target.reset();$('servUnidad').value='servicio';$('servPrecio').value='0';render()}});
+$('formCompromiso').addEventListener('submit',e=>{e.preventDefault();const pid=$('compProveedor').value, sid=$('compServicio').value, importe=Number($('compMonto').value),concepto=$('compDescripcion').value.trim(),tipo=$('compTipo').value;if(!proveedor(pid))return alert('Selecciona un proveedor válido.');if(!concepto||!Number.isFinite(importe)||importe<=0)return alert('Revisa concepto e importe.');if(sid&&estado.servicios.find(s=>s.id===sid)?.proveedor_id!==pid)return alert('El servicio seleccionado pertenece a otro proveedor.');if(tipo==='cotizacion'){estado.cotizaciones.push({id:nuevoId('COT'),proveedor_id:pid,servicio_id:sid||null,fecha_solicitud:$('compFecha').value||hoy(),fecha_recepcion:null,vigencia_hasta:null,concepto,importe,moneda:'MXN',estado:'recibida',archivo_referencia:'',observaciones:$('compNotas').value.trim()})}else{estado.compromisos.push({id:nuevoId('COMP'),proveedor_id:pid,servicio_id:sid||null,cotizacion_id:null,rubro_id:$('compRubro').value||'RUB-006',fecha_confirmacion:$('compFecha').value||hoy(),concepto,importe_confirmado:importe,moneda:'MXN',estado:'confirmado',autorizado_por:$('compAutorizado').value.trim(),fecha_vencimiento:null,observaciones:$('compNotas').value.trim()})}if(guardar()){e.target.reset();$('compFecha').value=hoy();render()}});
+$('formGasto').addEventListener('submit',e=>{e.preventDefault();const imp=Number($('gastoImporte').value);if(!Number.isFinite(imp)||imp<=0)return alert('El importe debe ser mayor que cero.');estado.gastos_adicionales.push({id:nuevoId('GASTO'),rubro_id:$('gastoRubro').value||'RUB-006',fecha:$('gastoFecha').value||hoy(),concepto:$('gastoConcepto').value.trim(),importe:imp,moneda:'MXN',proveedor_id:$('gastoProveedor').value||null,comprobante_referencia:$('gastoComprobante').value.trim(),estado:'confirmado',observaciones:$('gastoNotas').value.trim()});if(guardar()){e.target.reset();$('gastoFecha').value=hoy();render()}});
+$('pagoDestinoTipo').addEventListener('change',actualizarDestinoPago);$('formPago').addEventListener('submit',e=>{e.preventDefault();const tipoDestino=$('pagoDestinoTipo').value,id=$('pagoDestino').value,imp=Number($('pagoMonto').value);if(!Number.isFinite(imp)||imp<=0)return alert('El importe debe ser mayor que cero.');const target=tipoDestino==='gasto'?gasto(id):compromiso(id);if(!target)return alert('Selecciona un destino válido.');if(tipoDestino==='compromiso'&&!['confirmado','liquidado'].includes(target.estado))return alert('Solo se permiten pagos de compromisos confirmados.');const base=tipoDestino==='gasto'?Number(target.importe):Number(target.importe_confirmado),pagadoActual=tipoDestino==='gasto'?totalPagosGasto(id):totalPagosComp(id),saldo=base-pagadoActual;if($('pagoTipo').value!=='reembolso'&&imp>saldo+0.000001)return alert('El pago excede el saldo pendiente de '+dinero(saldo)+'.');const p={id:nuevoId('PAG'),compromiso_id:tipoDestino==='compromiso'?id:null,gasto_adicional_id:tipoDestino==='gasto'?id:null,fecha:$('pagoFecha').value||hoy(),tipo:$('pagoTipo').value,importe:imp,moneda:'MXN',metodo:$('pagoMetodo').value,referencia:$('pagoReferencia').value.trim(),comprobante_referencia:$('pagoReferencia').value.trim(),estado:'aplicado',registrado_por:'',observaciones:$('pagoNotas').value.trim()};estado.pagos.push(p);if(guardar()){e.target.reset();$('pagoFecha').value=hoy();$('estadoPago').textContent='Pago registrado correctamente.';render()}});
+$('formIngreso').addEventListener('submit',e=>{e.preventDefault();const esperado=Number($('ingEsperado').value)||0,cobrado=Number($('ingCobrado').value)||0,est=$('ingEstado').value;if(esperado<0||cobrado<0)return alert('Los importes no pueden ser negativos.');if(est==='cobrado'&&cobrado<=0)return alert('Para marcar como cobrado, captura el importe recibido.');const ingreso={id:nuevoId('ING'),fecha_prevista:$('ingFecha').value||null,fecha_cobro:est==='cobrado'?($('ingFecha').value||hoy()):null,fuente:$('ingFuente').value,concepto:$('ingConcepto').value.trim(),importe_esperado:esperado,importe_cobrado:cobrado,moneda:'MXN',estado:est,origen_sistema:'manual',referencia_externa:$('ingReferencia').value.trim()||null,persona_o_entidad:$('ingEntidad').value.trim(),metodo_cobro:$('ingMetodo').value||null,comprobante_referencia:'',observaciones:''};if(estado.ingresos.some(i=>ingreso.referencia_externa&&i.referencia_externa===ingreso.referencia_externa&&i.origen_sistema===ingreso.origen_sistema))return alert('Ya existe un ingreso con esa referencia externa.');estado.ingresos.push(ingreso);if(guardar()){e.target.reset();$('ingEsperado').value='0';$('ingCobrado').value='0';render()}});
+document.addEventListener('click',e=>{const b=e.target.closest('button[data-del]');if(!b)return;const tipo=b.dataset.del,id=b.dataset.id;if(!confirm('¿Eliminar este registro? Esta acción no se puede deshacer salvo que tengas un respaldo.'))return;const dependencias={proveedor:()=>{if(estado.servicios.some(s=>s.proveedor_id===id)||estado.cotizaciones.some(c=>c.proveedor_id===id)||estado.compromisos.some(c=>c.proveedor_id===id)||estado.gastos_adicionales.some(g=>g.proveedor_id===id))throw Error('El proveedor tiene registros asociados; no se puede eliminar.')},servicio:()=>{if(estado.compromisos.some(c=>c.servicio_id===id)||estado.cotizaciones.some(c=>c.servicio_id===id))throw Error('El servicio tiene cotizaciones o compromisos asociados.')},compromiso:()=>{if(estado.pagos.some(p=>p.compromiso_id===id))throw Error('El compromiso tiene pagos asociados. Elimina primero los pagos.')},gasto:()=>{if(estado.pagos.some(p=>p.gasto_adicional_id===id))throw Error('El egreso tiene pagos asociados. Elimina primero los pagos.')},pago:()=>{},cotizacion:()=>{},ingreso:()=>{}};try{if(dependencias[tipo])dependencias[tipo]();const mapa={proveedor:'proveedores',servicio:'servicios',compromiso:'compromisos',cotizacion:'cotizaciones',gasto:'gastos_adicionales',pago:'pagos',ingreso:'ingresos'};estado[mapa[tipo]]=estado[mapa[tipo]].filter(x=>x.id!==id);if(guardar())render()}catch(err){alert(err.message)}});
+$('importarReservaciones').addEventListener('click',async()=>{const archivo=$('archivoReservaciones').files[0];if(!archivo){alert('Selecciona primero el archivo JSON v2 de reservaciones.');return}try{const origen=JSON.parse(await archivo.text());if(origen.formato_version!==2||origen.evento_id!=='OXI-2026'||!Array.isArray(origen.reservaciones))throw Error('El archivo debe ser JSON v2 del evento OXI-2026 y contener la lista reservaciones.');const vistos=new Set(),registros=origen.reservaciones;for(const r of registros){if(!r.reservacion_id)throw Error('Hay una reservación sin reservacion_id.');if(vistos.has(r.reservacion_id))throw Error('El archivo contiene un reservacion_id duplicado: '+r.reservacion_id);vistos.add(r.reservacion_id)}const cortesias=registros.filter(r=>r.tipo_reservacion==='cortesia_institucional').length;const previos=estado.ingresos.filter(i=>i.origen_sistema==='reservaciones_oxi_2026').length;if(!confirm('Se importarán/actualizarán '+registros.length+' reservaciones ('+cortesias+' cortesías). Los registros previamente importados se actualizarán por reservacion_id; los ingresos manuales se conservarán. ¿Continuar?'))return;let nuevos=0,actualizados=0,omitidos=0;const fechaImportacion=new Date().toISOString();for(const r of registros){const existente=estado.ingresos.find(i=>i.origen_sistema==='reservaciones_oxi_2026'&&i.referencia_externa===r.reservacion_id);const manual=estado.ingresos.find(i=>i.origen_sistema!=='reservaciones_oxi_2026'&&i.referencia_externa===r.reservacion_id);if(manual&&!existente){omitidos++;continue}const cortesia=r.tipo_reservacion==='cortesia_institucional';const esperado=cortesia?0:Math.max(0,Number(r.subtotal_excel??r.costo_excel??0)||0);const pagadoOrigen=Math.max(0,Number(r.pagado_excel||0)||0);const estadoOrigen=String(r.estado_pago_excel||'').trim().toUpperCase();let cobrado=pagadoOrigen;if(!cortesia&&estadoOrigen==='PAGADO'&&cobrado<=0)cobrado=esperado;if(cortesia)cobrado=0;const estadoPagadoConsistente=estadoOrigen==='PAGADO'&&(cobrado+0.009>=esperado);const estadoIngreso=(!cortesia&&estadoOrigen==='PAGADO'&&estadoPagadoConsistente)?'cobrado':'esperado';const notas=[r.notas_excel||'',r.forma_pago_excel?'Forma de pago en origen: '+r.forma_pago_excel:'',r.estado_pago_excel?'Estado original: '+r.estado_pago_excel:'',r.debe_excel!==undefined?'Saldo de referencia en Excel: '+Number(r.debe_excel||0):'',(!cortesia&&estadoOrigen==='PAGADO'&&!estadoPagadoConsistente)?'REVISAR: estado PAGADO pero el importe declarado pagado es menor al importe esperado. Se conserva como pendiente de revisión.':'',cortesia?'Cortesía institucional; excluida de ingresos cobrados.':'',r.fila_origen_excel?'Fila de origen Excel: '+r.fila_origen_excel:''].filter(Boolean).join(' | ');const registro={id:existente?existente.id:nuevoId('ING-RES'),fecha_prevista:null,fecha_cobro:estadoIngreso==='cobrado'?null:null,fuente:cortesia?'cortesia_institucional':'reservacion',concepto:String(r.nombre_reservacion||r.reservacion_id),importe_esperado:esperado,importe_cobrado:cobrado,moneda:'MXN',estado:estadoIngreso,origen_sistema:'reservaciones_oxi_2026',referencia_externa:String(r.reservacion_id),persona_o_entidad:String(r.nombre_reservacion||''),metodo_cobro:String(r.forma_pago_excel||''),comprobante_referencia:'',observaciones:notas,reservacion_id:String(r.reservacion_id),mesa_numero:r.mesa_numero??null,total_asientos:Number(r.total_asientos_excel||0),tipo_reservacion:r.tipo_reservacion||'grupo',fecha_importacion:fechaImportacion,estado_pago_origen:estadoOrigen,importe_declarado_pagado:pagadoOrigen,saldo_origen:Number(r.debe_excel||0)};if(existente){Object.assign(existente,registro,{id:existente.id});actualizados++}else{estado.ingresos.push(registro);nuevos++}}estado.integraciones=estado.integraciones||{};estado.integraciones.reservaciones={...(estado.integraciones.reservaciones||{}),habilitada:true,sistema_origen:'modulo_reservaciones',ultima_sincronizacion:fechaImportacion,regla_identificador_externo:'reservacion_id',archivo_origen:archivo.name,registros_importados:registros.length,observaciones:'PAGADO se reconoce como cobrado cuando el importe pagado cubre el importe esperado; diferencias se marcan para revisión. Cortesías excluidas de ingresos. Importación repetible e idempotente.'};if(guardar()){render();$('estadoReservaciones').textContent='Importación completada: '+nuevos+' nuevos, '+actualizados+' actualizados, '+omitidos+' omitidos por posible duplicado manual. Archivo: '+archivo.name+'. Revisa las observaciones de los registros importados y concilia los importes.';alert('Reservaciones importadas. Nuevos: '+nuevos+'. Actualizados: '+actualizados+'. Omitidos por duplicado manual: '+omitidos+'.')}}catch(err){$('estadoReservaciones').textContent='No se pudo importar: '+err.message;alert('No se pudo importar el JSON de reservaciones: '+err.message)}});
+$('exportar').addEventListener('click',()=>{estado.metadata.ultima_actualizacion=new Date().toISOString();const blob=new Blob([JSON.stringify(estado,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='finanzas_oxi_2026.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});$('importar').addEventListener('click',()=>$('archivoImportar').click());$('archivoImportar').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const d=validar(JSON.parse(await f.text()));if(!confirm('La importación reemplazará los datos financieros guardados en este navegador. ¿Deseas continuar?'))return;estado=d;if(guardar()){render();alert('JSON importado y validado correctamente.')}}catch(err){alert('No se pudo importar el archivo: '+err.message)}finally{e.target.value=''}});
+const normalizarBusqueda=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+function aplicarBusqueda(){const q=normalizarBusqueda($('buscarRegistros').value);let visibles=0,total=0;document.querySelectorAll('.tabla-contenedor tbody').forEach(tbody=>{Array.from(tbody.querySelectorAll('tr')).forEach(tr=>{total++;const coincide=!q||normalizarBusqueda(tr.textContent).includes(q);tr.classList.toggle('oculto',!coincide);if(coincide)visibles++})});$('resultadoBusqueda').textContent=q?`${visibles} de ${total} filas coinciden.`:'Muestra todos los registros.'}
+$('buscarRegistros').addEventListener('input',aplicarBusqueda);$('limpiarBusqueda').addEventListener('click',()=>{$('buscarRegistros').value='';aplicarBusqueda();$('buscarRegistros').focus()});
+
+function configurarMenuFinanzas() {
+  const paneles = Array.from(
+    document.querySelectorAll('main > section.panel')
+  ).filter(panel => panel.id && panel.id.startsWith('panel-'));
+
+  function seleccionarSeccion(panelSeleccionado, abrir = true) {
+    paneles.forEach(panel => {
+      const esSeleccionado = panel === panelSeleccionado;
+      const debeAbrir = esSeleccionado && abrir;
+
+      panel.classList.toggle('seccion-abierta', debeAbrir);
+      panel.classList.toggle('seccion-seleccionada', debeAbrir);
+
+      const boton = panel.querySelector(
+        ':scope > .panel-titulo .panel-toggle'
+      );
+
+      if (boton) {
+        boton.setAttribute('aria-expanded', String(debeAbrir));
+      }
+    });
+
+    document.querySelectorAll('.navegacion-modulo a').forEach(enlace => {
+      const activo =
+        abrir &&
+        panelSeleccionado &&
+        enlace.getAttribute('href') === '#' + panelSeleccionado.id;
+
+      enlace.classList.toggle('seccion-activa', Boolean(activo));
+
+      if (activo) {
+        enlace.setAttribute('aria-current', 'location');
+      } else {
+        enlace.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  paneles.forEach(panel => {
+    const encabezado = panel.querySelector(
+      ':scope > .panel-titulo h3'
+    );
+
+    if (!encabezado || encabezado.querySelector('.panel-toggle')) {
+      return;
+    }
+
+    const titulo = encabezado.textContent.trim();
+    const boton = document.createElement('button');
+
+    boton.type = 'button';
+    boton.className = 'panel-toggle';
+    boton.textContent = titulo;
+    boton.setAttribute('aria-expanded', 'false');
+
+    encabezado.replaceChildren(boton);
+    panel.classList.add('seccion-colapsable');
+
+    boton.addEventListener('click', () => {
+      const yaAbierta = panel.classList.contains('seccion-abierta');
+
+      seleccionarSeccion(panel, !yaAbierta);
+    });
+  });
+
+  document.querySelectorAll('.navegacion-modulo a[href^="#panel-"]')
+    .forEach(enlace => {
+      enlace.addEventListener('click', evento => {
+        const id = enlace.getAttribute('href').slice(1);
+        const destino = document.getElementById(id);
+
+        if (!destino || !paneles.includes(destino)) return;
+
+        evento.preventDefault();
+
+        seleccionarSeccion(destino, true);
+        history.replaceState(null, '', '#' + id);
+
+        destino.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      });
+    });
+
+  seleccionarSeccion(null, false);
+}
+
+         const renderOriginal=render;render=function(){renderOriginal();aplicarBusqueda()};
+
+let archivoTrabajoActual = '';
+
+['compFecha', 'gastoFecha', 'pagoFecha', 'ingFecha'].forEach(
+  id => $(id).value = hoy()
+);
+
+configurarMenuFinanzas();
+
+$('cargarTrabajoInicial').addEventListener('click', async () => {
+  const archivo = $('archivoTrabajoInicial').files[0];
+  const mensaje = $('estadoCargaInicial');
+  const boton = $('cargarTrabajoInicial');
+
+  if (!archivo) {
+    mensaje.textContent = 'Selecciona primero un archivo JSON.';
+    $('archivoTrabajoInicial').focus();
+    return;
+  }
+
+  boton.disabled = true;
+  mensaje.textContent = 'Leyendo y validando el archivo...';
+
+  try {
+    const contenido = await archivo.text();
+    const datos = validar(JSON.parse(contenido));
+
+    // Consultar el catálogo central y agregar solo registros faltantes por ID.
+    // Si el catálogo no está disponible, se conserva el archivo financiero y se informa.
+    mensaje.textContent = 'Archivo financiero validado. Consultando catálogo central de proveedores...';
+    const integracion = await integrarCatalogoInstitucional(datos);
+    estado = validar(datos);
+    archivoTrabajoActual = archivo.name;
+
+    document.body.classList.remove('espera-archivo');
+
+    mensaje.textContent = 'Archivo validado correctamente.';
+
+    $('estadoCarga').textContent =
+      'Archivo de trabajo cargado: ' + archivoTrabajoActual +
+      '. Los cambios de esta sesión se guardan en este navegador.';
+
+    const etiqueta = document.createElement('p');
+    etiqueta.className = 'ayuda';
+    etiqueta.id = 'nombreArchivoTrabajo';
+    etiqueta.textContent = 'Archivo de trabajo: ' + archivoTrabajoActual;
+
+    const barra = document.querySelector('main > .barra');
+    if (barra && !$('nombreArchivoTrabajo')) {
+      barra.insertAdjacentElement('afterend', etiqueta);
+    } else if ($('nombreArchivoTrabajo')) {
+      $('nombreArchivoTrabajo').textContent =
+        'Archivo de trabajo: ' + archivoTrabajoActual;
+    }
+
+    render();
+
+    if (integracion.estado === 'correcto') {
+      const detalle = `Catálogo central integrado: ${integracion.proveedoresAgregados} proveedor(es) nuevo(s) y ${integracion.serviciosAgregados} servicio(s) nuevo(s).`;
+      mensaje.textContent = 'Archivo cargado correctamente. ' + detalle + ' Ya puedes comenzar a trabajar.';
+      $('estadoCarga').textContent = 'Archivo de trabajo cargado: ' + archivoTrabajoActual + '. ' + detalle + ' Los cambios se guardan en este navegador.';
+    } else {
+      mensaje.textContent = 'Archivo financiero cargado, pero no se pudo consultar el catálogo central. ' + (integracion.error || 'Revisa la ruta y la publicación de js/proveedores.js y data/proveedores.json.') + ' Los datos financieros se conservaron.';
+      $('estadoCarga').textContent = 'Archivo de trabajo cargado: ' + archivoTrabajoActual + '. Catálogo central pendiente de conexión: ' + (integracion.error || 'sin detalles') + '.';
+    }
+    // Guardar la integración localmente sin modificar movimientos ni identificadores existentes.
+    guardar();
+    render();
+
+  } catch (error) {
+    estado = null;
+    archivoTrabajoActual = '';
+
+    mensaje.textContent =
+      'No se pudo cargar el archivo: ' + error.message +
+      '. Verifica que sea un JSON financiero válido.';
+
+  } finally {
+    boton.disabled = false;
+  }
+});
+
+})();
+  </script>
+ </body>
+</html>
