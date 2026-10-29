@@ -15,5 +15,14 @@
       "archivo_datos": "./finanzas_oxi_2026.json",
       "activo": true
     }
+        {
+      "id": "Independencia-de-Grecia-2026",
+      "nombre": "Celebración de la Independencia de Grecia 2026",
+      "fecha_evento": "2026-03-25",
+      "tipo": "Cultural",
+      "estado": "planeacion",
+      "archivo_datos": "./finanzas_Independencia_2026.json",
+      "activo": true
+    }
   ]
 }
