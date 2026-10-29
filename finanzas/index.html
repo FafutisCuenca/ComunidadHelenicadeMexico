@@ -188,36 +188,52 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
   </header>
   <main>
 
+
 <section class="panel carga-inicial" id="pantallaCargaInicial">
   <div class="panel-titulo">
     <div>
-      <h3>Inicio de la sesión financiera</h3>
+      <h3>Administración de eventos</h3>
       <p>
-        Selecciona el archivo JSON de Finanzas que utilizarás en esta sesión.
-        Los formularios y las operaciones estarán disponibles después de cargarlo
-        y validar su contenido.
+        Selecciona un evento del catálogo para consultar su información financiera,
+        o carga manualmente un archivo JSON de respaldo.
       </p>
     </div>
   </div>
 
   <div class="contenido">
     <div class="campo">
-      <label for="archivoTrabajoInicial">Archivo financiero de trabajo</label>
-      <input
-        accept=".json,application/json"
-        id="archivoTrabajoInicial"
-        type="file"
-        required
-      />
+      <label for="eventoCatalogo">Evento disponible</label>
+      <select id="eventoCatalogo">
+        <option value="">Cargando catálogo de eventos...</option>
+      </select>
       <span class="ayuda">
-        Selecciona tu respaldo financiero, por ejemplo:
-        finanzas_oxi_2026.json.
+        Los eventos disponibles se definen en finanzas/eventos.json.
       </span>
     </div>
 
     <div class="botones-form">
-      <button class="primario" id="cargarTrabajoInicial" type="button">
-        Cargar archivo y comenzar
+      <button class="primario" id="cargarEventoCatalogo" type="button" disabled>
+        Abrir evento seleccionado
+      </button>
+    </div>
+
+    <hr style="margin:24px 0;border:0;border-top:1px solid var(--borde)">
+
+    <div class="campo">
+      <label for="archivoTrabajoInicial">O cargar un archivo financiero manualmente</label>
+      <input
+        accept=".json,application/json"
+        id="archivoTrabajoInicial"
+        type="file"
+      />
+      <span class="ayuda">
+        Por ejemplo, un respaldo JSON exportado anteriormente.
+      </span>
+    </div>
+
+    <div class="botones-form">
+      <button class="secundario" id="cargarTrabajoInicial" type="button">
+        Cargar archivo manual
       </button>
     </div>
 
@@ -226,7 +242,7 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
       class="aviso-estado"
       id="estadoCargaInicial"
     >
-      Esperando la selección del archivo financiero.
+      Preparando el catálogo de eventos...
     </p>
   </div>
 </section>
