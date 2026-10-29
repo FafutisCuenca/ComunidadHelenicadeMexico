@@ -1,0 +1,19 @@
+
+{
+  "metadata": {
+    "version_esquema": "1.0.0",
+    "sistema": "Comunidad Helénica de México A.C.",
+    "descripcion": "Catálogo general de eventos"
+  },
+  "eventos": [
+    {
+      "id": "OXI-2026",
+      "nombre": "Celebración del OXI 2026",
+      "fecha_evento": "2026-10-25",
+      "tipo": "Cultural",
+      "estado": "planeacion",
+      "archivo_datos": "./finanzas_oxi_2026.json",
+      "activo": true
+    }
+  ]
+}
