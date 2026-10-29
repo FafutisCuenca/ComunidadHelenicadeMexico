@@ -5,7 +5,7 @@
     "version_esquema": "1.0.0",
     "moneda": "MXN",
     "fecha_creacion": null,
-    "ultima_actualizacion": null,
+    "ultima_actualizacion": "2026-10-29",
     "notas": "Catalogo institucional central de proveedores y servicios. Las fechas no documentadas se mantienen en null para evitar inventar datos historicos."
   },
   "catalogos": {
@@ -91,6 +91,23 @@
       "fecha_baja": null,
       "fecha_reactivacion": null,
       "notas_internas": ""
+    },
+    {
+      "id": "PROV-MVTO48L4-Q7XS9",
+      "nombre": "Dulces Griegos",
+      "categoria": "Alimentos",
+      "contacto_nombre": "Hector Covarrubias Papahiou",
+      "telefono": "",
+      "correo": "",
+      "rfc": "",
+      "datos_fiscales": "",
+      "observaciones": "",
+      "notas_internas": "",
+      "estado": "activo",
+      "fecha_alta": "2026-10-29",
+      "ultima_actualizacion": "2026-10-29",
+      "fecha_baja": null,
+      "fecha_reactivacion": null
     }
   ],
   "servicios": [
@@ -148,6 +165,17 @@
       "precio_referencial": 4800,
       "activo": true,
       "observaciones": ""
+    },
+    {
+      "id": "SERV-MVTO57HZ-79XXS",
+      "proveedor_id": "PROV-MVTO48L4-Q7XS9",
+      "nombre": "Postres",
+      "categoria": "Alimentos",
+      "unidad": "Piezas",
+      "precio_referencial": null,
+      "descripcion": "Charolas con 32 Dulces Griegos",
+      "observaciones": "",
+      "activo": true
     }
   ]
 }
