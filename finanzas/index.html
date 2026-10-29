@@ -1995,76 +1995,72 @@ $('cargarTrabajoInicial').addEventListener('click', async () => {
   }
 
   boton.disabled = true;
-  mensaje.textContent = 'Leyendo y validando el archivo...';
+  mensaje.textContent = 'Leyendo archivo financiero...';
 
   try {
     const contenido = await archivo.text();
     const datos = validar(JSON.parse(contenido));
 
-    // Consultar el catálogo central y agregar solo registros faltantes por ID.
-    // Si el catálogo no está disponible, se conserva el archivo financiero y se informa.
-    mensaje.textContent = 'Archivo financiero validado. Consultando catálogo central de proveedores...';
+    mensaje.textContent = 'Consultando catálogo central de proveedores...';
+
     const integracion = await integrarCatalogoInstitucional(datos);
+
+    // Validar nuevamente después de integrar los catálogos.
     estado = validar(datos);
     archivoTrabajoActual = archivo.name;
 
     document.body.classList.remove('espera-archivo');
 
-    mensaje.textContent = 'Archivo validado correctamente.';
+    let etiqueta = $('nombreArchivoTrabajo');
 
-    $('estadoCarga').textContent =
-      'Archivo de trabajo cargado: ' + archivoTrabajoActual +
-      '. Los cambios de esta sesión se guardan en este navegador.';
+    if (!etiqueta) {
+      etiqueta = document.createElement('p');
+      etiqueta.className = 'ayuda';
+      etiqueta.id = 'nombreArchivoTrabajo';
 
-    const etiqueta = document.createElement('p');
-    etiqueta.className = 'ayuda';
-    etiqueta.id = 'nombreArchivoTrabajo';
-    etiqueta.textContent = 'Archivo de trabajo: ' + archivoTrabajoActual;
-
-    const barra = document.querySelector('main > .barra');
-    if (barra && !$('nombreArchivoTrabajo')) {
-      barra.insertAdjacentElement('afterend', etiqueta);
-    } else if ($('nombreArchivoTrabajo')) {
-      $('nombreArchivoTrabajo').textContent =
-        'Archivo de trabajo: ' + archivoTrabajoActual;
+      const barra = document.querySelector('main > .barra');
+      if (barra) {
+        barra.insertAdjacentElement('afterend', etiqueta);
+      }
     }
 
+    if (etiqueta) {
+      etiqueta.textContent = 'Archivo de trabajo: ' + archivoTrabajoActual;
+    }
+
+    // Repintar tablas y listas desplegables con los datos sincronizados.
     render();
 
     if (integracion.estado === 'correcto') {
-      const detalle =
-  `Catálogo central: ${integracion.proveedoresAgregados} proveedor(es) agregado(s), ` +
-  `${integracion.proveedoresActualizados} actualizado(s), ` +
-  `${integracion.serviciosAgregados} servicio(s) agregado(s) y ` +
-  `${integracion.serviciosActualizados} actualizado(s).`;
+      mensaje.textContent =
+        'Archivo cargado correctamente. ' +
+        'Catálogo central integrado: ' +
+        integracion.proveedoresAgregados + ' proveedor(es) agregado(s), ' +
+        integracion.proveedoresActualizados + ' actualizado(s), ' +
+        integracion.serviciosAgregados + ' servicio(s) agregado(s) y ' +
+        integracion.serviciosActualizados + ' actualizado(s).';
 
-mensaje.textContent =
-  'Archivo cargado correctamente. ' +
-  detalle +
-  ' Ya puedes comenzar a trabajar.';
-     
-    $('estadoCarga').textContent = 'Archivo de trabajo cargado: ' + archivoTrabajoActual + '. ' + detalle + ' Los cambios se guardan en este navegador.';
+      $('estadoCarga').textContent = mensaje.textContent;
     } else {
-      mensaje.textContent = 'Archivo financiero cargado, pero no se pudo consultar el catálogo central. ' + (integracion.error || 'Revisa la ruta y la publicación de js/proveedores.js y data/proveedores.json.') + ' Los datos financieros se conservaron.';
-      $('estadoCarga').textContent = 'Archivo de trabajo cargado: ' + archivoTrabajoActual + '. Catálogo central pendiente de conexión: ' + (integracion.error || 'sin detalles') + '.';
+      mensaje.textContent =
+        'Archivo financiero cargado, pero falló la integración central: ' +
+        integracion.error;
+
+      $('estadoCarga').textContent = mensaje.textContent;
     }
-    // Guardar la integración localmente sin modificar movimientos ni identificadores existentes.
+
+    // Guardar el estado financiero y el catálogo sincronizado en este navegador.
     guardar();
     render();
 
   } catch (error) {
-    estado = null;
-    archivoTrabajoActual = '';
-
     mensaje.textContent =
       'No se pudo cargar el archivo: ' + error.message +
       '. Verifica que sea un JSON financiero válido.';
-
   } finally {
     boton.disabled = false;
   }
 });
-
 })();
   </script>
  </body>
