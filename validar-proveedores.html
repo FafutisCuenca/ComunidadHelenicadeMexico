@@ -1,0 +1,416 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#173c35">
+
+  <title>Validación de proveedores | Comunidad Helénica</title>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --verde: #173c35;
+      --verde-claro: #e8f1ed;
+      --fondo: #f4f6f5;
+      --borde: #d8e0dc;
+      --texto: #24312d;
+      --rojo: #a12626;
+      --rojo-fondo: #fff0f0;
+      --amarillo: #795600;
+      --amarillo-fondo: #fff7df;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 24px;
+      background: var(--verde);
+      color: white;
+      border-radius: 14px;
+      margin-bottom: 22px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(23px, 4vw, 32px);
+    }
+
+    header p {
+      margin: 0;
+      opacity: 0.92;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .acciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 18px;
+      background: var(--verde);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button.secundario {
+      background: #e7ece9;
+      color: var(--texto);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .estado {
+      padding: 14px;
+      border-radius: 8px;
+      background: #eef2f0;
+      margin-top: 16px;
+      overflow-wrap: anywhere;
+    }
+
+    .estado.correcto {
+      background: var(--verde-claro);
+      border-left: 5px solid var(--verde);
+    }
+
+    .estado.error {
+      background: var(--rojo-fondo);
+      border-left: 5px solid var(--rojo);
+    }
+
+    .estado.advertencia {
+      background: var(--amarillo-fondo);
+      border-left: 5px solid #c28b00;
+    }
+
+    .metricas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .metrica {
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .metrica .numero {
+      display: block;
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--verde);
+    }
+
+    .metrica .etiqueta {
+      font-size: 13px;
+      color: #53615b;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-top: 0;
+    }
+
+    ul {
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .vacio {
+      color: #52615a;
+    }
+
+    .oculto {
+      display: none;
+    }
+
+    .nota {
+      font-size: 13px;
+      color: #53615b;
+    }
+
+    footer {
+      padding: 12px 0;
+      text-align: center;
+      color: #53615b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 12px;
+      }
+
+      header,
+      .panel {
+        padding: 16px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <header>
+      <h1>Validación del catálogo</h1>
+      <p>Comunidad Helénica de México A.C.</p>
+    </header>
+
+    <section class="panel">
+      <h2>Control de integridad</h2>
+
+      <p>
+        Esta pantalla comprueba la estructura del catálogo de
+        proveedores y servicios. No modifica los archivos ni
+        los registros de Finanzas OXI.
+      </p>
+
+      <div class="acciones">
+        <button id="btnValidar" type="button">
+          Ejecutar validación
+        </button>
+
+        <button
+          id="btnRecargar"
+          class="secundario"
+          type="button"
+        >
+          Recargar catálogo y validar
+        </button>
+      </div>
+
+      <div
+        id="estado"
+        class="estado"
+        role="status"
+        aria-live="polite"
+      >
+        Presiona «Ejecutar validación» para comenzar.
+      </div>
+
+      <p id="fecha" class="nota"></p>
+    </section>
+
+    <section id="panelResumen" class="panel oculto">
+      <h2>Resumen del catálogo</h2>
+
+      <div class="metricas">
+        <div class="metrica">
+          <span id="totalProveedores" class="numero">0</span>
+          <span class="etiqueta">Proveedores totales</span>
+        </div>
+
+        <div class="metrica">
+          <span id="proveedoresActivos" class="numero">0</span>
+          <span class="etiqueta">Proveedores activos</span>
+        </div>
+
+        <div class="metrica">
+          <span id="proveedoresInactivos" class="numero">0</span>
+          <span class="etiqueta">Proveedores inactivos</span>
+        </div>
+
+        <div class="metrica">
+          <span id="totalServicios" class="numero">0</span>
+          <span class="etiqueta">Servicios totales</span>
+        </div>
+
+        <div class="metrica">
+          <span id="serviciosActivos" class="numero">0</span>
+          <span class="etiqueta">Servicios activos</span>
+        </div>
+
+        <div class="metrica">
+          <span id="serviciosInactivos" class="numero">0</span>
+          <span class="etiqueta">Servicios inactivos</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Errores</h2>
+      <p class="nota">
+        Los errores deben corregirse antes de integrar el catálogo.
+      </p>
+      <div id="errores">
+        <p class="vacio">Todavía no se ha ejecutado la validación.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Advertencias</h2>
+      <p class="nota">
+        Son situaciones que conviene revisar; no necesariamente
+        impiden utilizar el catálogo.
+      </p>
+      <div id="advertencias">
+        <p class="vacio">Todavía no se ha ejecutado la validación.</p>
+      </div>
+    </section>
+
+    <footer>
+      Herramienta de validación independiente · Comunidad Helénica de México A.C.
+    </footer>
+  </main>
+
+  <script type="module">
+    import {
+      ejecutarValidacionProveedores
+    } from "./js/validar-proveedores.js";
+
+    const btnValidar = document.getElementById("btnValidar");
+    const btnRecargar = document.getElementById("btnRecargar");
+    const estado = document.getElementById("estado");
+    const fecha = document.getElementById("fecha");
+    const panelResumen = document.getElementById("panelResumen");
+
+    function mostrarLista(contenedorId, elementos, textoVacio) {
+      const contenedor = document.getElementById(contenedorId);
+      contenedor.replaceChildren();
+
+      if (!elementos || elementos.length === 0) {
+        const parrafo = document.createElement("p");
+        parrafo.className = "vacio";
+        parrafo.textContent = textoVacio;
+        contenedor.appendChild(parrafo);
+        return;
+      }
+
+      const lista = document.createElement("ul");
+
+      elementos.forEach((elemento) => {
+        const item = document.createElement("li");
+        item.textContent = elemento;
+        lista.appendChild(item);
+      });
+
+      contenedor.appendChild(lista);
+    }
+
+    function mostrarResumen(resumen) {
+      const campos = {
+        totalProveedores: resumen.total_proveedores,
+        proveedoresActivos: resumen.proveedores_activos,
+        proveedoresInactivos: resumen.proveedores_inactivos,
+        totalServicios: resumen.total_servicios,
+        serviciosActivos: resumen.servicios_activos,
+        serviciosInactivos: resumen.servicios_inactivos
+      };
+
+      Object.entries(campos).forEach(([id, valor]) => {
+        document.getElementById(id).textContent = valor ?? 0;
+      });
+
+      panelResumen.classList.remove("oculto");
+    }
+
+    async function validar() {
+      btnValidar.disabled = true;
+      btnRecargar.disabled = true;
+
+      estado.className = "estado";
+      estado.textContent = "Validando el catálogo. Espera un momento.";
+
+      try {
+        const resultado = await ejecutarValidacionProveedores();
+
+        mostrarResumen(resultado.resumen);
+
+        mostrarLista(
+          "errores",
+          resultado.errores,
+          "No se encontraron errores."
+        );
+
+        mostrarLista(
+          "advertencias",
+          resultado.advertencias,
+          "No se encontraron advertencias."
+        );
+
+        if (resultado.correcto && resultado.advertencias.length === 0) {
+          estado.className = "estado correcto";
+          estado.textContent =
+            "VALIDACIÓN CORRECTA: no se encontraron errores ni advertencias.";
+        } else if (resultado.correcto) {
+          estado.className = "estado advertencia";
+          estado.textContent =
+            "El catálogo no presenta errores estructurales, pero hay advertencias por revisar.";
+        } else {
+          estado.className = "estado error";
+          estado.textContent =
+            "VALIDACIÓN CON ERRORES: revisa la lista antes de integrar el catálogo.";
+        }
+
+        fecha.textContent = resultado.fecha_validacion
+          ? "Fecha de validación: " +
+            new Date(resultado.fecha_validacion).toLocaleString("es-MX")
+          : "";
+      } catch (error) {
+        estado.className = "estado error";
+        estado.textContent =
+          "No fue posible ejecutar la validación: " +
+          (error instanceof Error ? error.message : String(error));
+
+        mostrarLista(
+          "errores",
+          [estado.textContent],
+          "No se encontraron errores."
+        );
+      } finally {
+        btnValidar.disabled = false;
+        btnRecargar.disabled = false;
+      }
+    }
+
+    btnValidar.addEventListener("click", validar);
+
+    btnRecargar.addEventListener("click", validar);
+  </script>
+</body>
+</html>
