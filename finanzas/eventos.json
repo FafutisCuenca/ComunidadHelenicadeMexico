@@ -21,7 +21,7 @@
       "fecha_evento": "2026-03-25",
       "tipo": "Cultural",
       "estado": "planeacion",
-      "archivo_datos": "./finanzas_Independencia_2026.json",
+      "archivo_datos": "./finanzas_independencia_2026.json",
       "activo": true
     }
   ]
