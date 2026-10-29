@@ -1760,7 +1760,90 @@ $('formProveedor').addEventListener('submit',e=>{e.preventDefault();const p={id:
 $('formServicio').addEventListener('submit',e=>{e.preventDefault();const s={id:nuevoId('SERV'),proveedor_id:$('servProveedor').value,nombre:$('servNombre').value.trim(),categoria:$('servCategoria').value,descripcion:$('servNotas').value.trim(),unidad:$('servUnidad').value.trim()||'servicio',precio_referencial:Number($('servPrecio').value)||0,activo:true,observaciones:$('servNotas').value.trim()};if(!proveedor(s.proveedor_id))return alert('Registra y selecciona un proveedor.');if(!s.nombre)return alert('Indica el nombre del servicio.');estado.servicios.push(s);if(guardar()){e.target.reset();$('servUnidad').value='servicio';$('servPrecio').value='0';render()}});
 $('formCompromiso').addEventListener('submit',e=>{e.preventDefault();const pid=$('compProveedor').value, sid=$('compServicio').value, importe=Number($('compMonto').value),concepto=$('compDescripcion').value.trim(),tipo=$('compTipo').value;if(!proveedor(pid))return alert('Selecciona un proveedor válido.');if(!concepto||!Number.isFinite(importe)||importe<=0)return alert('Revisa concepto e importe.');if(sid&&estado.servicios.find(s=>s.id===sid)?.proveedor_id!==pid)return alert('El servicio seleccionado pertenece a otro proveedor.');if(tipo==='cotizacion'){estado.cotizaciones.push({id:nuevoId('COT'),proveedor_id:pid,servicio_id:sid||null,fecha_solicitud:$('compFecha').value||hoy(),fecha_recepcion:null,vigencia_hasta:null,concepto,importe,moneda:'MXN',estado:'recibida',archivo_referencia:'',observaciones:$('compNotas').value.trim()})}else{estado.compromisos.push({id:nuevoId('COMP'),proveedor_id:pid,servicio_id:sid||null,cotizacion_id:null,rubro_id:$('compRubro').value||'RUB-006',fecha_confirmacion:$('compFecha').value||hoy(),concepto,importe_confirmado:importe,moneda:'MXN',estado:'confirmado',autorizado_por:$('compAutorizado').value.trim(),fecha_vencimiento:null,observaciones:$('compNotas').value.trim()})}if(guardar()){e.target.reset();$('compFecha').value=hoy();render()}});
 $('formGasto').addEventListener('submit',e=>{e.preventDefault();const imp=Number($('gastoImporte').value);if(!Number.isFinite(imp)||imp<=0)return alert('El importe debe ser mayor que cero.');estado.gastos_adicionales.push({id:nuevoId('GASTO'),rubro_id:$('gastoRubro').value||'RUB-006',fecha:$('gastoFecha').value||hoy(),concepto:$('gastoConcepto').value.trim(),importe:imp,moneda:'MXN',proveedor_id:$('gastoProveedor').value||null,comprobante_referencia:$('gastoComprobante').value.trim(),estado:'confirmado',observaciones:$('gastoNotas').value.trim()});if(guardar()){e.target.reset();$('gastoFecha').value=hoy();render()}});
-$('pagoDestinoTipo').addEventListener('change',actualizarDestinoPago);$('formPago').addEventListener('submit',e=>{e.preventDefault();const tipoDestino=$('pagoDestinoTipo').value,id=$('pagoDestino').value,imp=Number($('pagoMonto').value);if(!Number.isFinite(imp)||imp<=0)return alert('El importe debe ser mayor que cero.');const target=tipoDestino==='gasto'?gasto(id):compromiso(id);if(!target)return alert('Selecciona un destino válido.');if(tipoDestino==='compromiso'&&!['confirmado','liquidado'].includes(target.estado))return alert('Solo se permiten pagos de compromisos confirmados.');const base=tipoDestino==='gasto'?Number(target.importe):Number(target.importe_confirmado),pagadoActual=tipoDestino==='gasto'?totalPagosGasto(id):totalPagosComp(id),saldo=base-pagadoActual;if($('pagoTipo').value!=='reembolso'&&imp>saldo+0.000001)return alert('El pago excede el saldo pendiente de '+dinero(saldo)+'.');const p={id:nuevoId('PAG'),compromiso_id:tipoDestino==='compromiso'?id:null,gasto_adicional_id:tipoDestino==='gasto'?id:null,fecha:$('pagoFecha').value||hoy(),tipo:$('pagoTipo').value,importe:imp,moneda:'MXN',metodo:$('pagoMetodo').value,referencia:$('pagoReferencia').value.trim(),comprobante_referencia:$('pagoReferencia').value.trim(),estado:'aplicado',registrado_por:'',observaciones:$('pagoNotas').value.trim()};estado.pagos.push(p);if(guardar()){e.target.reset();$('pagoFecha').value=hoy();$('estadoPago').textContent='Pago registrado correctamente.';render()}});
+
+$('pagoDestinoTipo').addEventListener('change',actualizarDestinoPago);
+
+$('formPago').addEventListener('submit',e=>{
+  e.preventDefault();
+
+  const tipoDestino=$('pagoDestinoTipo').value;
+  const id=$('pagoDestino').value;
+  const imp=Number($('pagoMonto').value);
+  const tipoPago=$('pagoTipo').value;
+
+  if(!Number.isFinite(imp)||imp<=0)
+    return alert('El importe debe ser mayor que cero.');
+
+  const target=tipoDestino==='gasto'
+    ?gasto(id)
+    :compromiso(id);
+
+  if(!target)
+    return alert('Selecciona un destino válido.');
+
+  if(
+    tipoDestino==='compromiso' &&
+    !['confirmado','liquidado'].includes(target.estado)
+  )
+    return alert('Solo se permiten pagos de compromisos confirmados.');
+
+  const base=tipoDestino==='gasto'
+    ?Number(target.importe)
+    :Number(target.importe_confirmado);
+
+  const pagadoActual=tipoDestino==='gasto'
+    ?totalPagosGasto(id)
+    :totalPagosComp(id);
+
+  const saldo=base-pagadoActual;
+  const tolerancia=0.000001;
+
+  if(tipoPago==='reembolso'){
+    if(pagadoActual<=tolerancia)
+      return alert(
+        'No se puede registrar un reembolso porque no hay pagos netos previos para este registro.'
+      );
+
+    if(imp>pagadoActual+tolerancia)
+      return alert(
+        'El reembolso no puede superar el importe neto pagado: '+
+        dinero(pagadoActual)+'.'
+      );
+  }else if(imp>saldo+tolerancia){
+    return alert(
+      'El pago excede el saldo pendiente de '+
+      dinero(saldo)+'.'
+    );
+  }
+
+  const p={
+    id:nuevoId('PAG'),
+    compromiso_id:tipoDestino==='compromiso'?id:null,
+    gasto_adicional_id:tipoDestino==='gasto'?id:null,
+    fecha:$('pagoFecha').value||hoy(),
+    tipo:tipoPago,
+    importe:imp,
+    moneda:'MXN',
+    metodo:$('pagoMetodo').value,
+    referencia:$('pagoReferencia').value.trim(),
+    comprobante_referencia:$('pagoReferencia').value.trim(),
+    estado:'aplicado',
+    registrado_por:'',
+    observaciones:$('pagoNotas').value.trim()
+  };
+
+  estado.pagos.push(p);
+
+  if(guardar()){
+    e.target.reset();
+    $('pagoFecha').value=hoy();
+    $('estadoPago').textContent=tipoPago==='reembolso'
+      ?'Reembolso registrado correctamente.'
+      :'Pago registrado correctamente.';
+    render();
+  }
+});
+
 $('formIngreso').addEventListener('submit',e=>{e.preventDefault();const esperado=Number($('ingEsperado').value)||0,cobrado=Number($('ingCobrado').value)||0,est=$('ingEstado').value;if(esperado<0||cobrado<0)return alert('Los importes no pueden ser negativos.');if(est==='cobrado'&&cobrado<=0)return alert('Para marcar como cobrado, captura el importe recibido.');const ingreso={id:nuevoId('ING'),fecha_prevista:$('ingFecha').value||null,fecha_cobro:est==='cobrado'?($('ingFecha').value||hoy()):null,fuente:$('ingFuente').value,concepto:$('ingConcepto').value.trim(),importe_esperado:esperado,importe_cobrado:cobrado,moneda:'MXN',estado:est,origen_sistema:'manual',referencia_externa:$('ingReferencia').value.trim()||null,persona_o_entidad:$('ingEntidad').value.trim(),metodo_cobro:$('ingMetodo').value||null,comprobante_referencia:'',observaciones:''};if(estado.ingresos.some(i=>ingreso.referencia_externa&&i.referencia_externa===ingreso.referencia_externa&&i.origen_sistema===ingreso.origen_sistema))return alert('Ya existe un ingreso con esa referencia externa.');estado.ingresos.push(ingreso);if(guardar()){e.target.reset();$('ingEsperado').value='0';$('ingCobrado').value='0';render()}});
 document.addEventListener('click',e=>{const b=e.target.closest('button[data-del]');if(!b)return;const tipo=b.dataset.del,id=b.dataset.id;if(!confirm('¿Eliminar este registro? Esta acción no se puede deshacer salvo que tengas un respaldo.'))return;const dependencias={proveedor:()=>{if(estado.servicios.some(s=>s.proveedor_id===id)||estado.cotizaciones.some(c=>c.proveedor_id===id)||estado.compromisos.some(c=>c.proveedor_id===id)||estado.gastos_adicionales.some(g=>g.proveedor_id===id))throw Error('El proveedor tiene registros asociados; no se puede eliminar.')},servicio:()=>{if(estado.compromisos.some(c=>c.servicio_id===id)||estado.cotizaciones.some(c=>c.servicio_id===id))throw Error('El servicio tiene cotizaciones o compromisos asociados.')},compromiso:()=>{if(estado.pagos.some(p=>p.compromiso_id===id))throw Error('El compromiso tiene pagos asociados. Elimina primero los pagos.')},gasto:()=>{if(estado.pagos.some(p=>p.gasto_adicional_id===id))throw Error('El egreso tiene pagos asociados. Elimina primero los pagos.')},pago:()=>{},cotizacion:()=>{},ingreso:()=>{}};try{if(dependencias[tipo])dependencias[tipo]();const mapa={proveedor:'proveedores',servicio:'servicios',compromiso:'compromisos',cotizacion:'cotizaciones',gasto:'gastos_adicionales',pago:'pagos',ingreso:'ingresos'};estado[mapa[tipo]]=estado[mapa[tipo]].filter(x=>x.id!==id);if(guardar())render()}catch(err){alert(err.message)}});
 $('importarReservaciones').addEventListener('click',async()=>{const archivo=$('archivoReservaciones').files[0];if(!archivo){alert('Selecciona primero el archivo JSON v2 de reservaciones.');return}try{const origen=JSON.parse(await archivo.text());if(origen.formato_version!==2||origen.evento_id!=='OXI-2026'||!Array.isArray(origen.reservaciones))throw Error('El archivo debe ser JSON v2 del evento OXI-2026 y contener la lista reservaciones.');const vistos=new Set(),registros=origen.reservaciones;for(const r of registros){if(!r.reservacion_id)throw Error('Hay una reservación sin reservacion_id.');if(vistos.has(r.reservacion_id))throw Error('El archivo contiene un reservacion_id duplicado: '+r.reservacion_id);vistos.add(r.reservacion_id)}const cortesias=registros.filter(r=>r.tipo_reservacion==='cortesia_institucional').length;const previos=estado.ingresos.filter(i=>i.origen_sistema==='reservaciones_oxi_2026').length;if(!confirm('Se importarán/actualizarán '+registros.length+' reservaciones ('+cortesias+' cortesías). Los registros previamente importados se actualizarán por reservacion_id; los ingresos manuales se conservarán. ¿Continuar?'))return;let nuevos=0,actualizados=0,omitidos=0;const fechaImportacion=new Date().toISOString();for(const r of registros){const existente=estado.ingresos.find(i=>i.origen_sistema==='reservaciones_oxi_2026'&&i.referencia_externa===r.reservacion_id);const manual=estado.ingresos.find(i=>i.origen_sistema!=='reservaciones_oxi_2026'&&i.referencia_externa===r.reservacion_id);if(manual&&!existente){omitidos++;continue}const cortesia=r.tipo_reservacion==='cortesia_institucional';const esperado=cortesia?0:Math.max(0,Number(r.subtotal_excel??r.costo_excel??0)||0);const pagadoOrigen=Math.max(0,Number(r.pagado_excel||0)||0);const estadoOrigen=String(r.estado_pago_excel||'').trim().toUpperCase();let cobrado=pagadoOrigen;if(!cortesia&&estadoOrigen==='PAGADO'&&cobrado<=0)cobrado=esperado;if(cortesia)cobrado=0;const estadoPagadoConsistente=estadoOrigen==='PAGADO'&&(cobrado+0.009>=esperado);const estadoIngreso=(!cortesia&&estadoOrigen==='PAGADO'&&estadoPagadoConsistente)?'cobrado':'esperado';const notas=[r.notas_excel||'',r.forma_pago_excel?'Forma de pago en origen: '+r.forma_pago_excel:'',r.estado_pago_excel?'Estado original: '+r.estado_pago_excel:'',r.debe_excel!==undefined?'Saldo de referencia en Excel: '+Number(r.debe_excel||0):'',(!cortesia&&estadoOrigen==='PAGADO'&&!estadoPagadoConsistente)?'REVISAR: estado PAGADO pero el importe declarado pagado es menor al importe esperado. Se conserva como pendiente de revisión.':'',cortesia?'Cortesía institucional; excluida de ingresos cobrados.':'',r.fila_origen_excel?'Fila de origen Excel: '+r.fila_origen_excel:''].filter(Boolean).join(' | ');const registro={id:existente?existente.id:nuevoId('ING-RES'),fecha_prevista:null,fecha_cobro:estadoIngreso==='cobrado'?null:null,fuente:cortesia?'cortesia_institucional':'reservacion',concepto:String(r.nombre_reservacion||r.reservacion_id),importe_esperado:esperado,importe_cobrado:cobrado,moneda:'MXN',estado:estadoIngreso,origen_sistema:'reservaciones_oxi_2026',referencia_externa:String(r.reservacion_id),persona_o_entidad:String(r.nombre_reservacion||''),metodo_cobro:String(r.forma_pago_excel||''),comprobante_referencia:'',observaciones:notas,reservacion_id:String(r.reservacion_id),mesa_numero:r.mesa_numero??null,total_asientos:Number(r.total_asientos_excel||0),tipo_reservacion:r.tipo_reservacion||'grupo',fecha_importacion:fechaImportacion,estado_pago_origen:estadoOrigen,importe_declarado_pagado:pagadoOrigen,saldo_origen:Number(r.debe_excel||0)};if(existente){Object.assign(existente,registro,{id:existente.id});actualizados++}else{estado.ingresos.push(registro);nuevos++}}estado.integraciones=estado.integraciones||{};estado.integraciones.reservaciones={...(estado.integraciones.reservaciones||{}),habilitada:true,sistema_origen:'modulo_reservaciones',ultima_sincronizacion:fechaImportacion,regla_identificador_externo:'reservacion_id',archivo_origen:archivo.name,registros_importados:registros.length,observaciones:'PAGADO se reconoce como cobrado cuando el importe pagado cubre el importe esperado; diferencias se marcan para revisión. Cortesías excluidas de ingresos. Importación repetible e idempotente.'};if(guardar()){render();$('estadoReservaciones').textContent='Importación completada: '+nuevos+' nuevos, '+actualizados+' actualizados, '+omitidos+' omitidos por posible duplicado manual. Archivo: '+archivo.name+'. Revisa las observaciones de los registros importados y concilia los importes.';alert('Reservaciones importadas. Nuevos: '+nuevos+'. Actualizados: '+actualizados+'. Omitidos por duplicado manual: '+omitidos+'.')}}catch(err){$('estadoReservaciones').textContent='No se pudo importar: '+err.message;alert('No se pudo importar el JSON de reservaciones: '+err.message)}});
