@@ -2,826 +2,457 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#102b49">
-  <title>Gestión de proveedores | Comunidad Helénica</title>
-
-  <style>
-    :root {
-      --azul: #102b49;
-      --azul2: #183d63;
-      --dorado: #c5a15a;
-      --fondo: #f3f5f8;
-      --borde: #dce2e9;
-      --texto: #253448;
-      --verde: #237547;
-      --rojo: #a93232;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: var(--fondo);
-      color: var(--texto);
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
-    }
-
-    header {
-      background: var(--azul);
-      color: white;
-      border-bottom: 5px solid var(--dorado);
-      padding: 18px 22px;
-    }
-
-    .encabezado {
-      max-width: 1150px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
-
-    .logo {
-      width: 78px;
-      height: 78px;
-      object-fit: contain;
-      background: white;
-      border-radius: 6px;
-      padding: 4px;
-    }
-
-    h1 { font-size: 24px; margin: 0 0 4px; }
-    .subtitulo { margin: 0; color: #e5eaf0; }
-    .fundacion { margin-top: 5px; color: #e7cc91; font-size: 13px; }
-
-    nav {
-      background: white;
-      border-bottom: 1px solid var(--borde);
-      padding: 12px 20px;
-    }
-
-    nav div {
-      max-width: 1150px;
-      margin: auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    nav a {
-      color: var(--azul2);
-      text-decoration: none;
-      font-weight: bold;
-      padding: 7px 10px;
-      border-radius: 5px;
-    }
-
-    nav a:hover { background: #edf1f6; }
-
-    main {
-      max-width: 1150px;
-      margin: 25px auto;
-      padding: 0 16px 35px;
-    }
-
-    h2 { color: var(--azul); margin-top: 0; }
-    h3 { color: var(--azul2); margin-top: 0; }
-
-    .panel {
-      background: white;
-      border: 1px solid var(--borde);
-      border-radius: 10px;
-      padding: 22px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px #102b490a;
-    }
-
-    .resumen {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .indicador {
-      background: white;
-      border: 1px solid var(--borde);
-      border-left: 4px solid var(--dorado);
-      border-radius: 8px;
-      padding: 15px;
-    }
-
-    .indicador strong {
-      display: block;
-      color: var(--azul);
-      font-size: 26px;
-    }
-
-    .indicador span { font-size: 13px; color: #59687a; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 15px;
-    }
-
-    .campo { margin-bottom: 15px; }
-
-    label {
-      display: block;
-      font-weight: bold;
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid #bdc7d3;
-      border-radius: 6px;
-      padding: 10px;
-      font: inherit;
-      color: var(--texto);
-      background: white;
-    }
-
-    textarea { min-height: 85px; resize: vertical; }
-
-    input:focus, select:focus, textarea:focus {
-      outline: 2px solid #c5a15a66;
-      border-color: var(--dorado);
-    }
-
-    .ayuda { color: #64748b; font-size: 12px; margin-top: 4px; }
-
-    .botones {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 6px;
-      padding: 11px 15px;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    button:disabled { opacity: .5; cursor: not-allowed; }
-
-    .primario { background: var(--azul); color: white; }
-    .secundario { background: #e8edf3; color: var(--azul); }
-    .dorado { background: var(--dorado); color: #1b2635; }
-    .peligro { background: #fae8e8; color: var(--rojo); }
-    .exito { background: #e6f4eb; color: var(--verde); }
-
-    .estado {
-      display: none;
-      padding: 12px 14px;
-      border-radius: 6px;
-      margin-bottom: 18px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .estado.visible { display: block; }
-    .estado.ok { background: #e6f4eb; color: #205f3b; }
-    .estado.error { background: #fae8e8; color: #8b2525; }
-    .estado.info { background: #eaf1fa; color: #204b78; }
-
-    .nota {
-      background: #fff8e9;
-      border: 1px solid #ead5a7;
-      border-radius: 7px;
-      padding: 13px;
-      font-size: 14px;
-      margin-bottom: 18px;
-    }
-
-    .etiqueta {
-      display: inline-block;
-      padding: 3px 9px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .activo { background: #e2f3e8; color: #216b3c; }
-    .inactivo { background: #fbe8e8; color: #982e2e; }
-
-    .datos-fechas {
-      background: #f6f8fb;
-      border: 1px solid var(--borde);
-      border-radius: 7px;
-      padding: 13px;
-      margin-top: 12px;
-      font-size: 13px;
-    }
-
-    .datos-fechas p { margin: 5px 0; }
-
-    .id-actual {
-      color: #64748b;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-    }
-
-    footer {
-      text-align: center;
-      color: #64748b;
-      font-size: 12px;
-      padding: 20px;
-    }
-
-    @media (max-width: 650px) {
-      .encabezado { align-items: flex-start; }
-      .logo { width: 58px; height: 58px; }
-      h1 { font-size: 19px; }
-      .grid, .resumen { grid-template-columns: 1fr; }
-      .panel { padding: 16px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#102b49">
+<title>Administración de proveedores | Comunidad Helénica</title>
+<style>
+:root{--azul:#102b49;--azul2:#183d63;--oro:#c5a15a;--fondo:#f3f5f8;--borde:#dce2e9;--texto:#253448;--verde:#237547;--rojo:#a93232}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--texto);font-family:Arial,sans-serif;line-height:1.5}
+header{background:var(--azul);color:white;border-bottom:5px solid var(--oro);padding:18px 22px}
+.encabezado{max-width:1200px;margin:auto;display:flex;align-items:center;gap:18px}
+.logo{width:72px;height:72px;object-fit:contain;background:white;border-radius:6px;padding:4px}
+h1{font-size:24px;margin:0 0 4px}.sub{margin:0;color:#e5eaf0}.fundacion{font-size:13px;color:#e7cc91;margin-top:5px}
+main{max-width:1200px;margin:24px auto;padding:0 16px 35px}
+h2,h3{color:var(--azul);margin-top:0}
+.panel{background:white;border:1px solid var(--borde);border-radius:10px;padding:20px;margin-bottom:18px;box-shadow:0 2px 8px #102b490a}
+.intro{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.resumen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}
+.kpi{background:white;border:1px solid var(--borde);border-left:4px solid var(--oro);border-radius:8px;padding:13px}
+.kpi strong{display:block;font-size:25px;color:var(--azul)}.kpi span{font-size:13px;color:#59687a}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px}
+.campo{margin-bottom:13px}
+label{display:block;font-weight:bold;font-size:14px;margin-bottom:5px}
+input,select,textarea{width:100%;padding:10px;border:1px solid #bdc7d3;border-radius:6px;background:white;color:var(--texto);font:inherit}
+textarea{min-height:72px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid #c5a15a66;border-color:var(--oro)}
+.ayuda{font-size:12px;color:#64748b}
+.botones{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+button,.boton-archivo{border:0;border-radius:6px;padding:10px 14px;font-weight:bold;font-size:14px;cursor:pointer;display:inline-block}
+button:disabled{opacity:.5;cursor:not-allowed}
+.primario{background:var(--azul);color:white}.secundario,.boton-archivo{background:#e8edf3;color:var(--azul)}.dorado{background:var(--oro);color:#1b2635}.peligro{background:#fae8e8;color:var(--rojo)}.exito{background:#e6f4eb;color:var(--verde)}
+.estado{display:none;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px 14px;border-radius:6px;margin:14px 0}
+.estado.visible{display:block}.estado.ok{background:#e6f4eb;color:#205f3b}.estado.error{background:#fae8e8;color:#8b2525}.estado.info{background:#eaf1fa;color:#204b78}
+.aviso{background:#fff8e9;border:1px solid #ead5a7;border-radius:7px;padding:13px;margin:15px 0;font-size:14px}
+.tabla-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--azul);color:white;text-align:left}
+th,td{padding:11px;border-bottom:1px solid var(--borde);vertical-align:top}
+tbody tr:hover{background:#f7f9fc}
+.etiqueta{display:inline-block;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:bold}
+.activo{background:#e2f3e8;color:#216b3c}.inactivo{background:#fbe8e8;color:#982e2e}
+.oculto{display:none!important}
+.servicio-form{border:1px solid var(--borde);background:#f8fafc;padding:15px;border-radius:8px;margin-top:15px}
+footer{text-align:center;color:#64748b;font-size:12px;padding:20px}
+@media(max-width:700px){.grid,.resumen{grid-template-columns:1fr 1fr}.panel{padding:15px}.logo{width:55px;height:55px}h1{font-size:19px}}
+@media(max-width:450px){.grid,.resumen{grid-template-columns:1fr}}
+</style>
 </head>
-
 <body>
-  <header>
-    <div class="encabezado">
-      <img
-        class="logo"
-        src="./images/Logo%20COMHELMEX.jpg"
-        alt="Logo de la Comunidad Helénica"
-        onerror="this.style.display='none'"
-      >
-      <div>
-        <h1>Comunidad Helénica de México, A.C.</h1>
-        <p class="subtitulo">Administración institucional de proveedores</p>
-        <div class="fundacion">Fundada el 13 de marzo de 1956</div>
-      </div>
-    </div>
-  </header>
-
-  <nav>
+<header>
+  <div class="encabezado">
+    <img class="logo" src="./images/Logo%20COMHELMEX.jpg" alt="Logo de la Comunidad Helénica" onerror="this.style.display='none'">
     <div>
-      <a href="./index.html">Inicio</a>
-      <a href="./proveedores.html">Consultar proveedores</a>
-      <a href="./administrar-proveedores.html">Importar y exportar</a>
-      <a href="./validar-proveedores.html">Validar catálogo</a>
+      <h1>Comunidad Helénica de México, A.C.</h1>
+      <p class="sub">Administración central de proveedores y servicios</p>
+      <div class="fundacion">Fundada el 13 de marzo de 1956</div>
     </div>
-  </nav>
+  </div>
+</header>
 
-  <main>
-    <h2>Gestión de proveedores</h2>
-    <p>Registra, consulta y actualiza los datos institucionales de los proveedores.</p>
-
-    <div id="mensaje" class="estado" role="status" aria-live="polite"></div>
-
-    <div class="nota">
-      <strong>Importante:</strong> los cambios se realizan en la memoria de esta página.
-      Para conservarlos, guarda el catálogo JSON exportado y súbelo a
-      <code>data/proveedores.json</code> en GitHub. No se modifica el repositorio
-      automáticamente.
+<main>
+  <div class="intro">
+    <div>
+      <h2>Proveedores y servicios</h2>
+      <p>Una sola pantalla para administrar el catálogo institucional.</p>
     </div>
+    <span id="estadoCarga" class="etiqueta inactivo">Catálogo sin cargar</span>
+  </div>
 
-    <section class="resumen">
-      <div class="indicador">
-        <strong id="totalProveedores">—</strong>
-        <span>Proveedores registrados</span>
-      </div>
-      <div class="indicador">
-        <strong id="totalActivos">—</strong>
-        <span>Proveedores activos</span>
-      </div>
-      <div class="indicador">
-        <strong id="totalInactivos">—</strong>
-        <span>Proveedores inactivos</span>
-      </div>
-    </section>
+  <div id="mensaje" class="estado" role="status" aria-live="polite"></div>
 
-    <section class="panel">
-      <h3>1. Seleccionar proveedor</h3>
+  <section class="panel">
+    <h3>1. Cargar o guardar el catálogo</h3>
+    <p>La página carga inicialmente el catálogo publicado en el repositorio. También puedes seleccionar un JSON previamente exportado para continuar trabajando sobre él.</p>
+    <div class="botones">
+      <button class="primario" id="btnRecargar" type="button">Cargar catálogo de GitHub</button>
+      <label class="boton-archivo" for="archivoJSON">Importar JSON</label>
+      <input id="archivoJSON" class="oculto" type="file" accept=".json,application/json">
+      <button class="dorado" id="btnExportar" type="button">Validar y exportar JSON</button>
+    </div>
+    <p class="ayuda">La importación sustituye el catálogo de trabajo de esta sesión, después de validarlo. Exporta los cambios al terminar y reemplaza manualmente <code>data/proveedores.json</code> en GitHub.</p>
+    <div class="aviso"><strong>Importante:</strong> el catálogo puede publicarse en un repositorio público. No incluyas contraseñas, datos bancarios ni información confidencial innecesaria. Esta página no modifica finanzas, cotizaciones ni pagos del OXI.</div>
+  </section>
 
+  <section class="resumen">
+    <div class="kpi"><strong id="numProveedores">—</strong><span>Proveedores</span></div>
+    <div class="kpi"><strong id="numActivos">—</strong><span>Proveedores activos</span></div>
+    <div class="kpi"><strong id="numServicios">—</strong><span>Servicios registrados</span></div>
+    <div class="kpi"><strong id="numServiciosActivos">—</strong><span>Servicios activos</span></div>
+  </section>
+
+  <section class="panel">
+    <h3>2. Lista de proveedores</h3>
+    <div class="grid">
+      <div class="campo">
+        <label for="buscar">Buscar proveedor</label>
+        <input id="buscar" type="search" placeholder="Nombre, ID, categoría o contacto">
+      </div>
+      <div class="campo">
+        <label for="filtroEstado">Estado</label>
+        <select id="filtroEstado">
+          <option value="todos">Todos</option>
+          <option value="activo">Activos</option>
+          <option value="inactivo">Inactivos</option>
+        </select>
+      </div>
+    </div>
+    <div class="tabla-wrap">
+      <table>
+        <thead><tr><th>Proveedor</th><th>Categoría</th><th>Contacto</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="tablaProveedores"><tr><td colspan="5">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+    <div id="totalProveedores" class="ayuda"></div>
+    <div class="botones">
+      <button class="primario" id="btnNuevoProveedor" type="button">+ Nuevo proveedor</button>
+    </div>
+  </section>
+
+  <section class="panel" id="panelProveedor">
+    <h3 id="tituloProveedor">3. Datos del proveedor</h3>
+    <p id="idProveedor" class="ayuda">Selecciona un proveedor o crea uno nuevo.</p>
+    <form id="formProveedor">
+      <input type="hidden" id="provId">
       <div class="grid">
-        <div class="campo">
-          <label for="buscar">Buscar por nombre o identificador</label>
-          <input id="buscar" type="search" placeholder="Escribe para filtrar">
-        </div>
-
-        <div class="campo">
-          <label for="proveedorSeleccionado">Proveedor registrado</label>
-          <select id="proveedorSeleccionado">
-            <option value="">Selecciona un proveedor</option>
-          </select>
-        </div>
+        <div class="campo"><label for="provNombre">Nombre o razón social *</label><input id="provNombre" maxlength="180" required></div>
+        <div class="campo"><label for="provCategoria">Categoría</label><select id="provCategoria"></select></div>
+        <div class="campo"><label for="provContacto">Nombre de contacto</label><input id="provContacto" maxlength="180"></div>
+        <div class="campo"><label for="provTelefono">Teléfono</label><input id="provTelefono" type="tel" maxlength="60"></div>
+        <div class="campo"><label for="provCorreo">Correo</label><input id="provCorreo" type="email" maxlength="180"></div>
+        <div class="campo"><label for="provRFC">RFC</label><input id="provRFC" maxlength="20" autocomplete="off"></div>
       </div>
-
+      <div class="campo"><label for="provFiscal">Datos fiscales adicionales</label><textarea id="provFiscal" maxlength="1500"></textarea></div>
+      <div class="campo"><label for="provObservaciones">Observaciones</label><textarea id="provObservaciones" maxlength="2000"></textarea></div>
+      <div class="campo"><label for="provNotas">Notas internas</label><textarea id="provNotas" maxlength="2000"></textarea></div>
+      <div id="fechasProveedor" class="aviso oculto"></div>
       <div class="botones">
-        <button type="button" class="secundario" id="btnNuevo">+ Nuevo proveedor</button>
-        <button type="button" class="secundario" id="btnLimpiar">Limpiar formulario</button>
+        <button class="primario" type="submit">Guardar proveedor</button>
+        <button class="secundario" id="btnCancelarProveedor" type="button">Cancelar</button>
+        <button class="peligro" id="btnBajaProveedor" type="button">Dar de baja</button>
+        <button class="exito" id="btnReactivarProveedor" type="button">Reactivar</button>
       </div>
+    </form>
+  </section>
 
-      <p id="idActual" class="id-actual">No hay proveedor seleccionado.</p>
-    </section>
+  <section class="panel">
+    <h3>4. Servicios del proveedor seleccionado</h3>
+    <p id="serviciosDelProveedor">Selecciona un proveedor para ver sus servicios.</p>
+    <div class="tabla-wrap">
+      <table>
+        <thead><tr><th>Servicio o producto</th><th>Categoría</th><th>Unidad</th><th>Precio de referencia</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="tablaServicios"><tr><td colspan="6">Selecciona un proveedor.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="botones">
+      <button class="primario" id="btnNuevoServicio" type="button" disabled>+ Nuevo servicio</button>
+    </div>
 
-    <section class="panel">
-      <h3>2. Datos del proveedor</h3>
-
-      <form id="formProveedor">
-        <input type="hidden" id="id">
-
+    <div id="formServicioPanel" class="servicio-form oculto">
+      <h3 id="tituloServicio">Nuevo servicio</h3>
+      <form id="formServicio">
+        <input id="servId" type="hidden">
         <div class="grid">
-          <div class="campo">
-            <label for="nombre">Nombre o razón social *</label>
-            <input id="nombre" maxlength="180" required>
-          </div>
-
-          <div class="campo">
-            <label for="categoria">Categoría</label>
-            <select id="categoria">
-              <option value="">Sin categoría</option>
-            </select>
-          </div>
-
-          <div class="campo">
-            <label for="contacto_nombre">Nombre de contacto</label>
-            <input id="contacto_nombre" maxlength="180">
-          </div>
-
-          <div class="campo">
-            <label for="telefono">Teléfono</label>
-            <input id="telefono" type="tel" maxlength="60">
-          </div>
-
-          <div class="campo">
-            <label for="correo">Correo electrónico</label>
-            <input id="correo" type="email" maxlength="180">
-          </div>
-
-          <div class="campo">
-            <label for="rfc">RFC</label>
-            <input id="rfc" maxlength="20" autocomplete="off">
-          </div>
+          <div class="campo"><label for="servNombre">Nombre del servicio *</label><input id="servNombre" maxlength="180" required></div>
+          <div class="campo"><label for="servCategoria">Categoría</label><select id="servCategoria"></select></div>
+          <div class="campo"><label for="servUnidad">Unidad</label><input id="servUnidad" maxlength="80" placeholder="Ej. servicio, pieza, paquete"></div>
+          <div class="campo"><label for="servPrecio">Precio de referencia (MXN)</label><input id="servPrecio" type="number" min="0" step="0.01" placeholder="Dejar vacío si no se conoce"></div>
         </div>
-
-        <div class="campo">
-          <label for="datos_fiscales">Datos fiscales adicionales</label>
-          <textarea id="datos_fiscales" maxlength="1500"></textarea>
-        </div>
-
-        <div class="campo">
-          <label for="observaciones">Observaciones</label>
-          <textarea id="observaciones" maxlength="2000"></textarea>
-        </div>
-
-        <div class="campo">
-          <label for="notas_internas">Notas internas</label>
-          <textarea id="notas_internas" maxlength="2000"></textarea>
-          <p class="ayuda">
-            Recuerda que el JSON está en un repositorio público si el repositorio
-            no es privado. No incluyas contraseñas, datos bancarios ni información
-            confidencial innecesaria.
-          </p>
-        </div>
-
-        <div class="datos-fechas">
-          <strong>Control de fechas</strong>
-          <p>Alta: <span id="fechaAlta">—</span></p>
-          <p>Última actualización: <span id="fechaActualizacion">—</span></p>
-          <p>Baja: <span id="fechaBaja">—</span></p>
-          <p>Última reactivación: <span id="fechaReactivacion">—</span></p>
-          <p>Estado actual: <span id="estadoActual">Sin seleccionar</span></p>
-        </div>
-
+        <div class="campo"><label for="servDescripcion">Descripción</label><textarea id="servDescripcion" maxlength="1500"></textarea></div>
+        <div class="campo"><label for="servObservaciones">Observaciones</label><textarea id="servObservaciones" maxlength="1500"></textarea></div>
+        <div class="campo"><label><input id="servActivo" type="checkbox" checked style="width:auto;margin-right:8px">Servicio activo</label></div>
         <div class="botones">
-          <button type="submit" class="primario" id="btnGuardar">Guardar proveedor</button>
-          <button type="button" class="peligro" id="btnBaja" disabled>Dar de baja</button>
-          <button type="button" class="exito" id="btnReactivar" disabled>Reactivar</button>
+          <button class="primario" type="submit">Guardar servicio</button>
+          <button class="secundario" id="btnCancelarServicio" type="button">Cancelar</button>
         </div>
       </form>
-    </section>
-
-    <section class="panel">
-      <h3>3. Guardar los cambios en el catálogo</h3>
-      <p>
-        Antes de exportar se validará el catálogo completo, incluidos los servicios
-        existentes y sus relaciones con los proveedores.
-      </p>
-
-      <div class="botones">
-        <button type="button" class="dorado" id="btnExportar">Validar y exportar JSON</button>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    Comunidad Helénica de México, A.C. · Administración institucional
-  </footer>
-
-  <script type="module">
-    import {
-      cargarCatalogoProveedores,
-      validarCatalogoProveedores
-    } from "./js/proveedores.js";
-
-    const $ = id => document.getElementById(id);
-
-    let catalogo = null;
-    let proveedorEnEdicion = null;
-    let esNuevo = false;
-
-    const campos = [
-      "nombre", "categoria", "contacto_nombre", "telefono",
-      "correo", "rfc", "datos_fiscales", "observaciones", "notas_internas"
-    ];
-
-    function fechaHoy() {
-      const ahora = new Date();
-      const local = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000);
-      return local.toISOString().slice(0, 10);
-    }
-
-    function mostrarMensaje(texto, tipo = "info") {
-      const caja = $("mensaje");
-      caja.textContent = texto;
-      caja.className = `estado visible ${tipo}`;
-      caja.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-
-    function limpiarMensaje() {
-      $("mensaje").textContent = "";
-      $("mensaje").className = "estado";
-    }
-
-    function escaparHTML(valor) {
-      return String(valor ?? "").replace(/[&<>"']/g, caracter => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[caracter]);
-    }
-
-    function generarId(prefijo) {
-      let id;
-      const ids = new Set([
-        ...catalogo.proveedores.map(p => p.id),
-        ...catalogo.servicios.map(s => s.id)
-      ]);
-
-      do {
-        const tiempo = Date.now().toString(36).toUpperCase();
-        const aleatorio = Math.random().toString(36).slice(2, 7).toUpperCase();
-        id = `${prefijo}-${tiempo}-${aleatorio}`;
-      } while (ids.has(id));
-
-      return id;
-    }
-
-    function actualizarResumen() {
-      const proveedores = catalogo.proveedores;
-      $("totalProveedores").textContent = proveedores.length;
-      $("totalActivos").textContent =
-        proveedores.filter(p => p.estado === "activo").length;
-      $("totalInactivos").textContent =
-        proveedores.filter(p => p.estado === "inactivo").length;
-    }
-
-    function cargarCategorias() {
-      const select = $("categoria");
-      select.innerHTML = '<option value="">Sin categoría</option>';
-
-      for (const categoria of catalogo.catalogos.categorias_proveedor) {
-        const opcion = document.createElement("option");
-        opcion.value = categoria;
-        opcion.textContent = categoria;
-        select.appendChild(opcion);
-      }
-    }
-
-    function actualizarSelector(idSeleccionado = "") {
-      const select = $("proveedorSeleccionado");
-      const termino = $("buscar").value.trim().toLocaleLowerCase("es");
-
-      const lista = catalogo.proveedores
-        .filter(p => {
-          const texto = `${p.nombre} ${p.id} ${p.categoria || ""}`.toLocaleLowerCase("es");
-          return texto.includes(termino);
-        })
-        .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
-
-      select.innerHTML = '<option value="">Selecciona un proveedor</option>';
-
-      for (const proveedor of lista) {
-        const opcion = document.createElement("option");
-        opcion.value = proveedor.id;
-        opcion.textContent =
-          `${proveedor.nombre} — ${proveedor.estado === "activo" ? "Activo" : "Inactivo"}`;
-        select.appendChild(opcion);
-      }
-
-      if (lista.some(p => p.id === idSeleccionado)) {
-        select.value = idSeleccionado;
-      }
-    }
-
-    function mostrarFechas(proveedor) {
-      $("fechaAlta").textContent = proveedor?.fecha_alta || "Sin dato";
-      $("fechaActualizacion").textContent =
-        proveedor?.ultima_actualizacion || "Sin dato";
-      $("fechaBaja").textContent = proveedor?.fecha_baja || "Sin dato";
-      $("fechaReactivacion").textContent =
-        proveedor?.fecha_reactivacion || "Sin dato";
-
-      const estado = proveedor?.estado || "";
-      $("estadoActual").textContent = estado
-        ? (estado === "activo" ? "Activo" : "Inactivo")
-        : "Sin seleccionar";
-
-      $("estadoActual").className = estado
-        ? `etiqueta ${estado}`
-        : "";
-    }
-
-    function limpiarFormulario() {
-      $("formProveedor").reset();
-      $("id").value = "";
-      proveedorEnEdicion = null;
-      esNuevo = false;
-
-      $("idActual").textContent = "No hay proveedor seleccionado.";
-      $("btnGuardar").textContent = "Guardar proveedor";
-      $("btnBaja").disabled = true;
-      $("btnReactivar").disabled = true;
-      mostrarFechas(null);
-      limpiarMensaje();
-    }
-
-    function cargarFormulario(proveedor) {
-      if (!proveedor) {
-        limpiarFormulario();
-        return;
-      }
-
-      proveedorEnEdicion = proveedor;
-      esNuevo = false;
-      $("id").value = proveedor.id;
-
-      for (const campo of campos) {
-        $(campo).value = proveedor[campo] ?? "";
-      }
-
-      $("idActual").textContent = `Identificador: ${proveedor.id}`;
-      $("btnGuardar").textContent = "Guardar cambios";
-      $("btnBaja").disabled = proveedor.estado !== "activo";
-      $("btnReactivar").disabled = proveedor.estado !== "inactivo";
-
-      mostrarFechas(proveedor);
-      limpiarMensaje();
-    }
-
-    function prepararNuevo() {
-      limpiarFormulario();
-      esNuevo = true;
-      $("btnGuardar").textContent = "Registrar proveedor";
-      $("nombre").focus();
-      mostrarMensaje(
-        "Modo de alta: completa el nombre y los datos disponibles. El identificador se generará al guardar.",
-        "info"
-      );
-    }
-
-    function registrarOActualizar(evento) {
-      evento.preventDefault();
-      limpiarMensaje();
-
-      const nombre = $("nombre").value.trim();
-
-      if (!nombre) {
-        mostrarMensaje("El nombre o razón social es obligatorio.", "error");
-        $("nombre").focus();
-        return;
-      }
-
-      const hoy = fechaHoy();
-      const categoria = $("categoria").value;
-
-      if (categoria &&
-          !catalogo.catalogos.categorias_proveedor.includes(categoria)) {
-        mostrarMensaje("La categoría seleccionada no existe en el catálogo.", "error");
-        return;
-      }
-
-      const datos = {};
-      for (const campo of campos) {
-        datos[campo] = $(campo).value.trim();
-      }
-
-      if (esNuevo || !proveedorEnEdicion) {
-        const nuevo = {
-          id: generarId("PROV"),
-          ...datos,
-          estado: "activo",
-          fecha_alta: hoy,
-          ultima_actualizacion: hoy,
-          fecha_baja: null,
-          fecha_reactivacion: null
-        };
-
-        catalogo.proveedores.push(nuevo);
-        proveedorEnEdicion = nuevo;
-        esNuevo = false;
-
-        actualizarResumen();
-        actualizarSelector(nuevo.id);
-        cargarFormulario(nuevo);
-
-        mostrarMensaje(
-          "Proveedor registrado en esta sesión. Exporta el catálogo para conservarlo en GitHub.",
-          "ok"
-        );
-      } else {
-        const original = proveedorEnEdicion;
-        const actualizado = {
-          ...original,
-          ...datos,
-          ultima_actualizacion: hoy
-        };
-
-        const indice = catalogo.proveedores.findIndex(p => p.id === original.id);
-
-        if (indice < 0) {
-          mostrarMensaje("No se encontró el proveedor que intentas editar.", "error");
-          return;
-        }
-
-        catalogo.proveedores[indice] = actualizado;
-        proveedorEnEdicion = actualizado;
-
-        actualizarResumen();
-        actualizarSelector(actualizado.id);
-        cargarFormulario(actualizado);
-
-        mostrarMensaje(
-          "Cambios aplicados en esta sesión. Exporta el catálogo para conservarlos en GitHub.",
-          "ok"
-        );
-      }
-    }
-
-    function cambiarEstado(nuevoEstado) {
-      if (!proveedorEnEdicion || esNuevo) {
-        mostrarMensaje("Primero selecciona un proveedor registrado.", "error");
-        return;
-      }
-
-      const proveedor = proveedorEnEdicion;
-      const hoy = fechaHoy();
-
-      if (nuevoEstado === "inactivo" && proveedor.estado === "inactivo") {
-        mostrarMensaje("El proveedor ya está inactivo.", "info");
-        return;
-      }
-
-      if (nuevoEstado === "activo" && proveedor.estado === "activo") {
-        mostrarMensaje("El proveedor ya está activo.", "info");
-        return;
-      }
-
-      const pregunta = nuevoEstado === "inactivo"
-        ? `¿Dar de baja a ${proveedor.nombre}? El registro y sus servicios se conservarán.`
-        : `¿Reactivar a ${proveedor.nombre}?`;
-
-      if (!confirm(pregunta)) return;
-
-      const actualizado = {
-        ...proveedor,
-        estado: nuevoEstado,
-        ultima_actualizacion: hoy
-      };
-
-      if (nuevoEstado === "inactivo") {
-        actualizado.fecha_baja = hoy;
-      } else {
-        actualizado.fecha_reactivacion = hoy;
-        actualizado.fecha_baja = null;
-      }
-
-      const indice = catalogo.proveedores.findIndex(p => p.id === proveedor.id);
-      catalogo.proveedores[indice] = actualizado;
-
-      proveedorEnEdicion = actualizado;
-
-      actualizarResumen();
-      actualizarSelector(actualizado.id);
-      cargarFormulario(actualizado);
-
-      mostrarMensaje(
-        `Proveedor ${nuevoEstado === "activo" ? "reactivado" : "dado de baja"} en esta sesión. Exporta el catálogo para conservar el cambio.`,
-        "ok"
-      );
-    }
-
-    function exportarCatalogo() {
-      limpiarMensaje();
-
-      catalogo.metadata = {
-        ...catalogo.metadata,
-        ultima_actualizacion: fechaHoy()
-      };
-
-      const errores = validarCatalogoProveedores(catalogo);
-
-      if (errores.length) {
-        mostrarMensaje(
-          "No se puede exportar: el catálogo tiene errores.\n\n" +
-          errores.map((e, i) => `${i + 1}. ${e}`).join("\n"),
-          "error"
-        );
-        return;
-      }
-
-      const contenido = JSON.stringify(catalogo, null, 2);
-      const blob = new Blob([contenido], { type: "application/json;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const enlace = document.createElement("a");
-
-      enlace.href = url;
-      enlace.download = "proveedores.json";
-      document.body.appendChild(enlace);
-      enlace.click();
-      enlace.remove();
-
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-      mostrarMensaje(
-        "Validación correcta. Se descargó proveedores.json.\n\n" +
-        "Siguiente paso: reemplaza data/proveedores.json en GitHub con el archivo descargado y confirma el cambio.",
-        "ok"
-      );
-    }
-
-    async function iniciar() {
-      try {
-        catalogo = await cargarCatalogoProveedores({ recargar: true });
-
-        if (!catalogo || !Array.isArray(catalogo.proveedores) ||
-            !Array.isArray(catalogo.servicios)) {
-          throw new Error("El catálogo no contiene las listas esperadas.");
-        }
-
-        if (!catalogo.catalogos ||
-            !Array.isArray(catalogo.catalogos.categorias_proveedor)) {
-          throw new Error("No se encontró la lista de categorías de proveedores.");
-        }
-
-        cargarCategorias();
-        actualizarResumen();
-        actualizarSelector();
-        limpiarFormulario();
-
-        mostrarMensaje(
-          "Catálogo cargado correctamente. Puedes seleccionar un proveedor o registrar uno nuevo.",
-          "ok"
-        );
-      } catch (error) {
-        mostrarMensaje(
-          "No fue posible cargar el catálogo.\n" +
-          (error?.message || String(error)) +
-          "\n\nVerifica que data/proveedores.json exista y que js/proveedores.js esté disponible.",
-          "error"
-        );
-
-        $("btnGuardar").disabled = true;
-        $("btnExportar").disabled = true;
-        $("btnNuevo").disabled = true;
-      }
-    }
-
-    $("buscar").addEventListener("input", () => {
-      const idActual = $("proveedorSeleccionado").value;
-      actualizarSelector(idActual);
+    </div>
+  </section>
+</main>
+<footer>Comunidad Helénica de México, A.C. · Catálogo institucional central</footer>
+
+<script type="module">
+import { cargarCatalogoProveedores, validarCatalogoProveedores } from "./js/proveedores.js";
+
+const $ = id => document.getElementById(id);
+let catalogo = null;
+let proveedorSeleccionado = null;
+let servicioSeleccionado = null;
+let modoProveedor = "editar";
+let modoServicio = "editar";
+
+function hoy() {
+  const d = new Date();
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0,10);
+}
+function aviso(texto, tipo="info") {
+  const m=$("mensaje"); m.textContent=texto; m.className=`estado visible ${tipo}`;
+  m.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function limpiarAviso(){ $("mensaje").textContent=""; $("mensaje").className="estado"; }
+function esc(v){return String(v ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function dinero(v){return v===null||v===undefined||v===""?"Sin precio":Number(v).toLocaleString("es-MX",{style:"currency",currency:"MXN"});}
+function nuevoId(tipo){
+  const existentes=new Set([...catalogo.proveedores.map(x=>x.id),...catalogo.servicios.map(x=>x.id)]);
+  let id;
+  do{id=`${tipo}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;}while(existentes.has(id));
+  return id;
+}
+function actualizarResumen(){
+  $("numProveedores").textContent=catalogo.proveedores.length;
+  $("numActivos").textContent=catalogo.proveedores.filter(p=>p.estado==="activo").length;
+  $("numServicios").textContent=catalogo.servicios.length;
+  $("numServiciosActivos").textContent=catalogo.servicios.filter(s=>s.activo===true).length;
+  $("estadoCarga").textContent="Catálogo cargado";
+  $("estadoCarga").className="etiqueta activo";
+}
+function cargarCategorias(){
+  for(const id of ["provCategoria","servCategoria"]){
+    const select=$(id), anterior=select.value;
+    select.innerHTML=id==="provCategoria"?'<option value="">Sin categoría</option>':'<option value="">Sin categoría</option>';
+    catalogo.catalogos.categorias_proveedor.forEach(c=>{
+      const o=document.createElement("option");o.value=c;o.textContent=c;select.appendChild(o);
     });
+    if([...select.options].some(o=>o.value===anterior))select.value=anterior;
+  }
+}
+function renderProveedores(){
+  const q=$("buscar").value.trim().toLocaleLowerCase("es");
+  const estado=$("filtroEstado").value;
+  const lista=catalogo.proveedores.filter(p=>{
+    const t=[p.nombre,p.id,p.categoria,p.contacto_nombre,p.telefono,p.correo].join(" ").toLocaleLowerCase("es");
+    return t.includes(q)&&(estado==="todos"||p.estado===estado);
+  }).sort((a,b)=>a.nombre.localeCompare(b.nombre,"es"));
+  $("tablaProveedores").innerHTML=lista.length?lista.map(p=>`
+    <tr>
+      <td><strong>${esc(p.nombre)}</strong><div class="ayuda">${esc(p.id)}</div></td>
+      <td>${esc(p.categoria||"Sin categoría")}</td>
+      <td>${esc(p.contacto_nombre||"—")}<div class="ayuda">${esc(p.telefono||"")} ${esc(p.correo||"")}</div></td>
+      <td><span class="etiqueta ${p.estado==="activo"?"activo":"inactivo"}">${p.estado==="activo"?"Activo":"Inactivo"}</span></td>
+      <td><button class="secundario" type="button" data-editar-prov="${esc(p.id)}">Editar</button></td>
+    </tr>`).join(""):'<tr><td colspan="5">No hay proveedores que coincidan.</td></tr>';
+  $("totalProveedores").textContent=`Mostrando ${lista.length} de ${catalogo.proveedores.length} proveedores.`;
+}
+function mostrarFechas(p){
+  const caja=$("fechasProveedor");
+  if(!p){caja.classList.add("oculto");caja.textContent="";return;}
+  caja.classList.remove("oculto");
+  caja.textContent=`Alta: ${p.fecha_alta||"Sin dato"} · Última actualización: ${p.ultima_actualizacion||"Sin dato"} · Baja: ${p.fecha_baja||"Sin dato"} · Última reactivación: ${p.fecha_reactivacion||"Sin dato"}`;
+}
+function formularioProveedorNuevo(){
+  proveedorSeleccionado=null;modoProveedor="nuevo";
+  $("formProveedor").reset();$("provId").value="";
+  $("tituloProveedor").textContent="3. Registrar nuevo proveedor";
+  $("idProveedor").textContent="El identificador se generará al guardar.";
+  $("btnBajaProveedor").disabled=true;$("btnReactivarProveedor").disabled=true;
+  mostrarFechas(null);renderServicios();
+  $("panelProveedor").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function editarProveedor(p){
+  proveedorSeleccionado=p;modoProveedor="editar";
+  $("provId").value=p.id;$("provNombre").value=p.nombre||"";
+  $("provCategoria").value=p.categoria||"";
+  $("provContacto").value=p.contacto_nombre||"";
+  $("provTelefono").value=p.telefono||"";$("provCorreo").value=p.correo||"";
+  $("provRFC").value=p.rfc||"";$("provFiscal").value=p.datos_fiscales||"";
+  $("provObservaciones").value=p.observaciones||"";$("provNotas").value=p.notas_internas||"";
+  $("tituloProveedor").textContent="3. Editar proveedor";
+  $("idProveedor").textContent=`Identificador: ${p.id}`;
+  $("btnBajaProveedor").disabled=p.estado!=="activo";
+  $("btnReactivarProveedor").disabled=p.estado!=="inactivo";
+  mostrarFechas(p);renderServicios();
+  $("panelProveedor").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function guardarProveedor(e){
+  e.preventDefault();limpiarAviso();
+  const nombre=$("provNombre").value.trim();
+  if(!nombre){aviso("El nombre del proveedor es obligatorio.","error");return;}
+  const hoyFecha=hoy();
+  const datos={
+    nombre,categoria:$("provCategoria").value,
+    contacto_nombre:$("provContacto").value.trim(),
+    telefono:$("provTelefono").value.trim(),
+    correo:$("provCorreo").value.trim(),rfc:$("provRFC").value.trim(),
+    datos_fiscales:$("provFiscal").value.trim(),
+    observaciones:$("provObservaciones").value.trim(),
+    notas_internas:$("provNotas").value.trim()
+  };
+  if(modoProveedor==="nuevo"){
+    const p={id:nuevoId("PROV"),...datos,estado:"activo",fecha_alta:hoyFecha,ultima_actualizacion:hoyFecha,fecha_baja:null,fecha_reactivacion:null};
+    catalogo.proveedores.push(p);proveedorSeleccionado=p;
+    aviso("Proveedor registrado en el catálogo de trabajo. Exporta el JSON al terminar.","ok");
+  }else{
+    const i=catalogo.proveedores.findIndex(p=>p.id===proveedorSeleccionado?.id);
+    if(i<0){aviso("Selecciona un proveedor válido.","error");return;}
+    const p={...catalogo.proveedores[i],...datos,ultima_actualizacion:hoyFecha};
+    catalogo.proveedores[i]=p;proveedorSeleccionado=p;
+    aviso("Cambios aplicados en esta sesión. Exporta el JSON para conservarlos.","ok");
+  }
+  actualizarResumen();renderProveedores();editarProveedor(proveedorSeleccionado);
+}
+function cambiarEstado(estado){
+  if(!proveedorSeleccionado)return;
+  const p=proveedorSeleccionado;
+  if(!confirm(`${estado==="inactivo"?"¿Dar de baja":"¿Reactivar"} a ${p.nombre}? El registro y sus servicios no se borrarán.`))return;
+  const fecha=hoy();
+  const actualizado={...p,estado,ultima_actualizacion:fecha};
+  if(estado==="inactivo")actualizado.fecha_baja=fecha;
+  else{actualizado.fecha_reactivacion=fecha;actualizado.fecha_baja=null;}
+  const i=catalogo.proveedores.findIndex(x=>x.id===p.id);
+  catalogo.proveedores[i]=actualizado;proveedorSeleccionado=actualizado;
+  actualizarResumen();renderProveedores();editarProveedor(actualizado);
+  aviso(`Proveedor ${estado==="activo"?"reactivado":"dado de baja"} en esta sesión. Exporta para conservar el cambio.`,"ok");
+}
+function renderServicios(){
+  const tbody=$("tablaServicios");
+  if(!proveedorSeleccionado){
+    $("serviciosDelProveedor").textContent="Selecciona un proveedor para ver sus servicios.";
+    tbody.innerHTML='<tr><td colspan="6">Selecciona un proveedor.</td></tr>';
+    $("btnNuevoServicio").disabled=true;return;
+  }
+  const p=proveedorSeleccionado;
+  const lista=catalogo.servicios.filter(s=>s.proveedor_id===p.id);
+  $("serviciosDelProveedor").textContent=`Servicios asociados a ${p.nombre} (${lista.length}).`;
+  $("btnNuevoServicio").disabled=false;
+  tbody.innerHTML=lista.length?lista.map(s=>`
+    <tr>
+      <td><strong>${esc(s.nombre)}</strong><div class="ayuda">${esc(s.descripcion||"")}</div></td>
+      <td>${esc(s.categoria||"Sin categoría")}</td><td>${esc(s.unidad||"—")}</td>
+      <td>${dinero(s.precio_referencial)}</td>
+      <td><span class="etiqueta ${s.activo?"activo":"inactivo"}">${s.activo?"Activo":"Inactivo"}</span></td>
+      <td><button class="secundario" type="button" data-editar-serv="${esc(s.id)}">Editar</button></td>
+    </tr>`).join(""):'<tr><td colspan="6">Este proveedor todavía no tiene servicios registrados.</td></tr>';
+}
+function nuevoServicio(){
+  if(!proveedorSeleccionado){aviso("Selecciona primero un proveedor.","error");return;}
+  servicioSeleccionado=null;modoServicio="nuevo";$("formServicio").reset();
+  $("servId").value="";$("servActivo").checked=true;
+  $("servCategoria").value=proveedorSeleccionado.categoria||"";
+  $("tituloServicio").textContent="Registrar servicio";
+  $("formServicioPanel").classList.remove("oculto");
+  $("formServicioPanel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function editarServicio(s){
+  servicioSeleccionado=s;modoServicio="editar";
+  $("servId").value=s.id;$("servNombre").value=s.nombre||"";
+  $("servCategoria").value=s.categoria||"";
+  $("servUnidad").value=s.unidad||"";
+  $("servPrecio").value=s.precio_referencial??"";
+  $("servDescripcion").value=s.descripcion||"";
+  $("servObservaciones").value=s.observaciones||"";
+  $("servActivo").checked=s.activo===true;
+  $("tituloServicio").textContent="Editar servicio";
+  $("formServicioPanel").classList.remove("oculto");
+  $("formServicioPanel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function guardarServicio(e){
+  e.preventDefault();
+  if(!proveedorSeleccionado){aviso("Selecciona un proveedor antes de guardar un servicio.","error");return;}
+  const nombre=$("servNombre").value.trim();
+  if(!nombre){aviso("El nombre del servicio es obligatorio.","error");return;}
+  const precioTexto=$("servPrecio").value;
+  const precio=precioTexto===""?null:Number(precioTexto);
+  if(precio!==null&&(!Number.isFinite(precio)||precio<0)){aviso("El precio debe ser un número igual o mayor que cero.","error");return;}
+  const datos={
+    proveedor_id:proveedorSeleccionado.id,nombre,
+    categoria:$("servCategoria").value,
+    unidad:$("servUnidad").value.trim(),
+    precio_referencial:precio,
+    descripcion:$("servDescripcion").value.trim(),
+    observaciones:$("servObservaciones").value.trim(),
+    activo:$("servActivo").checked
+  };
+  if(modoServicio==="nuevo"){
+    catalogo.servicios.push({id:nuevoId("SERV"),...datos});
+    aviso("Servicio agregado al catálogo de trabajo.","ok");
+  }else{
+    const i=catalogo.servicios.findIndex(s=>s.id===servicioSeleccionado?.id);
+    if(i<0){aviso("No se encontró el servicio que deseas editar.","error");return;}
+    catalogo.servicios[i]={...catalogo.servicios[i],...datos};
+    aviso("Servicio actualizado en esta sesión.","ok");
+  }
+  $("formServicioPanel").classList.add("oculto");
+  actualizarResumen();renderServicios();
+}
+async function cargarDesdeGitHub(){
+  limpiarAviso();
+  try{
+    const cargado=await cargarCatalogoProveedores({recargar:true});
+    catalogo=JSON.parse(JSON.stringify(cargado));
+    proveedorSeleccionado=null;servicioSeleccionado=null;
+    cargarCategorias();actualizarResumen();renderProveedores();
+    $("formProveedor").reset();mostrarFechas(null);renderServicios();
+    $("formServicioPanel").classList.add("oculto");
+    aviso("Catálogo publicado cargado correctamente. Los cambios anteriores no exportados de esta sesión se sustituyeron.","ok");
+  }catch(err){aviso("No se pudo cargar el catálogo publicado:\n"+(err?.message||err),"error");}
+}
+async function importarArchivo(file){
+  if(!file)return;
+  limpiarAviso();
+  try{
+    const texto=await file.text();
+    const candidato=JSON.parse(texto);
+    const errores=validarCatalogoProveedores(candidato);
+    if(errores.length)throw new Error("El archivo no pasó la validación:\n"+errores.join("\n"));
+    if(!confirm("La importación sustituirá el catálogo de trabajo actual de esta sesión. ¿Continuar?"))return;
+    catalogo=JSON.parse(JSON.stringify(candidato));
+    proveedorSeleccionado=null;servicioSeleccionado=null;
+    cargarCategorias();actualizarResumen();renderProveedores();
+    $("formProveedor").reset();mostrarFechas(null);renderServicios();
+    $("formServicioPanel").classList.add("oculto");
+    aviso(`Importación correcta: ${catalogo.proveedores.length} proveedores y ${catalogo.servicios.length} servicios.`,"ok");
+  }catch(err){aviso("No se importó el archivo:\n"+(err?.message||err),"error");}
+  finally{$("archivoJSON").value="";}
+}
+function exportar(){
+  limpiarAviso();
+  if(!catalogo){aviso("Primero carga o importa un catálogo.","error");return;}
+  const errores=validarCatalogoProveedores(catalogo);
+  if(errores.length){aviso("No se exportó el archivo. Corrige estos errores:\n\n"+errores.map((x,i)=>`${i+1}. ${x}`).join("\n"),"error");return;}
+  catalogo.metadata={...catalogo.metadata,ultima_actualizacion:hoy()};
+  const blob=new Blob([JSON.stringify(catalogo,null,2)],{type:"application/json;charset=utf-8"});
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="proveedores.json";document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  aviso("Validación correcta. Se descargó proveedores.json.\n\nPara publicar los cambios, reemplaza data/proveedores.json en GitHub con este archivo y confirma el cambio.","ok");
+}
 
-    $("proveedorSeleccionado").addEventListener("change", evento => {
-      const proveedor = catalogo.proveedores.find(
-        p => p.id === evento.target.value
-      );
-      cargarFormulario(proveedor);
-    });
+$("formProveedor").addEventListener("submit",guardarProveedor);
+$("formServicio").addEventListener("submit",guardarServicio);
+$("btnNuevoProveedor").addEventListener("click",formularioProveedorNuevo);
+$("btnCancelarProveedor").addEventListener("click",()=>{proveedorSeleccionado=null;$("formProveedor").reset();$("tituloProveedor").textContent="3. Datos del proveedor";$("idProveedor").textContent="Selecciona un proveedor o crea uno nuevo.";mostrarFechas(null);renderServicios();});
+$("btnBajaProveedor").addEventListener("click",()=>cambiarEstado("inactivo"));
+$("btnReactivarProveedor").addEventListener("click",()=>cambiarEstado("activo"));
+$("btnNuevoServicio").addEventListener("click",nuevoServicio);
+$("btnCancelarServicio").addEventListener("click",()=>$("formServicioPanel").classList.add("oculto"));
+$("btnRecargar").addEventListener("click",cargarDesdeGitHub);
+$("archivoJSON").addEventListener("change",e=>importarArchivo(e.target.files[0]));
+$("btnExportar").addEventListener("click",exportar);
+$("buscar").addEventListener("input",renderProveedores);
+$("filtroEstado").addEventListener("change",renderProveedores);
+$("tablaProveedores").addEventListener("click",e=>{
+  const b=e.target.closest("[data-editar-prov]");if(!b)return;
+  const p=catalogo.proveedores.find(x=>x.id===b.dataset.editarProv);
+  if(p)editarProveedor(p);
+});
+$("tablaServicios").addEventListener("click",e=>{
+  const b=e.target.closest("[data-editar-serv]");if(!b)return;
+  const s=catalogo.servicios.find(x=>x.id===b.dataset.editarServ);
+  if(s)editarServicio(s);
+});
 
-    $("btnNuevo").addEventListener("click", prepararNuevo);
-    $("btnLimpiar").addEventListener("click", limpiarFormulario);
-    $("formProveedor").addEventListener("submit", registrarOActualizar);
-    $("btnBaja").addEventListener("click", () => cambiarEstado("inactivo"));
-    $("btnReactivar").addEventListener("click", () => cambiarEstado("activo"));
-    $("btnExportar").addEventListener("click", exportarCatalogo);
-
-    iniciar();
-  </script>
+cargarDesdeGitHub();
+</script>
 </body>
 </html>
