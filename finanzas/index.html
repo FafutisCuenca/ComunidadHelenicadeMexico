@@ -667,48 +667,27 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
         <input id="provNombre" maxlength="120" required=""/>
        </div>
        <div class="campo">
-        <label for="provCategoria">
-         Categoría *
-        </label>
-        <select id="provCategoria" required="">
-         <option value="">
-          Selecciona
-         </option>
-         <option>
-          Alimentos
-         </option>
-         <option>
-          Bebidas
-         </option>
-         <option>
-          Carpas y montaje
-         </option>
-         <option>
-          Música y entretenimiento
-         </option>
-         <option>
-          Meseros y personal
-         </option>
-         <option>
-          Hielo
-         </option>
-         <option>
-          Insumos
-         </option>
-         <option>
-          Decoración
-         </option>
-         <option>
-          Renta de equipo
-         </option>
-         <option>
-          Transporte
-         </option>
-         <option>
-          Otros
-         </option>
-        </select>
-       </div>
+  <label for="provCategoria">
+    Clasificación referencial (opcional)
+  </label>
+  <select id="provCategoria">
+    <option value="">Sin clasificación general</option>
+    <option>Alimentos</option>
+    <option>Bebidas</option>
+    <option>Carpas y montaje</option>
+    <option>Música y entretenimiento</option>
+    <option>Meseros y personal</option>
+    <option>Hielo</option>
+    <option>Insumos</option>
+    <option>Decoración</option>
+    <option>Renta de equipo</option>
+    <option>Transporte</option>
+    <option>Otros</option>
+  </select>
+  <span class="ayuda">
+    Es una clasificación general. Los servicios tendrán su propia categoría.
+  </span>
+</div>
        <div class="campo">
         <label for="provContacto">
          Persona de contacto
