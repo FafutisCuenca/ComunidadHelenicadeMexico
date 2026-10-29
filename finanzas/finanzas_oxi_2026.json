@@ -1,592 +1,1374 @@
-
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#102b49">
-<title>Administración Financiera | Comunidad Helénica</title>
-
-<style>
-:root {
-  --azul: #102b49;
-  --azul2: #183d63;
-  --dorado: #c5a15a;
-  --fondo: #f3f6fa;
-  --texto: #25364a;
-  --gris: #66768a;
-  --borde: #dce4ed;
-  --verde: #18794e;
-  --rojo: #b42318;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--fondo);
-  color: var(--texto);
-  font-family: Arial, Helvetica, sans-serif;
-}
-header {
-  background: linear-gradient(125deg, var(--azul), var(--azul2));
-  color: white;
-  padding: 28px 22px;
-  border-bottom: 4px solid var(--dorado);
-}
-.encabezado {
-  max-width: 1250px;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-.logo {
-  width: 95px;
-  height: 95px;
-  background: white;
-  border: 1px solid var(--dorado);
-  border-radius: 15px;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 6px 20px #0003, 0 0 0 3px #c5a15a22;
-}
-.logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.identidad { min-width: 0; }
-.nombre-comunidad {
-  margin: 0;
-  color: #fff;
-  font-size: clamp(23px, 3vw, 34px);
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: .3px;
-}
-.fundacion {
-  margin: 5px 0 13px;
-  color: #e9d7a9;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: .4px;
-}
-.titulo-modulo {
-  margin: 0;
-  color: #fff;
-  font-size: clamp(23px, 3vw, 34px);
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: .3px;
-}
-.subtitulo {
-  margin: 9px 0 0;
-  color: #e1eaf3;
-  font-size: 15px;
-}
-main {
-  max-width: 1250px;
-  padding: 25px 18px 45px;
-  margin: auto;
-}
-.barra {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.barra h2 {
-  color: var(--azul);
-  margin: 0;
-  font-size: 23px;
-}
-.acciones, .botones-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-button, .boton {
-  border: 0;
-  border-radius: 7px;
-  padding: 10px 14px;
-  font-weight: bold;
-  font-size: 13px;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-}
-.primario { background: var(--azul); color: white; }
-.secundario { background: #e5edf5; color: var(--azul); }
-.dorado { background: var(--dorado); color: #172b41; }
-.peligro { background: #fde8e7; color: var(--rojo); }
-button:hover, .boton:hover { filter: brightness(.96); }
-.nota {
-  padding: 13px 15px;
-  background: #fff9e9;
-  border: 1px solid #ead9a9;
-  border-radius: 8px;
-  font-size: 13px;
-  line-height: 1.5;
-  margin-bottom: 20px;
-}
-.resumen {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 15px;
-  margin-bottom: 24px;
-}
-.indicador {
-  background: white;
-  padding: 19px;
-  border-radius: 11px;
-  border: 1px solid var(--borde);
-  box-shadow: 0 3px 10px #102b4908;
-  min-width: 0;
-}
-.etiqueta {
-  color: var(--gris);
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: .4px;
-}
-.valor {
-  display: block;
-  margin-top: 11px;
-  color: var(--azul);
-  font-size: clamp(19px, 2vw, 27px);
-  font-weight: bold;
-  overflow-wrap: anywhere;
-}
-.indicador small {
-  display: block;
-  margin-top: 7px;
-  color: var(--gris);
-  font-size: 12px;
-}
-.panel {
-  background: white;
-  border: 1px solid var(--borde);
-  border-radius: 11px;
-  margin-bottom: 22px;
-  overflow: hidden;
-  box-shadow: 0 3px 10px #102b4908;
-}
-.panel-titulo {
-  padding: 17px 20px;
-  background: #fafdff;
-  border-bottom: 1px solid var(--borde);
-}
-.panel-titulo h3 {
-  margin: 0;
-  color: var(--azul);
-  font-size: 18px;
-}
-.panel-titulo p {
-  margin: 6px 0 0;
-  color: var(--gris);
-  font-size: 13px;
-  line-height: 1.4;
-}
-.contenido { padding: 20px; }
-.formulario {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 15px;
-}
-.campo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-.campo.completo { grid-column: 1 / -1; }
-label {
-  font-size: 13px;
-  font-weight: bold;
-  color: #34485e;
-}
-input, select, textarea {
-  width: 100%;
-  min-width: 0;
-  padding: 11px;
-  border: 1px solid #cbd5e1;
-  border-radius: 7px;
-  background: white;
-  color: var(--texto);
-  font: inherit;
-  font-size: 14px;
-}
-input:focus, select:focus, textarea:focus {
-  outline: 2px solid #c5a15a66;
-  border-color: var(--dorado);
-}
-.ayuda {
-  color: var(--gris);
-  font-size: 12px;
-  line-height: 1.4;
-}
-.botones-form { margin-top: 18px; }
-.tabla-contenedor { overflow-x: auto; }
-table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 13px;
-}
-th, td {
-  text-align: left;
-  padding: 13px 15px;
-  border-bottom: 1px solid #e8edf3;
-  vertical-align: top;
-}
-th {
-  color: #52647a;
-  background: #f8fafc;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .4px;
-  white-space: nowrap;
-}
-td { line-height: 1.45; }
-td strong { color: var(--azul); }
-.numerico { text-align: right; white-space: nowrap; }
-.estado {
-  display: inline-block;
-  border-radius: 20px;
-  padding: 4px 8px;
-  background: #e9f5ee;
-  color: var(--verde);
-  font-size: 11px;
-  font-weight: bold;
-}
-.vacio {
-  text-align: center;
-  color: var(--gris);
-  padding: 25px 15px;
-}
-.oculto { display: none !important; }
-.aviso-estado {
-  margin: 14px 0 0;
-  font-size: 13px;
-  line-height: 1.5;
-}
-footer {
-  text-align: center;
-  padding: 20px;
-  background: var(--azul);
-  color: #dbe5ef;
-  font-size: 12px;
-  line-height: 1.6;
-}
-@media (max-width: 850px) {
-  .resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .formulario { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 540px) {
-  header { padding: 20px 15px; }
-  .encabezado { align-items: flex-start; gap: 13px; }
-  .logo { width: 68px; height: 68px; padding: 5px; }
-  .nombre-comunidad, .titulo-modulo { font-size: 23px; }
-  .fundacion { font-size: 10px; margin-bottom: 11px; }
-  .subtitulo { font-size: 13px; }
-  main { padding: 20px 12px 30px; }
-  .resumen { gap: 9px; }
-  .indicador { padding: 13px; }
-  .etiqueta { font-size: 10px; }
-  .formulario { grid-template-columns: 1fr; }
-  .campo.completo { grid-column: auto; }
-  .contenido { padding: 14px; }
-  .barra { align-items: flex-start; }
-}
-</style>
-</head>
-
-<body>
-<header>
-  <div class="encabezado">
-    <div class="logo">
-      <img src="../images/Logo%20COMHELMEX.jpg"
-           alt="Logotipo oficial de la Comunidad Helénica de México"
-           onerror="this.style.display='none'">
-    </div>
-    <div class="identidad">
-      <h1 class="nombre-comunidad">Comunidad Helénica de México, A.C.</h1>
-      <p class="fundacion">Fundada el 13 de marzo de 1956</p>
-      <h2 class="titulo-modulo">Administración Financiera</h2>
-      <p class="subtitulo">Control de proveedores, presupuesto y pagos</p>
-    </div>
-  </div>
-</header>
-
-<main>
-  <div class="barra">
-    <div>
-      <h2>Control financiero · OXI 2026</h2>
-      <p class="ayuda">Registro administrativo independiente de las reservaciones.</p>
-    </div>
-    <div class="acciones">
-      <a class="boton secundario" href="../index.html">← Volver al portal</a>
-      <button class="secundario" id="exportar">Exportar JSON</button>
-      <button class="secundario" id="importar">Importar JSON</button>
-      <input type="file" id="archivoImportar" accept=".json,application/json" class="oculto">
-    </div>
-  </div>
-
-  <div class="nota">
-    <strong>Importante:</strong> los datos se guardan en el navegador de este dispositivo.
-    Exporta periódicamente un respaldo JSON. Esta versión todavía no consulta automáticamente
-    las reservaciones ni constituye un sistema contable oficial.
-  </div>
-
-  <section class="resumen">
-    <div class="indicador"><span class="etiqueta">Presupuesto autorizado</span><strong class="valor" id="totalPresupuesto">$0.00</strong><small>Monto de referencia</small></div>
-    <div class="indicador"><span class="etiqueta">Compromisos registrados</span><strong class="valor" id="totalCompromisos">$0.00</strong><small>Importes confirmados</small></div>
-    <div class="indicador"><span class="etiqueta">Pagos registrados</span><strong class="valor" id="totalPagado">$0.00</strong><small>Anticipos y abonos capturados</small></div>
-    <div class="indicador"><span class="etiqueta">Saldo comprometido</span><strong class="valor" id="totalSaldo">$0.00</strong><small>Compromisos menos pagos</small></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-titulo"><h3>1. Presupuesto general</h3><p>Define el importe autorizado para el evento.</p></div>
-    <div class="contenido">
-      <form id="formPresupuesto">
-        <div class="formulario">
-          <div class="campo"><label for="presupuesto">Presupuesto autorizado (MXN)</label><input id="presupuesto" type="number" min="0" step="0.01" required placeholder="Ej. 50000"></div>
-          <div class="campo"><label for="evento">Evento o ejercicio</label><input id="evento" value="OXI 2026" required></div>
-        </div>
-        <div class="botones-form"><button class="primario" type="submit">Guardar presupuesto</button></div>
-        <p id="estadoPresupuesto" class="aviso-estado" aria-live="polite"></p>
-      </form>
-    </div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-titulo"><h3>2. Registro de proveedores</h3><p>Personas y empresas que suministran productos o servicios.</p></div>
-    <div class="contenido">
-      <form id="formProveedor">
-        <div class="formulario">
-          <div class="campo"><label for="proveedorNombre">Nombre del proveedor *</label><input id="proveedorNombre" required maxlength="120"></div>
-          <div class="campo"><label for="proveedorCategoria">Categoría *</label>
-            <select id="proveedorCategoria" required>
-              <option value="">Selecciona</option><option>Alimentos y banquete</option><option>Bebidas</option><option>Carpas y mobiliario</option><option>Música y entretenimiento</option><option>Meseros y personal</option><option>Decoración</option><option>Hielo y suministros</option><option>Renta de equipo</option><option>Transporte y logística</option><option>Otros</option>
-            </select>
-          </div>
-          <div class="campo"><label for="proveedorContacto">Contacto</label><input id="proveedorContacto" maxlength="120"></div>
-          <div class="campo"><label for="proveedorTelefono">Teléfono</label><input id="proveedorTelefono" type="tel" maxlength="40"></div>
-          <div class="campo"><label for="proveedorCorreo">Correo electrónico</label><input id="proveedorCorreo" type="email" maxlength="120"></div>
-          <div class="campo"><label for="proveedorNotas">Notas</label><input id="proveedorNotas" maxlength="250"></div>
-        </div>
-        <div class="botones-form"><button class="primario" type="submit">Agregar proveedor</button><button class="secundario" type="reset">Limpiar formulario</button></div>
-      </form>
-    </div>
-    <div class="tabla-contenedor"><table><thead><tr><th>Proveedor</th><th>Categoría</th><th>Contacto</th><th>Teléfono / correo</th><th>Acciones</th></tr></thead><tbody id="tablaProveedores"></tbody></table><div class="vacio" id="vacioProveedores">Todavía no hay proveedores registrados.</div></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-titulo"><h3>3. Compromisos y cotizaciones</h3><p>Los importes acordados y las cotizaciones se registran por separado.</p></div>
-    <div class="contenido">
-      <form id="formCompromiso">
-        <div class="formulario">
-          <div class="campo"><label for="compProveedor">Proveedor *</label><select id="compProveedor" required><option value="">Primero registra un proveedor</option></select></div>
-          <div class="campo"><label for="compDescripcion">Servicio o concepto *</label><input id="compDescripcion" required maxlength="160"></div>
-          <div class="campo"><label for="compTipo">Tipo de importe</label><select id="compTipo"><option value="cotizacion">Cotización estimada</option><option value="compromiso">Compromiso confirmado</option></select></div>
-          <div class="campo"><label for="compMonto">Importe (MXN) *</label><input id="compMonto" type="number" min="0.01" step="0.01" required></div>
-          <div class="campo"><label for="compFecha">Fecha</label><input id="compFecha" type="date"></div>
-          <div class="campo"><label for="compNotas">Observaciones</label><input id="compNotas" maxlength="250"></div>
-        </div>
-        <div class="botones-form"><button class="primario" type="submit">Registrar importe</button></div>
-      </form>
-    </div>
-    <div class="tabla-contenedor"><table><thead><tr><th>Proveedor / concepto</th><th>Tipo</th><th>Fecha</th><th class="numerico">Importe</th><th class="numerico">Pagado</th><th class="numerico">Saldo</th><th>Acciones</th></tr></thead><tbody id="tablaCompromisos"></tbody></table><div class="vacio" id="vacioCompromisos">Todavía no hay importes registrados.</div></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-titulo"><h3>4. Registro de pagos y anticipos</h3><p>Registra cada movimiento y asígnalo al compromiso correspondiente.</p></div>
-    <div class="contenido">
-      <form id="formPago">
-        <div class="formulario">
-          <div class="campo"><label for="pagoCompromiso">Compromiso *</label><select id="pagoCompromiso" required><option value="">Primero registra un compromiso</option></select></div>
-          <div class="campo"><label for="pagoMonto">Importe del pago (MXN) *</label><input id="pagoMonto" type="number" min="0.01" step="0.01" required></div>
-          <div class="campo"><label for="pagoFecha">Fecha de pago *</label><input id="pagoFecha" type="date" required></div>
-          <div class="campo"><label for="pagoTipo">Tipo de movimiento</label><select id="pagoTipo"><option>Anticipo</option><option>Abono</option><option>Liquidación</option></select></div>
-          <div class="campo"><label for="pagoMetodo">Forma de pago</label><select id="pagoMetodo"><option>Transferencia</option><option>Efectivo</option><option>Tarjeta</option><option>Cheque</option><option>Otro</option></select></div>
-          <div class="campo"><label for="pagoReferencia">Referencia / comprobante</label><input id="pagoReferencia" maxlength="120"></div>
-        </div>
-        <div class="botones-form"><button class="primario" type="submit">Registrar pago</button></div>
-        <p id="estadoPago" class="aviso-estado" aria-live="polite"></p>
-      </form>
-    </div>
-    <div class="tabla-contenedor"><table><thead><tr><th>Fecha</th><th>Proveedor / concepto</th><th>Movimiento</th><th>Forma de pago</th><th>Referencia</th><th class="numerico">Importe</th><th>Acciones</th></tr></thead><tbody id="tablaPagos"></tbody></table><div class="vacio" id="vacioPagos">Todavía no hay pagos registrados.</div></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-titulo"><h3>5. Resumen para revisión</h3><p>Indicadores calculados con los datos registrados.</p></div>
-    <div class="contenido">
-      <div class="formulario">
-        <div class="campo"><label>Presupuesto menos compromisos confirmados</label><strong id="disponible" style="font-size:22px;color:#102b49">$0.00</strong><span class="ayuda">No incluye cotizaciones.</span></div>
-        <div class="campo"><label>Cotizaciones estimadas</label><strong id="totalCotizaciones" style="font-size:22px;color:#102b49">$0.00</strong><span class="ayuda">No se suman a compromisos confirmados.</span></div>
-        <div class="campo"><label>Proveedores registrados</label><strong id="numeroProveedores" style="font-size:22px;color:#102b49">0</strong><span class="ayuda">Total de proveedores capturados.</span></div>
-      </div>
-      <p class="ayuda" style="margin-top:22px">Los ingresos por reservaciones, gastos no asociados a proveedores, cuentas por cobrar e informes ejecutivos se incorporarán en las siguientes etapas.</p>
-    </div>
-  </section>
-</main>
-
-<footer><strong>Comunidad Helénica de México, A.C.</strong><br>Administración financiera · OXI 2026<br>Herramienta administrativa preliminar. Conserva respaldos.</footer>
-
-<script>
-(() => {
-"use strict";
-const CLAVE = "comunidadHelenicaFinanzasOXI2026_v1";
-const estado = { evento:"OXI 2026", presupuesto:0, proveedores:[], compromisos:[], pagos:[] };
-const $ = id => document.getElementById(id);
-const dinero = v => new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(Number(v)||0);
-const idNuevo = p => p+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7);
-const texto = v => String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fechaHoy = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
-
-function guardar() {
-  try { localStorage.setItem(CLAVE,JSON.stringify(estado)); return true; }
-  catch(e) { alert("No se pudieron guardar los datos. Exporta un respaldo y verifica el almacenamiento disponible."); return false; }
-}
-function cargar() {
-  try {
-    const bruto=localStorage.getItem(CLAVE);
-    if(!bruto) return;
-    const d=JSON.parse(bruto);
-    if(!d||!Array.isArray(d.proveedores)||!Array.isArray(d.compromisos)||!Array.isArray(d.pagos)) throw Error("Formato inválido");
-    estado.evento=typeof d.evento==="string"?d.evento:"OXI 2026";
-    estado.presupuesto=Math.max(0,Number(d.presupuesto)||0);
-    estado.proveedores=d.proveedores; estado.compromisos=d.compromisos; estado.pagos=d.pagos;
-  } catch(e) { alert("No fue posible leer los datos guardados. Exporta o revisa tu respaldo anterior."); }
-}
-const proveedorPorId=id=>estado.proveedores.find(p=>p.id===id);
-const compromisoPorId=id=>estado.compromisos.find(c=>c.id===id);
-const importePagado=id=>estado.pagos.filter(p=>p.compromisoId===id).reduce((s,p)=>s+Number(p.monto),0);
-
-function renderizar() {
-  $("presupuesto").value=estado.presupuesto||"";
-  $("evento").value=estado.evento||"OXI 2026";
-  const confirmados=estado.compromisos.filter(c=>c.tipo==="compromiso").reduce((s,c)=>s+Number(c.monto),0);
-  const cotizaciones=estado.compromisos.filter(c=>c.tipo==="cotizacion").reduce((s,c)=>s+Number(c.monto),0);
-  const pagado=estado.pagos.reduce((s,p)=>s+Number(p.monto),0);
-  const saldo=estado.compromisos.filter(c=>c.tipo==="compromiso").reduce((s,c)=>s+Number(c.monto)-importePagado(c.id),0);
-  $("totalPresupuesto").textContent=dinero(estado.presupuesto);
-  $("totalCompromisos").textContent=dinero(confirmados);
-  $("totalPagado").textContent=dinero(pagado);
-  $("totalSaldo").textContent=dinero(saldo);
-  $("disponible").textContent=dinero(estado.presupuesto-confirmados);
-  $("totalCotizaciones").textContent=dinero(cotizaciones);
-  $("numeroProveedores").textContent=estado.proveedores.length;
-
-  $("tablaProveedores").innerHTML=estado.proveedores.map(p=>`<tr><td><strong>${texto(p.nombre)}</strong><br><span class="ayuda">${texto(p.notas)}</span></td><td>${texto(p.categoria)}</td><td>${texto(p.contacto||"—")}</td><td>${texto(p.telefono||"—")}<br>${texto(p.correo||"")}</td><td><button class="peligro" data-borrar-proveedor="${texto(p.id)}">Eliminar</button></td></tr>`).join("");
-  $("vacioProveedores").classList.toggle("oculto",estado.proveedores.length>0);
-  $("compProveedor").innerHTML='<option value="">Selecciona un proveedor</option>'+estado.proveedores.map(p=>`<option value="${texto(p.id)}">${texto(p.nombre)}</option>`).join("");
-
-  $("tablaCompromisos").innerHTML=estado.compromisos.map(c=>{
-    const p=proveedorPorId(c.proveedorId), pg=importePagado(c.id);
-    return `<tr><td><strong>${texto(p?p.nombre:"Proveedor no disponible")}</strong><br>${texto(c.descripcion)}<br><span class="ayuda">${texto(c.notas)}</span></td><td>${c.tipo==="compromiso"?'<span class="estado">Confirmado</span>':"Cotización"}</td><td>${texto(c.fecha||"—")}</td><td class="numerico">${dinero(c.monto)}</td><td class="numerico">${dinero(pg)}</td><td class="numerico">${dinero(Number(c.monto)-pg)}</td><td><button class="peligro" data-borrar-compromiso="${texto(c.id)}">Eliminar</button></td></tr>`;
-  }).join("");
-  $("vacioCompromisos").classList.toggle("oculto",estado.compromisos.length>0);
-
-  const confirmadosLista=estado.compromisos.filter(c=>c.tipo==="compromiso");
-  $("pagoCompromiso").innerHTML='<option value="">Selecciona un compromiso confirmado</option>'+confirmadosLista.map(c=>{const p=proveedorPorId(c.proveedorId);return `<option value="${texto(c.id)}">${texto(p?p.nombre:"Proveedor")} — ${texto(c.descripcion)} (saldo ${dinero(Number(c.monto)-importePagado(c.id))})</option>`;}).join("");
-
-  $("tablaPagos").innerHTML=estado.pagos.map(p=>{
-    const c=compromisoPorId(p.compromisoId), prov=c?proveedorPorId(c.proveedorId):null;
-    return `<tr><td>${texto(p.fecha)}</td><td><strong>${texto(prov?prov.nombre:"Proveedor")}</strong><br>${texto(c?c.descripcion:"Compromiso no disponible")}</td><td>${texto(p.tipo)}</td><td>${texto(p.metodo)}</td><td>${texto(p.referencia||"—")}</td><td class="numerico">${dinero(p.monto)}</td><td><button class="peligro" data-borrar-pago="${texto(p.id)}">Eliminar</button></td></tr>`;
-  }).join("");
-  $("vacioPagos").classList.toggle("oculto",estado.pagos.length>0);
-}
-
-$("formPresupuesto").addEventListener("submit",e=>{
-  e.preventDefault(); const monto=Number($("presupuesto").value);
-  if(!Number.isFinite(monto)||monto<0){alert("Captura un presupuesto válido.");return;}
-  estado.presupuesto=monto; estado.evento=$("evento").value.trim()||"OXI 2026";
-  if(guardar()){renderizar();$("estadoPresupuesto").textContent="Presupuesto guardado en este navegador.";}
-});
-$("formProveedor").addEventListener("submit",e=>{
-  e.preventDefault();
-  const p={id:idNuevo("PROV"),nombre:$("proveedorNombre").value.trim(),categoria:$("proveedorCategoria").value,contacto:$("proveedorContacto").value.trim(),telefono:$("proveedorTelefono").value.trim(),correo:$("proveedorCorreo").value.trim(),notas:$("proveedorNotas").value.trim(),creado:fechaHoy()};
-  if(!p.nombre||!p.categoria){alert("Completa el nombre y la categoría.");return;}
-  estado.proveedores.push(p); if(guardar()){e.target.reset();renderizar();}
-});
-$("formCompromiso").addEventListener("submit",e=>{
-  e.preventDefault(); const proveedorId=$("compProveedor").value,monto=Number($("compMonto").value);
-  if(!proveedorPorId(proveedorId)){alert("Selecciona un proveedor válido.");return;}
-  if(!Number.isFinite(monto)||monto<=0){alert("El importe debe ser mayor que cero.");return;}
-  estado.compromisos.push({id:idNuevo("COMP"),proveedorId,descripcion:$("compDescripcion").value.trim(),tipo:$("compTipo").value,monto,fecha:$("compFecha").value||fechaHoy(),notas:$("compNotas").value.trim(),creado:fechaHoy()});
-  if(guardar()){e.target.reset();$("compFecha").value=fechaHoy();renderizar();}
-});
-$("formPago").addEventListener("submit",e=>{
-  e.preventDefault(); const id=$("pagoCompromiso").value,c=compromisoPorId(id),monto=Number($("pagoMonto").value);
-  if(!c||c.tipo!=="compromiso"){alert("Selecciona un compromiso confirmado.");return;}
-  if(!Number.isFinite(monto)||monto<=0){alert("El pago debe ser mayor que cero.");return;}
-  const saldo=Number(c.monto)-importePagado(c.id);
-  if(monto>saldo+0.000001){alert("El pago excede el saldo pendiente de "+dinero(saldo)+".");return;}
-  estado.pagos.push({id:idNuevo("PAGO"),compromisoId:id,monto,fecha:$("pagoFecha").value||fechaHoy(),tipo:$("pagoTipo").value,metodo:$("pagoMetodo").value,referencia:$("pagoReferencia").value.trim(),creado:fechaHoy()});
-  if(guardar()){e.target.reset();$("pagoFecha").value=fechaHoy();renderizar();$("estadoPago").textContent="Pago registrado correctamente.";}
-});
-
-document.addEventListener("click",e=>{
-  const b=e.target.closest("button"); if(!b)return;
-  if(b.dataset.borrarProveedor){
-    const id=b.dataset.borrarProveedor;
-    if(estado.compromisos.some(c=>c.proveedorId===id)){alert("No se puede eliminar: el proveedor tiene compromisos asociados.");return;}
-    if(!confirm("¿Eliminar este proveedor?"))return;
-    estado.proveedores=estado.proveedores.filter(p=>p.id!==id); if(guardar())renderizar();
-  }
-  if(b.dataset.borrarCompromiso){
-    const id=b.dataset.borrarCompromiso;
-    if(estado.pagos.some(p=>p.compromisoId===id)){alert("Este compromiso tiene pagos asociados. Elimina primero los pagos si necesitas corregirlo.");return;}
-    if(!confirm("¿Eliminar este registro?"))return;
-    estado.compromisos=estado.compromisos.filter(c=>c.id!==id); if(guardar())renderizar();
-  }
-  if(b.dataset.borrarPago){
-    const id=b.dataset.borrarPago;
-    if(!confirm("¿Eliminar este registro de pago? Verifica el comprobante antes de continuar."))return;
-    estado.pagos=estado.pagos.filter(p=>p.id!==id); if(guardar())renderizar();
-  }
-});
-
-$("exportar").addEventListener("click",()=>{
-  const datos={version:1,sistema:"Comunidad Helénica - Administración Financiera",exportado:new Date().toISOString(),...estado};
-  const url=URL.createObjectURL(new Blob([JSON.stringify(datos,null,2)],{type:"application/json"}));
-  const a=document.createElement("a");a.href=url;a.download="respaldo-finanzas-oxi-2026.json";a.click();URL.revokeObjectURL(url);
-});
-$("importar").addEventListener("click",()=>$("archivoImportar").click());
-$("archivoImportar").addEventListener("change",async e=>{
-  const archivo=e.target.files[0];if(!archivo)return;
-  try{
-    const d=JSON.parse(await archivo.text());
-    if(!d||!Array.isArray(d.proveedores)||!Array.isArray(d.compromisos)||!Array.isArray(d.pagos)||!Number.isFinite(Number(d.presupuesto))||Number(d.presupuesto)<0)throw Error("Estructura del archivo no válida.");
-    const idsProv=new Set(d.proveedores.map(p=>p.id)),idsComp=new Set(d.compromisos.map(c=>c.id));
-    if(idsProv.size!==d.proveedores.length||idsComp.size!==d.compromisos.length)throw Error("Hay identificadores duplicados.");
-    for(const p of d.proveedores)if(!p.id||!p.nombre||!p.categoria)throw Error("Hay un proveedor incompleto.");
-    for(const c of d.compromisos)if(!c.id||!idsProv.has(c.proveedorId)||!Number.isFinite(Number(c.monto))||Number(c.monto)<=0||!["cotizacion","compromiso"].includes(c.tipo))throw Error("Hay un compromiso inválido.");
-    for(const p of d.pagos)if(!p.id||!idsComp.has(p.compromisoId)||!Number.isFinite(Number(p.monto))||Number(p.monto)<=0)throw Error("Hay un pago inválido.");
-    for(const c of d.compromisos){
-      const total=d.pagos.filter(p=>p.compromisoId===c.id).reduce((s,p)=>s+Number(p.monto),0);
-      if(c.tipo!=="compromiso"&&total>0)throw Error("Una cotización no puede tener pagos asociados.");
-      if(total>Number(c.monto)+0.000001)throw Error("Los pagos exceden el importe de un compromiso.");
+{
+  "metadata": {
+    "archivo": "finanzas_oxi_2026.json",
+    "sistema": "Portal Administrativo - Comunidad Helenica de Mexico, A.C.",
+    "evento_id": "OXI-2026",
+    "version_esquema": "1.0.0",
+    "moneda": "MXN",
+    "fecha_creacion": "2026-10-23T18:16:32.601Z",
+    "ultima_actualizacion": "2026-10-28T22:14:28.226Z",
+    "notas": "Datos administrados por el modulo financiero."
+  },
+  "evento": {
+    "id": "OXI-2026",
+    "nombre": "Celebracion del OXI 2026",
+    "fecha_evento": "2026-10-25",
+    "estado": "planeacion",
+    "responsable_finanzas": "",
+    "observaciones": ""
+  },
+  "catalogos": {
+    "categorias_proveedor": [
+      "Alimentos",
+      "Bebidas",
+      "Carpas y montaje",
+      "Musica y entretenimiento",
+      "Meseros y personal",
+      "Hielo",
+      "Insumos",
+      "Decoracion",
+      "Renta de equipo",
+      "Transporte",
+      "Otros"
+    ]
+  },
+  "presupuesto": {
+    "id": "PRES-OXI-2026-001",
+    "moneda": "MXN",
+    "importe_autorizado": 80000,
+    "fecha_autorizacion": "2026-10-23",
+    "autorizado_por": "",
+    "rubros": [
+      {
+        "id": "RUB-001",
+        "nombre": "Alimentos",
+        "importe_autorizado": 0,
+        "observaciones": ""
+      },
+      {
+        "id": "RUB-002",
+        "nombre": "Bebidas",
+        "importe_autorizado": 0,
+        "observaciones": ""
+      },
+      {
+        "id": "RUB-003",
+        "nombre": "Carpas y montaje",
+        "importe_autorizado": 0,
+        "observaciones": ""
+      },
+      {
+        "id": "RUB-004",
+        "nombre": "Musica y entretenimiento",
+        "importe_autorizado": 0,
+        "observaciones": ""
+      },
+      {
+        "id": "RUB-005",
+        "nombre": "Personal y meseros",
+        "importe_autorizado": 0,
+        "observaciones": ""
+      },
+      {
+        "id": "RUB-006",
+        "nombre": "Otros gastos",
+        "importe_autorizado": 0,
+        "observaciones": ""
+      }
+    ]
+  },
+  "proveedores": [
+    {
+      "id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Jesus Elenis",
+      "categoria": "Alimentos",
+      "contacto_nombre": "Jesus Elenis",
+      "telefono": "",
+      "correo": "",
+      "rfc": "",
+      "datos_fiscales": "",
+      "estado": "activo",
+      "observaciones": "Persona que proporcionará el menu griego para la fiesta del OXI"
+    },
+    {
+      "id": "PROV-mvlbt3e2-0QV5J",
+      "nombre": "Armando Ramírez",
+      "categoria": "Música y entretenimiento",
+      "contacto_nombre": "Armando Ramírez",
+      "telefono": "",
+      "correo": "",
+      "rfc": "",
+      "datos_fiscales": "",
+      "estado": "activo",
+      "observaciones": ""
+    },
+    {
+      "id": "PROV-mvlh88lc-EBND0",
+      "nombre": "Alicia Fafutis",
+      "categoria": "Alimentos",
+      "contacto_nombre": "Alicia Fafutis",
+      "telefono": "",
+      "correo": "",
+      "rfc": "",
+      "datos_fiscales": "",
+      "estado": "activo",
+      "observaciones": ""
+    },
+    {
+      "id": "PROV-mvlh8x7s-CKQ4S",
+      "nombre": "Tienda González",
+      "categoria": "Bebidas",
+      "contacto_nombre": "Tienda González",
+      "telefono": "",
+      "correo": "",
+      "rfc": "",
+      "datos_fiscales": "",
+      "estado": "activo",
+      "observaciones": ""
     }
-    if(!confirm("La importación reemplazará los datos actuales. ¿Deseas continuar?"))return;
-    estado.evento=typeof d.evento==="string"?d.evento:"OXI 2026";
-    estado.presupuesto=Number(d.presupuesto);
-    estado.proveedores=d.proveedores;estado.compromisos=d.compromisos;estado.pagos=d.pagos;
-    if(guardar()){renderizar();alert("Respaldo importado correctamente.");}
-  }catch(err){alert("No se pudo importar: "+err.message);}
-  finally{e.target.value="";}
-});
-
-$("compFecha").value=fechaHoy();
-$("pagoFecha").value=fechaHoy();
-cargar();
-renderizar();
-})();
-</script>
-</body>
-</html>
+  ],
+  "servicios": [
+    {
+      "id": "SERV-mvlhara8-7KATH",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Carpas",
+      "categoria": "Carpas y montaje",
+      "descripcion": "2 Modulos de Carpa",
+      "unidad": "servicio",
+      "precio_referencial": 9500,
+      "activo": true,
+      "observaciones": "2 Modulos de Carpa"
+    },
+    {
+      "id": "SERV-mvsnzgx9-Y651I",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Montaje 1 Modulos de Carpa Extra",
+      "categoria": "Carpas y montaje",
+      "descripcion": "",
+      "unidad": "Servicio de Carpas",
+      "precio_referencial": 1500,
+      "activo": true,
+      "observaciones": ""
+    },
+    {
+      "id": "SERV-mvso07hc-A9MMN",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "120 Platillos",
+      "categoria": "Alimentos",
+      "descripcion": "",
+      "unidad": "servicio",
+      "precio_referencial": 22800,
+      "activo": true,
+      "observaciones": ""
+    },
+    {
+      "id": "SERV-mvso0ufh-I63XK",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Montaje Carpas",
+      "categoria": "Carpas y montaje",
+      "descripcion": "",
+      "unidad": "servicio",
+      "precio_referencial": 3000,
+      "activo": true,
+      "observaciones": ""
+    },
+    {
+      "id": "SERV-mvso1ij4-91YYH",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "nombre": "Servicio de Meseros y Personal en Acceso",
+      "categoria": "Meseros y personal",
+      "descripcion": "",
+      "unidad": "servicio",
+      "precio_referencial": 4800,
+      "activo": true,
+      "observaciones": ""
+    }
+  ],
+  "cotizaciones": [
+    {
+      "id": "COT-mvlatjwl-35NRH",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "servicio_id": null,
+      "fecha_solicitud": "2026-10-23",
+      "fecha_recepcion": null,
+      "vigencia_hasta": null,
+      "concepto": "Alimentos",
+      "importe": 19000,
+      "moneda": "MXN",
+      "estado": "recibida",
+      "archivo_referencia": "",
+      "observaciones": "Costo p/p $190 pesos."
+    }
+  ],
+  "compromisos": [],
+  "gastos_adicionales": [
+    {
+      "id": "GASTO-mvlbqcoj-FACX8",
+      "rubro_id": "RUB-004",
+      "fecha": "2026-10-23",
+      "concepto": "DJ Música",
+      "importe": 6000,
+      "moneda": "MXN",
+      "proveedor_id": null,
+      "comprobante_referencia": "",
+      "estado": "confirmado",
+      "observaciones": ""
+    },
+    {
+      "id": "GASTO-mvso2ruo-V6VBE",
+      "rubro_id": "RUB-006",
+      "fecha": "2026-10-28",
+      "concepto": "Servicio Alimentos, Carpas, Meseros",
+      "importe": 41600,
+      "moneda": "MXN",
+      "proveedor_id": "PROV-mvlapz67-VC5IX",
+      "comprobante_referencia": "",
+      "estado": "confirmado",
+      "observaciones": ""
+    },
+    {
+      "id": "GASTO-mvso4duq-8BE85",
+      "rubro_id": "RUB-001",
+      "fecha": "2026-10-28",
+      "concepto": "Empanadas de Espinaca",
+      "importe": 8000,
+      "moneda": "MXN",
+      "proveedor_id": "PROV-mvlh88lc-EBND0",
+      "comprobante_referencia": "",
+      "estado": "confirmado",
+      "observaciones": "200 empanadas a $40 c/u"
+    },
+    {
+      "id": "GASTO-mvso4qvb-X4WJA",
+      "rubro_id": "RUB-002",
+      "fecha": "2026-10-28",
+      "concepto": "Bebidas y Hielo",
+      "importe": 2200,
+      "moneda": "MXN",
+      "proveedor_id": "PROV-mvlh8x7s-CKQ4S",
+      "comprobante_referencia": "",
+      "estado": "confirmado",
+      "observaciones": ""
+    },
+    {
+      "id": "GASTO-mvso58aq-FIFCX",
+      "rubro_id": "RUB-006",
+      "fecha": "2026-10-28",
+      "concepto": "Impresión Menus",
+      "importe": 300,
+      "moneda": "MXN",
+      "proveedor_id": null,
+      "comprobante_referencia": "",
+      "estado": "confirmado",
+      "observaciones": ""
+    }
+  ],
+  "pagos": [
+    {
+      "id": "PAG-mvso6bx9-8N4Y9",
+      "compromiso_id": null,
+      "gasto_adicional_id": "GASTO-mvlbqcoj-FACX8",
+      "fecha": "2026-10-28",
+      "tipo": "liquidacion",
+      "importe": 6000,
+      "moneda": "MXN",
+      "metodo": "efectivo",
+      "referencia": "",
+      "comprobante_referencia": "",
+      "estado": "aplicado",
+      "registrado_por": "",
+      "observaciones": ""
+    },
+    {
+      "id": "PAG-mvso6pff-TQ326",
+      "compromiso_id": null,
+      "gasto_adicional_id": "GASTO-mvso2ruo-V6VBE",
+      "fecha": "2026-10-28",
+      "tipo": "liquidacion",
+      "importe": 41600,
+      "moneda": "MXN",
+      "metodo": "efectivo",
+      "referencia": "",
+      "comprobante_referencia": "",
+      "estado": "aplicado",
+      "registrado_por": "",
+      "observaciones": ""
+    },
+    {
+      "id": "PAG-mvso7049-QG0QF",
+      "compromiso_id": null,
+      "gasto_adicional_id": "GASTO-mvso4duq-8BE85",
+      "fecha": "2026-10-28",
+      "tipo": "liquidacion",
+      "importe": 8000,
+      "moneda": "MXN",
+      "metodo": "efectivo",
+      "referencia": "",
+      "comprobante_referencia": "",
+      "estado": "aplicado",
+      "registrado_por": "",
+      "observaciones": ""
+    },
+    {
+      "id": "PAG-mvso78tj-AXEQK",
+      "compromiso_id": null,
+      "gasto_adicional_id": "GASTO-mvso4qvb-X4WJA",
+      "fecha": "2026-10-28",
+      "tipo": "liquidacion",
+      "importe": 2200,
+      "moneda": "MXN",
+      "metodo": "efectivo",
+      "referencia": "",
+      "comprobante_referencia": "",
+      "estado": "aplicado",
+      "registrado_por": "",
+      "observaciones": ""
+    },
+    {
+      "id": "PAG-mvso7hog-T4ZDH",
+      "compromiso_id": null,
+      "gasto_adicional_id": "GASTO-mvso58aq-FIFCX",
+      "fecha": "2026-10-28",
+      "tipo": "liquidacion",
+      "importe": 300,
+      "moneda": "MXN",
+      "metodo": "efectivo",
+      "referencia": "",
+      "comprobante_referencia": "",
+      "estado": "aplicado",
+      "registrado_por": "",
+      "observaciones": ""
+    }
+  ],
+  "ingresos": [
+    {
+      "id": "ING-RES-mvlbg8gi-E3URA",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "DIMITRIOS KRIMBALIS",
+      "importe_esperado": 3850,
+      "importe_cobrado": 3850,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-003",
+      "persona_o_entidad": "DIMITRIOS KRIMBALIS",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Regresar $350 | Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 3",
+      "reservacion_id": "OXI-XLSX-FILA-003",
+      "mesa_numero": 3,
+      "total_asientos": 6,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 3850,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-VPN7Y",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "DARÍO TIBURCIO LAURA Y ATHENA PARASKEVAS",
+      "importe_esperado": 3500,
+      "importe_cobrado": 2800,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-004",
+      "persona_o_entidad": "DARÍO TIBURCIO LAURA Y ATHENA PARASKEVAS",
+      "metodo_cobro": "PAGO EFECTIVO EN CUENTA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: PAGO EFECTIVO EN CUENTA | Estado original: PAGADO (4) PENDIENTE (1) | Saldo de referencia en Excel: 700 | Fila de origen Excel: 4",
+      "reservacion_id": "OXI-XLSX-FILA-004",
+      "mesa_numero": 8,
+      "total_asientos": 5,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO (4) PENDIENTE (1)",
+      "importe_declarado_pagado": 2800,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-F60GA",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "CHRYSOMALLIS ANNY MAESTRA",
+      "importe_esperado": 1400,
+      "importe_cobrado": 1400,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-005",
+      "persona_o_entidad": "CHRYSOMALLIS ANNY MAESTRA",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 5",
+      "reservacion_id": "OXI-XLSX-FILA-005",
+      "mesa_numero": 9,
+      "total_asientos": 2,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 1400,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-XXKNH",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "LAURA SÁNCHEZ DE LA VEGA",
+      "importe_esperado": 700,
+      "importe_cobrado": 700,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-006",
+      "persona_o_entidad": "LAURA SÁNCHEZ DE LA VEGA",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO | Saldo de referencia en Excel: 700 | Fila de origen Excel: 6",
+      "reservacion_id": "OXI-XLSX-FILA-006",
+      "mesa_numero": 6,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-1XGN9",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "MARY CARMEN SUAVES",
+      "importe_esperado": 700,
+      "importe_cobrado": 700,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-007",
+      "persona_o_entidad": "MARY CARMEN SUAVES",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO | Saldo de referencia en Excel: 700 | Fila de origen Excel: 7",
+      "reservacion_id": "OXI-XLSX-FILA-007",
+      "mesa_numero": 6,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-VLBYX",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "PANAGIOTIS, TAKIS KRINIS",
+      "importe_esperado": 4200,
+      "importe_cobrado": 2800,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-008",
+      "persona_o_entidad": "PANAGIOTIS, TAKIS KRINIS",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO | Saldo de referencia en Excel: 1400 | REVISAR: estado PAGADO pero el importe declarado pagado es menor al importe esperado. Se conserva como pendiente de revisión. | Fila de origen Excel: 8",
+      "reservacion_id": "OXI-XLSX-FILA-008",
+      "mesa_numero": 9,
+      "total_asientos": 6,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 2800,
+      "saldo_origen": 1400
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-OPPJS",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "KALYOPE RODRÍGUEZ MAGIRAS",
+      "importe_esperado": 4200,
+      "importe_cobrado": 4200,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-009",
+      "persona_o_entidad": "KALYOPE RODRÍGUEZ MAGIRAS",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 9",
+      "reservacion_id": "OXI-XLSX-FILA-009",
+      "mesa_numero": 11,
+      "total_asientos": 6,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 4200,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-LXRZ7",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "TERE CASTILLO",
+      "importe_esperado": 350,
+      "importe_cobrado": 350,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-010",
+      "persona_o_entidad": "TERE CASTILLO",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 10",
+      "reservacion_id": "OXI-XLSX-FILA-010",
+      "mesa_numero": 6,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 350,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-FFUNT",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "JORGE CUENCA FAFUTIS",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-011",
+      "persona_o_entidad": "JORGE CUENCA FAFUTIS",
+      "metodo_cobro": "CORTESIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: CORTESIA | Estado original: CORTESIA | Saldo de referencia en Excel: 0 | Fila de origen Excel: 11",
+      "reservacion_id": "OXI-XLSX-FILA-011",
+      "mesa_numero": 6,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "CORTESIA",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-82D0H",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "MARISOL CARRILLO - PRIMA JORGE CUENCA",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-012",
+      "persona_o_entidad": "MARISOL CARRILLO - PRIMA JORGE CUENCA",
+      "metodo_cobro": "",
+      "comprobante_referencia": "",
+      "observaciones": "Saldo de referencia en Excel: 700 | Fila de origen Excel: 12",
+      "reservacion_id": "OXI-XLSX-FILA-012",
+      "mesa_numero": 6,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-01FPG",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "Embajador Estado Kuwait, Excmo. Sr. Salah Alhaddad",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-013",
+      "persona_o_entidad": "Embajador Estado Kuwait, Excmo. Sr. Salah Alhaddad",
+      "metodo_cobro": "PUERTA",
+      "comprobante_referencia": "",
+      "observaciones": "MISMA MESA MONICA | Forma de pago en origen: PUERTA | Estado original: POR PAGAR | Saldo de referencia en Excel: 700 | Fila de origen Excel: 13",
+      "reservacion_id": "OXI-XLSX-FILA-013",
+      "mesa_numero": 5,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "POR PAGAR",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-A61LB",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "MAESTRO AGUSTÍN REYES",
+      "importe_esperado": 700,
+      "importe_cobrado": 700,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-014",
+      "persona_o_entidad": "MAESTRO AGUSTÍN REYES",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 14",
+      "reservacion_id": "OXI-XLSX-FILA-014",
+      "mesa_numero": 8,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 700,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-77B2T",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "DAFNE KRINIS - ALUMNA",
+      "importe_esperado": 1050,
+      "importe_cobrado": 1050,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-015",
+      "persona_o_entidad": "DAFNE KRINIS - ALUMNA",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 15",
+      "reservacion_id": "OXI-XLSX-FILA-015",
+      "mesa_numero": 4,
+      "total_asientos": 2,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 1050,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-4X9TK",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "ELENI MATHIOU",
+      "importe_esperado": 2100,
+      "importe_cobrado": 2100,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-016",
+      "persona_o_entidad": "ELENI MATHIOU",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 16",
+      "reservacion_id": "OXI-XLSX-FILA-016",
+      "mesa_numero": 10,
+      "total_asientos": 3,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 2100,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-7DXAY",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "MÓNICA SANTIBÁÑEZ",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-018",
+      "persona_o_entidad": "MÓNICA SANTIBÁÑEZ",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO A ALICIA | Saldo de referencia en Excel: 350 | Fila de origen Excel: 18",
+      "reservacion_id": "OXI-XLSX-FILA-018",
+      "mesa_numero": 4,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO A ALICIA",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 350
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-DGQBZ",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "ALFREDO CENTENO MISMA MESA QUE MONI",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-019",
+      "persona_o_entidad": "ALFREDO CENTENO MISMA MESA QUE MONI",
+      "metodo_cobro": "PUERTA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: PUERTA | Estado original: POR PAGAR | Saldo de referencia en Excel: 700 | Fila de origen Excel: 19",
+      "reservacion_id": "OXI-XLSX-FILA-019",
+      "mesa_numero": 4,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "POR PAGAR",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-HBVBE",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "NORA CASTREJÓN LÓPEZ amiga Moni",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-020",
+      "persona_o_entidad": "NORA CASTREJÓN LÓPEZ amiga Moni",
+      "metodo_cobro": "PUERTA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: PUERTA | Estado original: POR PAGAR | Saldo de referencia en Excel: 700 | Fila de origen Excel: 20",
+      "reservacion_id": "OXI-XLSX-FILA-020",
+      "mesa_numero": 4,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "POR PAGAR",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-399GE",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "MONTSERRAT G KARRAS/MARILÚ OLMOS",
+      "importe_esperado": 3500,
+      "importe_cobrado": 3500,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-021",
+      "persona_o_entidad": "MONTSERRAT G KARRAS/MARILÚ OLMOS",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 21",
+      "reservacion_id": "OXI-XLSX-FILA-021",
+      "mesa_numero": 10,
+      "total_asientos": 5,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 3500,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-F5J16",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "PAOLA (MISMA MESA DR. MANUEL)",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-022",
+      "persona_o_entidad": "PAOLA (MISMA MESA DR. MANUEL)",
+      "metodo_cobro": "PUERTA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: PUERTA | Estado original: POR PAGAR | Saldo de referencia en Excel: 700 | Fila de origen Excel: 22",
+      "reservacion_id": "OXI-XLSX-FILA-022",
+      "mesa_numero": 8,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "POR PAGAR",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-NOMA0",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "ANGELIKÌ KRINIS Y DANAE AGUILERA",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-023",
+      "persona_o_entidad": "ANGELIKÌ KRINIS Y DANAE AGUILERA",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO A ALICIA | Saldo de referencia en Excel: 1400 | Fila de origen Excel: 23",
+      "reservacion_id": "OXI-XLSX-FILA-023",
+      "mesa_numero": 4,
+      "total_asientos": 2,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO A ALICIA",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 1400
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-2IE8C",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "DR. MANUEL",
+      "importe_esperado": 700,
+      "importe_cobrado": 700,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-024",
+      "persona_o_entidad": "DR. MANUEL",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 24",
+      "reservacion_id": "OXI-XLSX-FILA-024",
+      "mesa_numero": 8,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "",
+      "importe_declarado_pagado": 700,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-ZPOF8",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "MARA FRAGOZO (ITHAKI) JUAN CARLOS ESPARZA",
+      "importe_esperado": 1400,
+      "importe_cobrado": 1050,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-025",
+      "persona_o_entidad": "MARA FRAGOZO (ITHAKI) JUAN CARLOS ESPARZA",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 0 | REVISAR: estado PAGADO pero el importe declarado pagado es menor al importe esperado. Se conserva como pendiente de revisión. | Fila de origen Excel: 25",
+      "reservacion_id": "OXI-XLSX-FILA-025",
+      "mesa_numero": 9,
+      "total_asientos": 2,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 1050,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-TXBQQ",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "CONSTANTINO KOUTSOVITIS",
+      "importe_esperado": 4200,
+      "importe_cobrado": 4200,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-026",
+      "persona_o_entidad": "CONSTANTINO KOUTSOVITIS",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 26",
+      "reservacion_id": "OXI-XLSX-FILA-026",
+      "mesa_numero": 1,
+      "total_asientos": 6,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 4200,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-L5OPX",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "PANOS LIDIS (QUIZÁS 2 AMIGOS MÁS )",
+      "importe_esperado": 700,
+      "importe_cobrado": 700,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-027",
+      "persona_o_entidad": "PANOS LIDIS (QUIZÁS 2 AMIGOS MÁS )",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 27",
+      "reservacion_id": "OXI-XLSX-FILA-027",
+      "mesa_numero": 11,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 700,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-FDB3P",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "KARLA STAVROULA (AMIGA DE MAGDA)",
+      "importe_esperado": 700,
+      "importe_cobrado": 700,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-028",
+      "persona_o_entidad": "KARLA STAVROULA (AMIGA DE MAGDA)",
+      "metodo_cobro": "PUERTA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: PUERTA | Estado original: PAGADO A ALICIA | Saldo de referencia en Excel: 0 | Fila de origen Excel: 28",
+      "reservacion_id": "OXI-XLSX-FILA-028",
+      "mesa_numero": 3,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO A ALICIA",
+      "importe_declarado_pagado": 700,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-OBLW3",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "DAFHNI (poner en mesa de Koutsovitis)",
+      "importe_esperado": 350,
+      "importe_cobrado": 350,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-029",
+      "persona_o_entidad": "DAFHNI (poner en mesa de Koutsovitis)",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO A ALICIA | Saldo de referencia en Excel: 0 | Fila de origen Excel: 29",
+      "reservacion_id": "OXI-XLSX-FILA-029",
+      "mesa_numero": 2,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO A ALICIA",
+      "importe_declarado_pagado": 350,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-N08R9",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "DIMITRI SCARTADOS",
+      "importe_esperado": 1400,
+      "importe_cobrado": 1400,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-030",
+      "persona_o_entidad": "DIMITRI SCARTADOS",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO A ALICIA | Saldo de referencia en Excel: 0 | Fila de origen Excel: 30",
+      "reservacion_id": "OXI-XLSX-FILA-030",
+      "mesa_numero": 1,
+      "total_asientos": 2,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO A ALICIA",
+      "importe_declarado_pagado": 1400,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-A0C6O",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "KOSTAS GALANIS",
+      "importe_esperado": 700,
+      "importe_cobrado": 700,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-031",
+      "persona_o_entidad": "KOSTAS GALANIS",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO A ALICIA | Saldo de referencia en Excel: 0 | Fila de origen Excel: 31",
+      "reservacion_id": "OXI-XLSX-FILA-031",
+      "mesa_numero": 5,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO A ALICIA",
+      "importe_declarado_pagado": 700,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-Q050J",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "LUCERO MORALES",
+      "importe_esperado": 350,
+      "importe_cobrado": 350,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-032",
+      "persona_o_entidad": "LUCERO MORALES",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 32",
+      "reservacion_id": "OXI-XLSX-FILA-032",
+      "mesa_numero": 8,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 350,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-VH1QF",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "ALFREDO ZEULER AMIGO MONI",
+      "importe_esperado": 700,
+      "importe_cobrado": 100,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-033",
+      "persona_o_entidad": "ALFREDO ZEULER AMIGO MONI",
+      "metodo_cobro": "PUERTA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: PUERTA | Estado original: PAGADO $100 A ALICIA | Saldo de referencia en Excel: 600 | Fila de origen Excel: 33",
+      "reservacion_id": "OXI-XLSX-FILA-033",
+      "mesa_numero": 4,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO $100 A ALICIA",
+      "importe_declarado_pagado": 100,
+      "saldo_origen": 600
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-56AKW",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "EMMANUEL",
+      "importe_esperado": 350,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-034",
+      "persona_o_entidad": "EMMANUEL",
+      "metodo_cobro": "PUERTA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: PUERTA | Estado original: POR PAGAR | Saldo de referencia en Excel: 350 | Fila de origen Excel: 34",
+      "reservacion_id": "OXI-XLSX-FILA-034",
+      "mesa_numero": 4,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "POR PAGAR",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 350
+    },
+    {
+      "id": "ING-RES-mvlbg8gi-OF7RA",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "DIEGO SCHULTZ",
+      "importe_esperado": 1400,
+      "importe_cobrado": 1400,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-035",
+      "persona_o_entidad": "DIEGO SCHULTZ",
+      "metodo_cobro": "EFECTIVO",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: EFECTIVO | Estado original: PAGADO | Saldo de referencia en Excel: 0 | Fila de origen Excel: 35",
+      "reservacion_id": "OXI-XLSX-FILA-035",
+      "mesa_numero": 10,
+      "total_asientos": 2,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 1400,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gj-JO7LM",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "ANGEL FABRICIO",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-036",
+      "persona_o_entidad": "ANGEL FABRICIO",
+      "metodo_cobro": "PUERTA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: PUERTA | Estado original: POR PAGAR | Saldo de referencia en Excel: 700 | Fila de origen Excel: 36",
+      "reservacion_id": "OXI-XLSX-FILA-036",
+      "mesa_numero": 2,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "POR PAGAR",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvlbg8gj-PW358",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "cortesia_institucional",
+      "concepto": "IGLESIA",
+      "importe_esperado": 0,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-042",
+      "persona_o_entidad": "IGLESIA",
+      "metodo_cobro": "",
+      "comprobante_referencia": "",
+      "observaciones": "Saldo de referencia en Excel: 0 | Cortesía institucional; excluida de ingresos cobrados. | Fila de origen Excel: 42",
+      "reservacion_id": "OXI-XLSX-FILA-042",
+      "mesa_numero": 7,
+      "total_asientos": 5,
+      "tipo_reservacion": "cortesia_institucional",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "",
+      "importe_declarado_pagado": 7000,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gj-8DVJQ",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "cortesia_institucional",
+      "concepto": "EMBAJADA",
+      "importe_esperado": 0,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-043",
+      "persona_o_entidad": "EMBAJADA",
+      "metodo_cobro": "",
+      "comprobante_referencia": "",
+      "observaciones": "Saldo de referencia en Excel: 0 | Cortesía institucional; excluida de ingresos cobrados. | Fila de origen Excel: 43",
+      "reservacion_id": "OXI-XLSX-FILA-043",
+      "mesa_numero": 5,
+      "total_asientos": 5,
+      "tipo_reservacion": "cortesia_institucional",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "",
+      "importe_declarado_pagado": 4200,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-RES-mvlbg8gj-JY1A2",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "cortesia_institucional",
+      "concepto": "GRUPO BAILE",
+      "importe_esperado": 0,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-XLSX-FILA-044",
+      "persona_o_entidad": "GRUPO BAILE",
+      "metodo_cobro": "",
+      "comprobante_referencia": "",
+      "observaciones": "Estado original: CORTESÍA | Saldo de referencia en Excel: 0 | Cortesía institucional; excluida de ingresos cobrados. | Fila de origen Excel: 44",
+      "reservacion_id": "OXI-XLSX-FILA-044",
+      "mesa_numero": null,
+      "total_asientos": 0,
+      "tipo_reservacion": "cortesia_institucional",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "CORTESÍA",
+      "importe_declarado_pagado": 4900,
+      "saldo_origen": 0
+    },
+    {
+      "id": "ING-mvlgpscx-OTRWW",
+      "fecha_prevista": "2026-10-25",
+      "fecha_cobro": null,
+      "fuente": "donativo",
+      "concepto": "FAGE",
+      "importe_esperado": 2000,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "manual",
+      "referencia_externa": null,
+      "persona_o_entidad": "FAGE",
+      "metodo_cobro": "efectivo",
+      "comprobante_referencia": "",
+      "observaciones": ""
+    },
+    {
+      "id": "ING-mvlgxatf-RA65N",
+      "fecha_prevista": "2026-10-25",
+      "fecha_cobro": "2026-10-25",
+      "fuente": "donativo",
+      "concepto": "Yogurt FAGE",
+      "importe_esperado": 2000,
+      "importe_cobrado": 2500,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "manual",
+      "referencia_externa": null,
+      "persona_o_entidad": "Personal de FAGE",
+      "metodo_cobro": "efectivo",
+      "comprobante_referencia": "",
+      "observaciones": ""
+    },
+    {
+      "id": "ING-RES-mvso8nl9-J93PN",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "David M",
+      "importe_esperado": 1400,
+      "importe_cobrado": 1400,
+      "moneda": "MXN",
+      "estado": "cobrado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-1792797823955-925ff99923f308",
+      "persona_o_entidad": "David M",
+      "metodo_cobro": "TRANSFERENCIA",
+      "comprobante_referencia": "",
+      "observaciones": "Forma de pago en origen: TRANSFERENCIA | Estado original: PAGADO | Saldo de referencia en Excel: 1400",
+      "reservacion_id": "OXI-1792797823955-925ff99923f308",
+      "mesa_numero": 2,
+      "total_asientos": 2,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PAGADO",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 1400
+    },
+    {
+      "id": "ING-RES-mvso8nl9-Q3JHR",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "GPO PRUEBA",
+      "importe_esperado": 700,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-WEB-20261027035504482-5X2WT",
+      "persona_o_entidad": "GPO PRUEBA",
+      "metodo_cobro": "",
+      "comprobante_referencia": "",
+      "observaciones": "Estado original: PENDIENTE | Saldo de referencia en Excel: 700",
+      "reservacion_id": "OXI-WEB-20261027035504482-5X2WT",
+      "mesa_numero": 12,
+      "total_asientos": 1,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PENDIENTE",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 700
+    },
+    {
+      "id": "ING-RES-mvso8nl9-73HNU",
+      "fecha_prevista": null,
+      "fecha_cobro": null,
+      "fuente": "reservacion",
+      "concepto": "PRUEBA NUEVA",
+      "importe_esperado": 1400,
+      "importe_cobrado": 0,
+      "moneda": "MXN",
+      "estado": "esperado",
+      "origen_sistema": "reservaciones_oxi_2026",
+      "referencia_externa": "OXI-WEB-20261027042239503-OQUG2",
+      "persona_o_entidad": "PRUEBA NUEVA",
+      "metodo_cobro": "",
+      "comprobante_referencia": "",
+      "observaciones": "Estado original: PENDIENTE | Saldo de referencia en Excel: 1400",
+      "reservacion_id": "OXI-WEB-20261027042239503-OQUG2",
+      "mesa_numero": 13,
+      "total_asientos": 3,
+      "tipo_reservacion": "grupo",
+      "fecha_importacion": "2026-10-28T22:13:50.060Z",
+      "estado_pago_origen": "PENDIENTE",
+      "importe_declarado_pagado": 0,
+      "saldo_origen": 1400
+    }
+  ],
+  "ajustes_presupuesto": [],
+  "calculos": {
+    "reglas": {}
+  },
+  "integraciones": {
+    "reservaciones": {
+      "habilitada": true,
+      "sistema_origen": "modulo_reservaciones",
+      "ultima_sincronizacion": "2026-10-28T22:13:50.060Z",
+      "regla_identificador_externo": "reservacion_id",
+      "observaciones": "PAGADO se reconoce como cobrado cuando el importe pagado cubre el importe esperado; diferencias se marcan para revisión. Cortesías excluidas de ingresos. Importación repetible e idempotente.",
+      "archivo_origen": "reservaciones-OXI-2026-actualizado (6).json",
+      "registros_importados": 39
+    }
+  },
+  "auditoria": {
+    "creado_por": "",
+    "actualizado_por": "",
+    "historial": []
+  }
+}
