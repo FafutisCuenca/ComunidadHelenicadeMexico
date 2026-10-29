@@ -217,6 +217,20 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
       </button>
     </div>
 
+   
+<div id="progresoCargaEvento" hidden
+     role="status" aria-live="polite"
+     style="margin:16px 0;padding:14px;border:1px solid var(--borde);border-radius:10px">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+    <span aria-hidden="true">⏳</span>
+    <strong id="textoProgresoEvento">Cargando evento...</strong>
+  </div>
+  <progress style="width:100%;height:12px"></progress>
+  <p style="margin:8px 0 0;font-size:13px;color:var(--texto-secundario)">
+    Estamos leyendo y validando los datos. No cierres esta pantalla.
+  </p>
+</div>
+
     <hr style="margin:24px 0;border:0;border-top:1px solid var(--borde)">
 
     <div class="campo">
@@ -2201,13 +2215,20 @@ async function abrirEventoSeleccionado() {
   const boton = $('cargarEventoCatalogo');
   const mensaje = $('estadoCargaInicial');
 
+ const progreso = $('progresoCargaEvento');
+const textoProgreso = $('textoProgresoEvento');
+
   if (!eventoCatalogo) {
     mensaje.textContent = 'Selecciona un evento válido del catálogo.';
     return;
   }
 
-  boton.disabled = true;
-  mensaje.textContent = 'Cargando y validando los datos del evento...';
+boton.disabled = true;
+$('eventoCatalogo').disabled = true;
+
+progreso.hidden = false;
+textoProgreso.textContent = 'Cargando y validando los datos del evento...';
+mensaje.textContent = 'La carga está en curso. Espera, por favor.';
 
   try {
     let datos;
@@ -2281,7 +2302,10 @@ async function abrirEventoSeleccionado() {
   } catch (error) {
     mensaje.textContent = 'No se pudo abrir el evento: ' + error.message;
   } finally {
-    boton.disabled = false;
+  progreso.hidden = true;
+  boton.disabled = false;
+  $('eventoCatalogo').disabled = false;
+}
   }
 }
 
