@@ -251,7 +251,7 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
    <div class="barra">
     <div>
      <h2>
-      Control financiero · OXI 2026
+      Control financiero · Evento seleccionado
      </h2>
      <p class="ayuda">
       Datos locales con estructura JSON. Independiente del módulo de reservaciones.
@@ -1522,7 +1522,7 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
     </div>
    </section>
    <div class="pie-modulo">
-    Comunidad Helénica de México, A.C. · Administración Financiera · OXI 2026
+    Comunidad Helénica de México, A.C. · Administración Financiera · Gestión de eventos
     <br/>
     Recomendación operativa: exportar un respaldo JSON después de cada sesión importante y antes de importar información.
    </div>
@@ -1532,7 +1532,7 @@ body.espera-archivo main > :not(#pantallaCargaInicial) {
     Comunidad Helénica de México, A.C.
    </strong>
    <br/>
-   Administración financiera · OXI 2026
+   Administración financiera · Módulo de eventos
    <br/>
    Herramienta administrativa preliminar. Conserva respaldos y verifica los movimientos.
   </footer>
@@ -1770,12 +1770,15 @@ async function integrarCatalogoInstitucional(datos) {
   }
 
   return resultado;
-}         async function cargar(){const local=localStorage.getItem(CLAVE);if(local){try{estado=validar(JSON.parse(local));$('estadoCarga').textContent='Datos cargados desde el almacenamiento de este navegador.';return}catch(e){alert('Los datos locales de la nueva versión no pudieron leerse: '+e.message)}}try{const r=await fetch(JSON_INICIAL,{cache:'no-store'});if(!r.ok)throw Error('No se pudo leer el JSON publicado (HTTP '+r.status+').');estado=validar(await r.json());$('estadoCarga').textContent='Plantilla inicial cargada desde finanzas_oxi_2026.json. Los cambios se guardarán localmente.'}catch(e){estado=plantilla();$('estadoCarga').textContent='No se pudo cargar la plantilla publicada; se inició una estructura vacía. '+e.message}guardar()}
+}         async function cargar(){const local = localStorage.getItem(claveEvento('OXI-2026'));if(local){try{estado=validar(JSON.parse(local));$('estadoCarga').textContent='Datos cargados desde el almacenamiento de este navegador.';return}catch(e){alert('Los datos locales de la nueva versión no pudieron leerse: '+e.message)}}try{const r=await fetch(JSON_INICIAL,{cache:'no-store'});if(!r.ok)throw Error('No se pudo leer el JSON publicado (HTTP '+r.status+').');estado=validar(await r.json());$('estadoCarga').textContent='Plantilla inicial cargada desde finanzas_oxi_2026.json. Los cambios se guardarán localmente.'}catch(e){estado=plantilla();$('estadoCarga').textContent='No se pudo cargar la plantilla publicada; se inició una estructura vacía. '+e.message}guardar()}
 const proveedor=id=>estado.proveedores.find(x=>x.id===id);const compromiso=id=>estado.compromisos.find(x=>x.id===id);const gasto=id=>estado.gastos_adicionales.find(x=>x.id===id);const pagosValidos=()=>estado.pagos.filter(p=>p.estado!=='cancelado');const totalPagosComp=id=>pagosValidos().filter(p=>p.compromiso_id===id&&p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);const totalPagosGasto=id=>pagosValidos().filter(p=>p.gasto_adicional_id===id&&p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);const comprometido=()=>estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe_confirmado||0),0)+estado.gastos_adicionales.filter(g=>g.estado==='confirmado').reduce((s,g)=>s+Number(g.importe||0),0);const autorizado=()=>Number(estado.presupuesto.importe_autorizado||0)+estado.ajustes_presupuesto.filter(a=>a.estado==='aprobado').reduce((s,a)=>s+(a.tipo==='reduccion'?-1:1)*Number(a.importe||0),0);const pagado=()=>pagosValidos().filter(p=>p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);
 function selectOpts(id,items,placeholder,labelFn){const el=$(id),old=el.value;el.innerHTML=`<option value="">${esc(placeholder)}</option>`+items.map(x=>`<option value="${esc(x.id)}">${esc(labelFn(x))}</option>`).join('');if(items.some(x=>x.id===old))el.value=old}
 function actualizarSelects(){selectOpts('servProveedor',estado.proveedores,'Selecciona proveedor',p=>p.nombre);selectOpts('compProveedor',estado.proveedores,'Selecciona proveedor',p=>p.nombre);selectOpts('gastoProveedor',estado.proveedores,'Sin proveedor',p=>p.nombre);selectOpts('compServicio',estado.servicios,'Sin servicio asociado',s=>`${s.nombre} — ${(proveedor(s.proveedor_id)||{}).nombre||'Proveedor'}`);selectOpts('compRubro',estado.presupuesto.rubros,'Selecciona rubro',r=>r.nombre);selectOpts('gastoRubro',estado.presupuesto.rubros,'Selecciona rubro',r=>r.nombre);actualizarDestinoPago()}
 function actualizarDestinoPago(){const tipo=$('pagoDestinoTipo').value;if(tipo==='gasto'){selectOpts('pagoDestino',estado.gastos_adicionales.filter(g=>g.estado==='confirmado'),'Selecciona gasto',g=>`${g.concepto} (saldo ${dinero(Number(g.importe)-totalPagosGasto(g.id))})`)}else{selectOpts('pagoDestino',estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)),'Selecciona compromiso',c=>`${(proveedor(c.proveedor_id)||{}).nombre||'Proveedor'} — ${c.concepto} (saldo ${dinero(Number(c.importe_confirmado)-totalPagosComp(c.id))})`)}}
-function render(){if(!estado)return;$('presupuesto').value=estado.presupuesto.importe_autorizado||0;$('eventoNombre').value=estado.evento.nombre||'Celebracion del OXI 2026';$('eventoFecha').value=estado.evento.fecha_evento||'';const comp=comprometido(),pg=pagado(),saldo=estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe_confirmado)-totalPagosComp(c.id),0)+estado.gastos_adicionales.filter(g=>g.estado==='confirmado').reduce((s,g)=>s+Number(g.importe)-totalPagosGasto(g.id),0);const cot=estado.cotizaciones.filter(c=>!['rechazada','vencida'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe||0),0);const ingresosActivos=estado.ingresos.filter(i=>i.estado!=='cancelado'&&i.fuente!=='cortesia_institucional');const ie=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_esperado||0)-Number(i.importe_cobrado||0)),0);const ic=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_cobrado||0)),0);const ingresosPrevistos=ie+ic;const utilidad=ingresosPrevistos-comp;const caja=ic-pg;$('totalPresupuesto').textContent=dinero(autorizado());$('totalCompromisos').textContent=dinero(comp);$('totalPagado').textContent=dinero(pg);$('totalSaldo').textContent=dinero(saldo);$('disponible').textContent=dinero(autorizado()-comp);$('totalCotizaciones').textContent=dinero(cot);$('ingresosEsperados').textContent=dinero(ie);$('ingresosCobrados').textContent=dinero(ic);$('gastosRegistrados').textContent=dinero(comp);$('gastosPagados').textContent=dinero(pg);$('utilidadEstimada').textContent=dinero(utilidad);$('saldoCaja').textContent=dinero(caja);$('resultadoEstimado').textContent=dinero(utilidad);$('resultadoCaja').textContent=dinero(caja);
+function render(){
+  if (!estado) return;
+  actualizarEncabezadoEvento(estado);
+ $('presupuesto').value=estado.presupuesto.importe_autorizado||0;$('eventoNombre').value=estado.evento.nombre||'Celebracion del OXI 2026';$('eventoFecha').value=estado.evento.fecha_evento||'';const comp=comprometido(),pg=pagado(),saldo=estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe_confirmado)-totalPagosComp(c.id),0)+estado.gastos_adicionales.filter(g=>g.estado==='confirmado').reduce((s,g)=>s+Number(g.importe)-totalPagosGasto(g.id),0);const cot=estado.cotizaciones.filter(c=>!['rechazada','vencida'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe||0),0);const ingresosActivos=estado.ingresos.filter(i=>i.estado!=='cancelado'&&i.fuente!=='cortesia_institucional');const ie=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_esperado||0)-Number(i.importe_cobrado||0)),0);const ic=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_cobrado||0)),0);const ingresosPrevistos=ie+ic;const utilidad=ingresosPrevistos-comp;const caja=ic-pg;$('totalPresupuesto').textContent=dinero(autorizado());$('totalCompromisos').textContent=dinero(comp);$('totalPagado').textContent=dinero(pg);$('totalSaldo').textContent=dinero(saldo);$('disponible').textContent=dinero(autorizado()-comp);$('totalCotizaciones').textContent=dinero(cot);$('ingresosEsperados').textContent=dinero(ie);$('ingresosCobrados').textContent=dinero(ic);$('gastosRegistrados').textContent=dinero(comp);$('gastosPagados').textContent=dinero(pg);$('utilidadEstimada').textContent=dinero(utilidad);$('saldoCaja').textContent=dinero(caja);$('resultadoEstimado').textContent=dinero(utilidad);$('resultadoCaja').textContent=dinero(caja);
 // Estado financiero por rubro: solo cobros registrados; cortesías y registros cancelados no cuentan como ingreso.
 const cobradoFuente=(fuente)=>ingresosActivos.filter(i=>i.fuente===fuente).reduce((s,i)=>s+Math.max(0,Number(i.importe_cobrado||0)),0);
 const esperadoPendiente=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_esperado||0)-Number(i.importe_cobrado||0)),0);
@@ -1879,7 +1882,11 @@ $('formPago').addEventListener('submit',e=>{
 $('formIngreso').addEventListener('submit',e=>{e.preventDefault();const esperado=Number($('ingEsperado').value)||0,cobrado=Number($('ingCobrado').value)||0,est=$('ingEstado').value;if(esperado<0||cobrado<0)return alert('Los importes no pueden ser negativos.');if(est==='cobrado'&&cobrado<=0)return alert('Para marcar como cobrado, captura el importe recibido.');const ingreso={id:nuevoId('ING'),fecha_prevista:$('ingFecha').value||null,fecha_cobro:est==='cobrado'?($('ingFecha').value||hoy()):null,fuente:$('ingFuente').value,concepto:$('ingConcepto').value.trim(),importe_esperado:esperado,importe_cobrado:cobrado,moneda:'MXN',estado:est,origen_sistema:'manual',referencia_externa:$('ingReferencia').value.trim()||null,persona_o_entidad:$('ingEntidad').value.trim(),metodo_cobro:$('ingMetodo').value||null,comprobante_referencia:'',observaciones:''};if(estado.ingresos.some(i=>ingreso.referencia_externa&&i.referencia_externa===ingreso.referencia_externa&&i.origen_sistema===ingreso.origen_sistema))return alert('Ya existe un ingreso con esa referencia externa.');estado.ingresos.push(ingreso);if(guardar()){e.target.reset();$('ingEsperado').value='0';$('ingCobrado').value='0';render()}});
 document.addEventListener('click',e=>{const b=e.target.closest('button[data-del]');if(!b)return;const tipo=b.dataset.del,id=b.dataset.id;if(!confirm('¿Eliminar este registro? Esta acción no se puede deshacer salvo que tengas un respaldo.'))return;const dependencias={proveedor:()=>{if(estado.servicios.some(s=>s.proveedor_id===id)||estado.cotizaciones.some(c=>c.proveedor_id===id)||estado.compromisos.some(c=>c.proveedor_id===id)||estado.gastos_adicionales.some(g=>g.proveedor_id===id))throw Error('El proveedor tiene registros asociados; no se puede eliminar.')},servicio:()=>{if(estado.compromisos.some(c=>c.servicio_id===id)||estado.cotizaciones.some(c=>c.servicio_id===id))throw Error('El servicio tiene cotizaciones o compromisos asociados.')},compromiso:()=>{if(estado.pagos.some(p=>p.compromiso_id===id))throw Error('El compromiso tiene pagos asociados. Elimina primero los pagos.')},gasto:()=>{if(estado.pagos.some(p=>p.gasto_adicional_id===id))throw Error('El egreso tiene pagos asociados. Elimina primero los pagos.')},pago:()=>{},cotizacion:()=>{},ingreso:()=>{}};try{if(dependencias[tipo])dependencias[tipo]();const mapa={proveedor:'proveedores',servicio:'servicios',compromiso:'compromisos',cotizacion:'cotizaciones',gasto:'gastos_adicionales',pago:'pagos',ingreso:'ingresos'};estado[mapa[tipo]]=estado[mapa[tipo]].filter(x=>x.id!==id);if(guardar())render()}catch(err){alert(err.message)}});
 $('importarReservaciones').addEventListener('click',async()=>{const archivo=$('archivoReservaciones').files[0];if(!archivo){alert('Selecciona primero el archivo JSON v2 de reservaciones.');return}try{const origen=JSON.parse(await archivo.text());if(origen.formato_version!==2||origen.evento_id!=='OXI-2026'||!Array.isArray(origen.reservaciones))throw Error('El archivo debe ser JSON v2 del evento OXI-2026 y contener la lista reservaciones.');const vistos=new Set(),registros=origen.reservaciones;for(const r of registros){if(!r.reservacion_id)throw Error('Hay una reservación sin reservacion_id.');if(vistos.has(r.reservacion_id))throw Error('El archivo contiene un reservacion_id duplicado: '+r.reservacion_id);vistos.add(r.reservacion_id)}const cortesias=registros.filter(r=>r.tipo_reservacion==='cortesia_institucional').length;const previos=estado.ingresos.filter(i=>i.origen_sistema==='reservaciones_oxi_2026').length;if(!confirm('Se importarán/actualizarán '+registros.length+' reservaciones ('+cortesias+' cortesías). Los registros previamente importados se actualizarán por reservacion_id; los ingresos manuales se conservarán. ¿Continuar?'))return;let nuevos=0,actualizados=0,omitidos=0;const fechaImportacion=new Date().toISOString();for(const r of registros){const existente=estado.ingresos.find(i=>i.origen_sistema==='reservaciones_oxi_2026'&&i.referencia_externa===r.reservacion_id);const manual=estado.ingresos.find(i=>i.origen_sistema!=='reservaciones_oxi_2026'&&i.referencia_externa===r.reservacion_id);if(manual&&!existente){omitidos++;continue}const cortesia=r.tipo_reservacion==='cortesia_institucional';const esperado=cortesia?0:Math.max(0,Number(r.subtotal_excel??r.costo_excel??0)||0);const pagadoOrigen=Math.max(0,Number(r.pagado_excel||0)||0);const estadoOrigen=String(r.estado_pago_excel||'').trim().toUpperCase();let cobrado=pagadoOrigen;if(!cortesia&&estadoOrigen==='PAGADO'&&cobrado<=0)cobrado=esperado;if(cortesia)cobrado=0;const estadoPagadoConsistente=estadoOrigen==='PAGADO'&&(cobrado+0.009>=esperado);const estadoIngreso=(!cortesia&&estadoOrigen==='PAGADO'&&estadoPagadoConsistente)?'cobrado':'esperado';const notas=[r.notas_excel||'',r.forma_pago_excel?'Forma de pago en origen: '+r.forma_pago_excel:'',r.estado_pago_excel?'Estado original: '+r.estado_pago_excel:'',r.debe_excel!==undefined?'Saldo de referencia en Excel: '+Number(r.debe_excel||0):'',(!cortesia&&estadoOrigen==='PAGADO'&&!estadoPagadoConsistente)?'REVISAR: estado PAGADO pero el importe declarado pagado es menor al importe esperado. Se conserva como pendiente de revisión.':'',cortesia?'Cortesía institucional; excluida de ingresos cobrados.':'',r.fila_origen_excel?'Fila de origen Excel: '+r.fila_origen_excel:''].filter(Boolean).join(' | ');const registro={id:existente?existente.id:nuevoId('ING-RES'),fecha_prevista:null,fecha_cobro:estadoIngreso==='cobrado'?null:null,fuente:cortesia?'cortesia_institucional':'reservacion',concepto:String(r.nombre_reservacion||r.reservacion_id),importe_esperado:esperado,importe_cobrado:cobrado,moneda:'MXN',estado:estadoIngreso,origen_sistema:'reservaciones_oxi_2026',referencia_externa:String(r.reservacion_id),persona_o_entidad:String(r.nombre_reservacion||''),metodo_cobro:String(r.forma_pago_excel||''),comprobante_referencia:'',observaciones:notas,reservacion_id:String(r.reservacion_id),mesa_numero:r.mesa_numero??null,total_asientos:Number(r.total_asientos_excel||0),tipo_reservacion:r.tipo_reservacion||'grupo',fecha_importacion:fechaImportacion,estado_pago_origen:estadoOrigen,importe_declarado_pagado:pagadoOrigen,saldo_origen:Number(r.debe_excel||0)};if(existente){Object.assign(existente,registro,{id:existente.id});actualizados++}else{estado.ingresos.push(registro);nuevos++}}estado.integraciones=estado.integraciones||{};estado.integraciones.reservaciones={...(estado.integraciones.reservaciones||{}),habilitada:true,sistema_origen:'modulo_reservaciones',ultima_sincronizacion:fechaImportacion,regla_identificador_externo:'reservacion_id',archivo_origen:archivo.name,registros_importados:registros.length,observaciones:'PAGADO se reconoce como cobrado cuando el importe pagado cubre el importe esperado; diferencias se marcan para revisión. Cortesías excluidas de ingresos. Importación repetible e idempotente.'};if(guardar()){render();$('estadoReservaciones').textContent='Importación completada: '+nuevos+' nuevos, '+actualizados+' actualizados, '+omitidos+' omitidos por posible duplicado manual. Archivo: '+archivo.name+'. Revisa las observaciones de los registros importados y concilia los importes.';alert('Reservaciones importadas. Nuevos: '+nuevos+'. Actualizados: '+actualizados+'. Omitidos por duplicado manual: '+omitidos+'.')}}catch(err){$('estadoReservaciones').textContent='No se pudo importar: '+err.message;alert('No se pudo importar el JSON de reservaciones: '+err.message)}});
-$('exportar').addEventListener('click',()=>{estado.metadata.ultima_actualizacion=new Date().toISOString();const blob=new Blob([JSON.stringify(estado,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='finanzas_oxi_2026.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});$('importar').addEventListener('click',()=>$('archivoImportar').click());$('archivoImportar').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const d=validar(JSON.parse(await f.text()));if(!confirm('La importación reemplazará los datos financieros guardados en este navegador. ¿Deseas continuar?'))return;estado=d;if(guardar()){render();alert('JSON importado y validado correctamente.')}}catch(err){alert('No se pudo importar el archivo: '+err.message)}finally{e.target.value=''}});
+$('exportar').addEventListener('click',()=>{estado.metadata.ultima_actualizacion=new Date().toISOString();const blob=new Blob([JSON.stringify(estado,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download = 'finanzas_' +
+  String(estado.evento.id || 'evento')
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '_') +
+  '.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});$('importar').addEventListener('click',()=>$('archivoImportar').click());$('archivoImportar').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const d=validar(JSON.parse(await f.text()));if(!confirm('La importación reemplazará los datos financieros guardados en este navegador. ¿Deseas continuar?'))return;estado=d;if(guardar()){render();alert('JSON importado y validado correctamente.')}}catch(err){alert('No se pudo importar el archivo: '+err.message)}finally{e.target.value=''}});
 const normalizarBusqueda=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 function aplicarBusqueda(){const q=normalizarBusqueda($('buscarRegistros').value);let visibles=0,total=0;document.querySelectorAll('.tabla-contenedor tbody').forEach(tbody=>{Array.from(tbody.querySelectorAll('tr')).forEach(tr=>{total++;const coincide=!q||normalizarBusqueda(tr.textContent).includes(q);tr.classList.toggle('oculto',!coincide);if(coincide)visibles++})});$('resultadoBusqueda').textContent=q?`${visibles} de ${total} filas coinciden.`:'Muestra todos los registros.'}
 $('buscarRegistros').addEventListener('input',aplicarBusqueda);$('limpiarBusqueda').addEventListener('click',()=>{$('buscarRegistros').value='';aplicarBusqueda();$('buscarRegistros').focus()});
@@ -2119,6 +2126,172 @@ async function integrarCatalogoInstitucional(datos) {
 }         
          
 let archivoTrabajoActual = '';
+         
+let catalogoEventos = [];
+
+function actualizarEncabezadoEvento(datos) {
+  const evento = datos.evento || {};
+  const nombre = evento.nombre || evento.id || 'Evento seleccionado';
+
+  const titulo = document.querySelector('main > .barra h2');
+  if (titulo) {
+    titulo.textContent = 'Control financiero · ' + nombre;
+  }
+
+  document.title = 'Finanzas · ' + nombre + ' | Comunidad Helénica';
+}
+
+async function cargarCatalogoEventos() {
+  const selector = $('eventoCatalogo');
+  const boton = $('cargarEventoCatalogo');
+  const mensaje = $('estadoCargaInicial');
+
+  try {
+    const respuesta = await fetch('./eventos.json', {
+      cache: 'no-store'
+    });
+
+    if (!respuesta.ok) {
+      throw new Error(
+        'No se pudo cargar eventos.json (HTTP ' + respuesta.status + ').'
+      );
+    }
+
+    const catalogo = await respuesta.json();
+
+    if (!Array.isArray(catalogo.eventos)) {
+      throw new Error('El catálogo no contiene una lista válida de eventos.');
+    }
+
+    catalogoEventos = catalogo.eventos.filter(evento =>
+      evento &&
+      evento.id &&
+      evento.nombre &&
+      evento.archivo_datos &&
+      evento.activo !== false
+    );
+
+    selector.innerHTML =
+      '<option value="">Selecciona un evento</option>' +
+      catalogoEventos.map(evento =>
+        '<option value="' + esc(evento.id) + '">' +
+        esc(evento.nombre) +
+        (evento.fecha_evento ? ' · ' + esc(evento.fecha_evento) : '') +
+        '</option>'
+      ).join('');
+
+    boton.disabled = catalogoEventos.length === 0;
+
+    mensaje.textContent = catalogoEventos.length
+      ? 'Catálogo cargado. Selecciona el evento con el que deseas trabajar.'
+      : 'No hay eventos activos en el catálogo. Puedes cargar un JSON manualmente.';
+
+  } catch (error) {
+    selector.innerHTML = '<option value="">Catálogo no disponible</option>';
+    boton.disabled = true;
+    mensaje.textContent =
+      'No fue posible cargar el catálogo: ' + error.message +
+      ' Verifica que eventos.json exista en la carpeta finanzas.';
+  }
+}
+
+async function abrirEventoSeleccionado() {
+  const id = $('eventoCatalogo').value;
+  const eventoCatalogo = catalogoEventos.find(evento => evento.id === id);
+  const boton = $('cargarEventoCatalogo');
+  const mensaje = $('estadoCargaInicial');
+
+  if (!eventoCatalogo) {
+    mensaje.textContent = 'Selecciona un evento válido del catálogo.';
+    return;
+  }
+
+  boton.disabled = true;
+  mensaje.textContent = 'Cargando y validando los datos del evento...';
+
+  try {
+    let datos;
+    let origenLocal = false;
+
+    const clave = claveEvento(eventoCatalogo.id);
+    const copiaLocal = localStorage.getItem(clave);
+
+    if (copiaLocal) {
+      try {
+        datos = validar(JSON.parse(copiaLocal));
+        origenLocal = true;
+      } catch (errorLocal) {
+        throw new Error(
+          'La copia local de este evento no pudo validarse. ' +
+          'Antes de continuar, exporta o recupera un respaldo válido. ' +
+          errorLocal.message
+        );
+      }
+    } else {
+      const respuesta = await fetch(eventoCatalogo.archivo_datos, {
+        cache: 'no-store'
+      });
+
+      if (!respuesta.ok) {
+        throw new Error(
+          'No se pudo cargar el archivo financiero ' +
+          eventoCatalogo.archivo_datos + ' (HTTP ' + respuesta.status + ').'
+        );
+      }
+
+      datos = validar(await respuesta.json());
+    }
+
+    if (datos.evento.id !== eventoCatalogo.id) {
+      throw new Error(
+        'El identificador del archivo financiero no coincide con el evento del catálogo.'
+      );
+    }
+
+    estado = datos;
+    archivoTrabajoActual = eventoCatalogo.archivo_datos;
+
+    actualizarEncabezadoEvento(datos);
+    
+
+    document.body.classList.remove('espera-archivo');
+    $('estadoCarga').textContent = origenLocal
+      ? 'Evento cargado desde el almacenamiento local de este navegador.'
+      : 'Evento cargado desde el archivo publicado. Los cambios posteriores se guardarán localmente.';
+
+    const etiqueta = document.createElement('p');
+    etiqueta.className = 'ayuda';
+    etiqueta.id = 'nombreArchivoTrabajo';
+    etiqueta.textContent = 'Evento: ' + datos.evento.nombre +
+      ' · Archivo: ' + eventoCatalogo.archivo_datos;
+
+    const barra = document.querySelector('main > .barra');
+
+    if (barra && !$('nombreArchivoTrabajo')) {
+      barra.insertAdjacentElement('afterend', etiqueta);
+    } else if ($('nombreArchivoTrabajo')) {
+      $('nombreArchivoTrabajo').textContent = etiqueta.textContent;
+    }
+
+    render();
+
+    mensaje.textContent =
+      'Evento abierto correctamente. Ya puedes consultar su información.';
+
+  } catch (error) {
+    mensaje.textContent = 'No se pudo abrir el evento: ' + error.message;
+  } finally {
+    boton.disabled = false;
+  }
+}
+
+$('cargarEventoCatalogo').addEventListener(
+  'click',
+  abrirEventoSeleccionado
+);
+
+cargarCatalogoEventos();
+
 
 ['compFecha', 'gastoFecha', 'pagoFecha', 'ingFecha'].forEach(
   id => $(id).value = hoy()
@@ -2151,7 +2324,8 @@ $('cargarTrabajoInicial').addEventListener('click', async () => {
     // Validar nuevamente después de integrar los catálogos.
     estado = validar(datos);
     archivoTrabajoActual = archivo.name;
-
+    actualizarEncabezadoEvento(datos);
+   
     document.body.classList.remove('espera-archivo');
 
     let etiqueta = $('nombreArchivoTrabajo');
