@@ -1506,7 +1506,130 @@ async function cargar(){const local=localStorage.getItem(CLAVE);if(local){try{es
 const proveedor=id=>estado.proveedores.find(x=>x.id===id);const compromiso=id=>estado.compromisos.find(x=>x.id===id);const gasto=id=>estado.gastos_adicionales.find(x=>x.id===id);const pagosValidos=()=>estado.pagos.filter(p=>p.estado!=='cancelado');const totalPagosComp=id=>pagosValidos().filter(p=>p.compromiso_id===id&&p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);const totalPagosGasto=id=>pagosValidos().filter(p=>p.gasto_adicional_id===id&&p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);const comprometido=()=>estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe_confirmado||0),0)+estado.gastos_adicionales.filter(g=>g.estado==='confirmado').reduce((s,g)=>s+Number(g.importe||0),0);const autorizado=()=>Number(estado.presupuesto.importe_autorizado||0)+estado.ajustes_presupuesto.filter(a=>a.estado==='aprobado').reduce((s,a)=>s+(a.tipo==='reduccion'?-1:1)*Number(a.importe||0),0);const pagado=()=>pagosValidos().filter(p=>p.estado==='aplicado').reduce((s,p)=>s+Number(p.importe||0)*(p.tipo==='reembolso'?-1:1),0);
 function selectOpts(id,items,placeholder,labelFn){const el=$(id),old=el.value;el.innerHTML=`<option value="">${esc(placeholder)}</option>`+items.map(x=>`<option value="${esc(x.id)}">${esc(labelFn(x))}</option>`).join('');if(items.some(x=>x.id===old))el.value=old}
 function actualizarSelects(){selectOpts('servProveedor',estado.proveedores,'Selecciona proveedor',p=>p.nombre);selectOpts('compProveedor',estado.proveedores,'Selecciona proveedor',p=>p.nombre);selectOpts('gastoProveedor',estado.proveedores,'Sin proveedor',p=>p.nombre);selectOpts('compServicio',estado.servicios,'Sin servicio asociado',s=>`${s.nombre} — ${(proveedor(s.proveedor_id)||{}).nombre||'Proveedor'}`);selectOpts('compRubro',estado.presupuesto.rubros,'Selecciona rubro',r=>r.nombre);selectOpts('gastoRubro',estado.presupuesto.rubros,'Selecciona rubro',r=>r.nombre);actualizarDestinoPago()}
-function actualizarDestinoPago(){const tipo=$('pagoDestinoTipo').value;if(tipo==='gasto'){selectOpts('pagoDestino',estado.gastos_adicionales.filter(g=>g.estado==='confirmado'),'Selecciona gasto',g=>`${g.concepto} (saldo ${dinero(Number(g.importe)-totalPagosGasto(g.id))})`)}else{selectOpts('pagoDestino',estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)),'Selecciona compromiso',c=>`${(proveedor(c.proveedor_id)||{}).nombre||'Proveedor'} — ${c.concepto} (saldo ${dinero(Number(c.importe_confirmado)-totalPagosComp(c.id))})`)}}
+// Integra el catálogo institucional sin duplicar registros
+// ni modificar movimientos financieros.
+async function integrarCatalogoCentral(datos) {
+  const respuesta = await fetch('../data/proveedores.json', {
+    cache: 'no-store'
+  });
+
+  if (!respuesta.ok) {
+    throw new Error(
+      'No se pudo leer data/proveedores.json (HTTP ' +
+      respuesta.status + ').'
+    );
+  }
+
+  const catalogo = await respuesta.json();
+
+  if (
+    !catalogo ||
+    !Array.isArray(catalogo.proveedores) ||
+    !Array.isArray(catalogo.servicios)
+  ) {
+    throw new Error(
+      'El catálogo central no contiene las listas de proveedores y servicios.'
+    );
+  }
+
+  // Validar identificadores del catálogo central.
+  for (const [nombreLista, registros] of [
+    ['proveedores', catalogo.proveedores],
+    ['servicios', catalogo.servicios]
+  ]) {
+    const ids = registros.map(r => r.id);
+
+    if (
+      registros.some(r => !r.id) ||
+      new Set(ids).size !== ids.length
+    ) {
+      throw new Error(
+        'El catálogo central contiene identificadores vacíos o duplicados en ' +
+        nombreLista + '.'
+      );
+    }
+  }
+
+  let proveedoresNuevos = 0;
+  let serviciosNuevos = 0;
+  let proveedoresCoincidentes = 0;
+  let serviciosCoincidentes = 0;
+
+  // Proveedores: conserva el ID y sincroniza sus datos centrales.
+  for (const central of catalogo.proveedores) {
+    if (!central.nombre || !central.categoria) {
+      throw new Error(
+        'Hay un proveedor central sin nombre o categoría.'
+      );
+    }
+
+    const existente = datos.proveedores.find(
+      p => p.id === central.id
+    );
+
+    if (existente) {
+      Object.assign(existente, central);
+      proveedoresCoincidentes++;
+    } else {
+      datos.proveedores.push({ ...central });
+      proveedoresNuevos++;
+    }
+  }
+
+  // Servicios: conserva el ID y verifica su relación con un proveedor.
+  for (const central of catalogo.servicios) {
+    if (!central.nombre || !central.proveedor_id) {
+      throw new Error(
+        'Hay un servicio central sin nombre o proveedor asociado.'
+      );
+    }
+
+    const proveedorExiste = datos.proveedores.some(
+      p => p.id === central.proveedor_id
+    );
+
+    if (!proveedorExiste) {
+      throw new Error(
+        'El servicio "' + central.nombre +
+        '" referencia un proveedor que no existe: ' +
+        central.proveedor_id
+      );
+    }
+
+    const existente = datos.servicios.find(
+      s => s.id === central.id
+    );
+
+    if (existente) {
+      Object.assign(existente, central);
+      serviciosCoincidentes++;
+    } else {
+      datos.servicios.push({ ...central });
+      serviciosNuevos++;
+    }
+  }
+
+  // Actualiza las categorías disponibles sin eliminar las existentes.
+  const categoriasCentral =
+    catalogo.catalogos?.categorias_proveedor || [];
+
+  datos.catalogos = datos.catalogos || {};
+
+  datos.catalogos.categorias_proveedor = [
+    ...new Set([
+      ...categoriasCentral,
+      ...(datos.catalogos.categorias_proveedor || [])
+    ])
+  ];
+
+  return {
+    proveedoresNuevos,
+    serviciosNuevos,
+    proveedoresCoincidentes,
+    serviciosCoincidentes
+  };
+}
+         function actualizarDestinoPago(){const tipo=$('pagoDestinoTipo').value;if(tipo==='gasto'){selectOpts('pagoDestino',estado.gastos_adicionales.filter(g=>g.estado==='confirmado'),'Selecciona gasto',g=>`${g.concepto} (saldo ${dinero(Number(g.importe)-totalPagosGasto(g.id))})`)}else{selectOpts('pagoDestino',estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)),'Selecciona compromiso',c=>`${(proveedor(c.proveedor_id)||{}).nombre||'Proveedor'} — ${c.concepto} (saldo ${dinero(Number(c.importe_confirmado)-totalPagosComp(c.id))})`)}}
 function render(){if(!estado)return;$('presupuesto').value=estado.presupuesto.importe_autorizado||0;$('eventoNombre').value=estado.evento.nombre||'Celebracion del OXI 2026';$('eventoFecha').value=estado.evento.fecha_evento||'';const comp=comprometido(),pg=pagado(),saldo=estado.compromisos.filter(c=>['confirmado','liquidado'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe_confirmado)-totalPagosComp(c.id),0)+estado.gastos_adicionales.filter(g=>g.estado==='confirmado').reduce((s,g)=>s+Number(g.importe)-totalPagosGasto(g.id),0);const cot=estado.cotizaciones.filter(c=>!['rechazada','vencida'].includes(c.estado)).reduce((s,c)=>s+Number(c.importe||0),0);const ingresosActivos=estado.ingresos.filter(i=>i.estado!=='cancelado'&&i.fuente!=='cortesia_institucional');const ie=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_esperado||0)-Number(i.importe_cobrado||0)),0);const ic=ingresosActivos.reduce((s,i)=>s+Math.max(0,Number(i.importe_cobrado||0)),0);const ingresosPrevistos=ie+ic;const utilidad=ingresosPrevistos-comp;const caja=ic-pg;$('totalPresupuesto').textContent=dinero(autorizado());$('totalCompromisos').textContent=dinero(comp);$('totalPagado').textContent=dinero(pg);$('totalSaldo').textContent=dinero(saldo);$('disponible').textContent=dinero(autorizado()-comp);$('totalCotizaciones').textContent=dinero(cot);$('ingresosEsperados').textContent=dinero(ie);$('ingresosCobrados').textContent=dinero(ic);$('gastosRegistrados').textContent=dinero(comp);$('gastosPagados').textContent=dinero(pg);$('utilidadEstimada').textContent=dinero(utilidad);$('saldoCaja').textContent=dinero(caja);$('resultadoEstimado').textContent=dinero(utilidad);$('resultadoCaja').textContent=dinero(caja);
 // Estado financiero por rubro: solo cobros registrados; cortesías y registros cancelados no cuentan como ingreso.
 const cobradoFuente=(fuente)=>ingresosActivos.filter(i=>i.fuente===fuente).reduce((s,i)=>s+Math.max(0,Number(i.importe_cobrado||0)),0);
