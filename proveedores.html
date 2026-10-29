@@ -1,0 +1,957 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102b49">
+
+  <title>Proveedores y servicios | Comunidad Helénica de México</title>
+
+  <style>
+    :root {
+      --azul: #102b49;
+      --azul-secundario: #183d63;
+      --dorado: #c5a15a;
+      --fondo: #f4f6f8;
+      --blanco: #ffffff;
+      --texto: #263442;
+      --texto-secundario: #687583;
+      --borde: #dce3e9;
+      --verde: #23764c;
+      --verde-fondo: #e8f5ed;
+      --gris-fondo: #edf0f3;
+      --sombra: 0 3px 12px rgba(16, 43, 73, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--fondo);
+      color: var(--texto);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button,
+    select {
+      cursor: pointer;
+    }
+
+    .contenedor {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    /* Encabezado institucional */
+
+    .encabezado {
+      color: var(--blanco);
+      background: var(--azul);
+      border-bottom: 4px solid var(--dorado);
+    }
+
+    .encabezado-interior {
+      min-height: 126px;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding-top: 18px;
+      padding-bottom: 18px;
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      flex: 0 0 100px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: var(--blanco);
+      padding: 5px;
+    }
+
+    .identidad {
+      min-width: 0;
+    }
+
+    .identidad h1 {
+      margin: 0;
+      font-size: clamp(21px, 3vw, 30px);
+      line-height: 1.25;
+    }
+
+    .identidad .fundacion {
+      margin: 7px 0 0;
+      color: #e8d7b1;
+      font-size: 14px;
+    }
+
+    .identidad .area {
+      margin: 8px 0 0;
+      font-size: 13px;
+      color: #e1e9f1;
+      letter-spacing: 0.4px;
+    }
+
+    /* Navegación */
+
+    .navegacion {
+      background: var(--blanco);
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .navegacion-interior {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+    }
+
+    .volver {
+      color: var(--azul-secundario);
+      text-decoration: none;
+      font-weight: bold;
+      padding: 10px 0;
+    }
+
+    .volver:hover {
+      text-decoration: underline;
+    }
+
+    /* Contenido */
+
+    main {
+      padding-top: 26px;
+      padding-bottom: 36px;
+    }
+
+    .titulo-pagina {
+      margin-bottom: 22px;
+    }
+
+    .titulo-pagina h2 {
+      margin: 0;
+      color: var(--azul);
+      font-size: clamp(24px, 3vw, 30px);
+    }
+
+    .titulo-pagina p {
+      margin: 8px 0 0;
+      color: var(--texto-secundario);
+    }
+
+    .panel {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      box-shadow: var(--sombra);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel h3 {
+      margin: 0 0 16px;
+      color: var(--azul);
+      font-size: 18px;
+    }
+
+    /* Indicadores */
+
+    .indicadores {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .indicador {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-top: 3px solid var(--dorado);
+      border-radius: 10px;
+      padding: 17px;
+      box-shadow: var(--sombra);
+    }
+
+    .indicador strong {
+      display: block;
+      color: var(--azul);
+      font-size: 29px;
+      line-height: 1.2;
+    }
+
+    .indicador span {
+      display: block;
+      margin-top: 5px;
+      color: var(--texto-secundario);
+      font-size: 13px;
+    }
+
+    /* Filtros */
+
+    .filtros {
+      display: grid;
+      grid-template-columns: minmax(220px, 2fr) repeat(2, minmax(160px, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .campo label {
+      font-weight: bold;
+      color: var(--azul);
+      font-size: 13px;
+    }
+
+    .campo input,
+    .campo select {
+      width: 100%;
+      min-height: 43px;
+      border: 1px solid #cbd5de;
+      border-radius: 7px;
+      background: var(--blanco);
+      color: var(--texto);
+      padding: 10px 12px;
+    }
+
+    .campo input:focus,
+    .campo select:focus {
+      outline: 2px solid var(--dorado);
+      outline-offset: 1px;
+    }
+
+    .acciones {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .boton {
+      min-height: 41px;
+      padding: 10px 16px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: var(--azul);
+      color: var(--blanco);
+      font-weight: bold;
+    }
+
+    .boton:hover {
+      background: var(--azul-secundario);
+    }
+
+    .boton-secundario {
+      background: var(--blanco);
+      color: var(--azul);
+      border-color: var(--borde);
+    }
+
+    .boton-secundario:hover {
+      background: #edf2f6;
+    }
+
+    .estado-mensaje {
+      margin: 14px 0 0;
+      padding: 12px 14px;
+      border-radius: 7px;
+      background: #edf2f6;
+      overflow-wrap: anywhere;
+    }
+
+    .estado-mensaje.error {
+      background: #fff0f0;
+      color: #942626;
+    }
+
+    .estado-mensaje.correcto {
+      background: var(--verde-fondo);
+      color: #205d3d;
+    }
+
+    /* Resultados */
+
+    .resultados-cabecera {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .resultados-cabecera h3 {
+      margin: 0;
+    }
+
+    .contador {
+      color: var(--texto-secundario);
+      font-size: 13px;
+    }
+
+    .lista-proveedores {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .proveedor {
+      min-width: 0;
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 11px;
+      padding: 18px;
+      box-shadow: var(--sombra);
+    }
+
+    .proveedor-cabecera {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .proveedor h4 {
+      color: var(--azul);
+      font-size: 18px;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .proveedor-id {
+      display: block;
+      margin-top: 5px;
+      color: var(--texto-secundario);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    .etiqueta {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .etiqueta.activo {
+      background: var(--verde-fondo);
+      color: var(--verde);
+    }
+
+    .etiqueta.inactivo {
+      background: var(--gris-fondo);
+      color: #59636e;
+    }
+
+    .categoria {
+      display: inline-block;
+      margin: 0 0 12px;
+      padding: 5px 9px;
+      border-radius: 5px;
+      background: #edf2f7;
+      color: var(--azul-secundario);
+      font-size: 12px;
+    }
+
+    .observaciones {
+      margin: 0 0 14px;
+      color: var(--texto-secundario);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .servicios {
+      border-top: 1px solid var(--borde);
+      padding-top: 13px;
+      margin-top: 10px;
+    }
+
+    .servicios h5 {
+      margin: 0 0 10px;
+      color: var(--azul);
+      font-size: 14px;
+    }
+
+    .servicio {
+      padding: 10px 0;
+      border-bottom: 1px solid #edf0f3;
+    }
+
+    .servicio:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .servicio-nombre {
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
+
+    .servicio-detalle {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px 12px;
+      margin-top: 4px;
+      color: var(--texto-secundario);
+      font-size: 12px;
+    }
+
+    .precio {
+      color: var(--azul);
+      font-weight: bold;
+    }
+
+    .sin-resultados {
+      grid-column: 1 / -1;
+      padding: 30px 20px;
+      text-align: center;
+      background: var(--blanco);
+      border: 1px dashed #cbd5de;
+      border-radius: 10px;
+      color: var(--texto-secundario);
+    }
+
+    .nota {
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--texto-secundario);
+    }
+
+    footer {
+      padding: 18px 0;
+      background: var(--azul);
+      border-top: 3px solid var(--dorado);
+      color: #e5eaf0;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .oculto {
+      display: none !important;
+    }
+
+    @media (max-width: 760px) {
+      .filtros {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .campo-busqueda {
+        grid-column: 1 / -1;
+      }
+
+      .lista-proveedores {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .contenedor {
+        width: calc(100% - 22px);
+      }
+
+      .encabezado-interior {
+        gap: 13px;
+        min-height: 100px;
+      }
+
+      .logo {
+        width: 72px;
+        height: 72px;
+        flex-basis: 72px;
+      }
+
+      .identidad h1 {
+        font-size: 19px;
+      }
+
+      .identidad .fundacion {
+        font-size: 12px;
+      }
+
+      .identidad .area {
+        font-size: 11px;
+      }
+
+      .indicadores {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      .indicador {
+        padding: 13px;
+      }
+
+      .indicador strong {
+        font-size: 24px;
+      }
+
+      .filtros {
+        grid-template-columns: 1fr;
+      }
+
+      .campo-busqueda {
+        grid-column: auto;
+      }
+
+      .panel {
+        padding: 15px;
+      }
+
+      .resultados-cabecera {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .boton {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="encabezado">
+    <div class="contenedor encabezado-interior">
+      <img
+        class="logo"
+        src="./images/Logo%20COMHELMEX.jpg"
+        alt="Logotipo de la Comunidad Helénica de México"
+        onerror="this.style.display='none'"
+      >
+
+      <div class="identidad">
+        <h1>Comunidad Helénica de México, A.C.</h1>
+        <p class="fundacion">Fundada el 13 de marzo de 1956</p>
+        <p class="area">PORTAL ADMINISTRATIVO INSTITUCIONAL</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="navegacion">
+    <div class="contenedor navegacion-interior">
+      <a class="volver" href="./index.html">← Volver al portal</a>
+    </div>
+  </nav>
+
+  <main class="contenedor">
+    <section class="titulo-pagina">
+      <h2>Catálogo de proveedores y servicios</h2>
+      <p>
+        Consulta institucional de proveedores, categorías y servicios
+        registrados en el catálogo central.
+      </p>
+    </section>
+
+    <section class="indicadores" aria-label="Resumen del catálogo">
+      <div class="indicador">
+        <strong id="totalProveedores">—</strong>
+        <span>Proveedores registrados</span>
+      </div>
+
+      <div class="indicador">
+        <strong id="totalActivos">—</strong>
+        <span>Proveedores activos</span>
+      </div>
+
+      <div class="indicador">
+        <strong id="totalServicios">—</strong>
+        <span>Servicios registrados</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Buscar y filtrar</h3>
+
+      <div class="filtros">
+        <div class="campo campo-busqueda">
+          <label for="buscar">Buscar proveedor o servicio</label>
+          <input
+            id="buscar"
+            type="search"
+            placeholder="Escribe un nombre, servicio o categoría..."
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="campo">
+          <label for="filtroCategoria">Categoría</label>
+          <select id="filtroCategoria">
+            <option value="">Todas las categorías</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="filtroEstado">Estado del proveedor</label>
+          <select id="filtroEstado">
+            <option value="todos">Todos los estados</option>
+            <option value="activo">Activos</option>
+            <option value="inactivo">Inactivos</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="acciones">
+        <button id="btnLimpiar" class="boton boton-secundario" type="button">
+          Limpiar filtros
+        </button>
+
+        <button id="btnRecargar" class="boton" type="button">
+          Recargar catálogo
+        </button>
+      </div>
+
+      <p id="mensaje" class="estado-mensaje" role="status" aria-live="polite">
+        Cargando catálogo...
+      </p>
+    </section>
+
+    <section>
+      <div class="resultados-cabecera">
+        <h3>Proveedores registrados</h3>
+        <span id="contadorResultados" class="contador">—</span>
+      </div>
+
+      <div id="listaProveedores" class="lista-proveedores"></div>
+
+      <p class="nota">
+        Los precios mostrados son referenciales y no representan
+        necesariamente el importe contratado o pagado en un evento.
+        Los datos de esta pantalla se consultan desde el catálogo
+        institucional; esta página no permite modificarlos.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Comunidad Helénica de México, A.C. · Portal Administrativo Institucional
+  </footer>
+
+  <script type="module">
+    import {
+      cargarCatalogoProveedores
+    } from "./js/proveedores.js";
+
+    const elementoBuscar = document.getElementById("buscar");
+    const filtroCategoria = document.getElementById("filtroCategoria");
+    const filtroEstado = document.getElementById("filtroEstado");
+    const listaProveedores = document.getElementById("listaProveedores");
+    const mensaje = document.getElementById("mensaje");
+    const contadorResultados = document.getElementById("contadorResultados");
+    const btnRecargar = document.getElementById("btnRecargar");
+
+    let catalogo = null;
+
+    const formatoMoneda = new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN",
+      maximumFractionDigits: 2
+    });
+
+    function crearElemento(etiqueta, clase, texto) {
+      const elemento = document.createElement(etiqueta);
+
+      if (clase) {
+        elemento.className = clase;
+      }
+
+      if (texto !== undefined && texto !== null) {
+        elemento.textContent = String(texto);
+      }
+
+      return elemento;
+    }
+
+    function normalizar(texto) {
+      return String(texto ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+    }
+
+    function cargarIndicadores() {
+      const proveedores = catalogo.proveedores;
+      const servicios = catalogo.servicios;
+
+      document.getElementById("totalProveedores").textContent =
+        proveedores.length;
+
+      document.getElementById("totalActivos").textContent =
+        proveedores.filter((p) => p.estado === "activo").length;
+
+      document.getElementById("totalServicios").textContent =
+        servicios.length;
+    }
+
+    function cargarCategorias() {
+      const categorias = catalogo.catalogos?.categorias_proveedor ?? [];
+
+      filtroCategoria.replaceChildren();
+
+      filtroCategoria.appendChild(
+        crearElemento("option", "", "Todas las categorías")
+      );
+
+      filtroCategoria.options[0].value = "";
+
+      [...categorias]
+        .sort((a, b) => a.localeCompare(b, "es"))
+        .forEach((categoria) => {
+          const opcion = crearElemento("option", "", categoria);
+          opcion.value = categoria;
+          filtroCategoria.appendChild(opcion);
+        });
+    }
+
+    function crearServicio(servicio) {
+      const contenedor = crearElemento("div", "servicio");
+
+      contenedor.appendChild(
+        crearElemento("div", "servicio-nombre", servicio.nombre)
+      );
+
+      const detalle = crearElemento("div", "servicio-detalle");
+
+      const categoria = servicio.categoria || "Sin categoría";
+      const unidad = servicio.unidad || "Unidad no especificada";
+
+      detalle.appendChild(
+        crearElemento("span", "", `${categoria} · ${unidad}`)
+      );
+
+      let precioTexto = "Precio no registrado";
+
+      if (
+        typeof servicio.precio_referencial === "number" &&
+        Number.isFinite(servicio.precio_referencial)
+      ) {
+        precioTexto = formatoMoneda.format(
+          servicio.precio_referencial
+        );
+      }
+
+      detalle.appendChild(
+        crearElemento("span", "precio", precioTexto)
+      );
+
+      contenedor.appendChild(detalle);
+
+      if (servicio.descripcion) {
+        contenedor.appendChild(
+          crearElemento("p", "observaciones", servicio.descripcion)
+        );
+      }
+
+      return contenedor;
+    }
+
+    function crearTarjetaProveedor(proveedor) {
+      const tarjeta = crearElemento("article", "proveedor");
+
+      const cabecera = crearElemento("div", "proveedor-cabecera");
+      const bloqueNombre = crearElemento("div", "");
+
+      bloqueNombre.appendChild(
+        crearElemento("h4", "", proveedor.nombre)
+      );
+
+      bloqueNombre.appendChild(
+        crearElemento("span", "proveedor-id", proveedor.id)
+      );
+
+      cabecera.appendChild(bloqueNombre);
+
+      const estado = proveedor.estado === "activo"
+        ? "Activo"
+        : "Inactivo";
+
+      cabecera.appendChild(
+        crearElemento(
+          "span",
+          `etiqueta ${proveedor.estado === "activo" ? "activo" : "inactivo"}`,
+          estado
+        )
+      );
+
+      tarjeta.appendChild(cabecera);
+
+      tarjeta.appendChild(
+        crearElemento(
+          "span",
+          "categoria",
+          proveedor.categoria || "Sin categoría"
+        )
+      );
+
+      if (proveedor.observaciones) {
+        tarjeta.appendChild(
+          crearElemento(
+            "p",
+            "observaciones",
+            proveedor.observaciones
+          )
+        );
+      }
+
+      const serviciosProveedor = catalogo.servicios.filter(
+        (servicio) => servicio.proveedor_id === proveedor.id
+      );
+
+      const seccionServicios = crearElemento("div", "servicios");
+
+      seccionServicios.appendChild(
+        crearElemento(
+          "h5",
+          "",
+          `Servicios asociados (${serviciosProveedor.length})`
+        )
+      );
+
+      if (serviciosProveedor.length === 0) {
+        seccionServicios.appendChild(
+          crearElemento(
+            "p",
+            "observaciones",
+            "No hay servicios registrados para este proveedor."
+          )
+        );
+      } else {
+        serviciosProveedor.forEach((servicio) => {
+          seccionServicios.appendChild(crearServicio(servicio));
+        });
+      }
+
+      tarjeta.appendChild(seccionServicios);
+
+      return tarjeta;
+    }
+
+    function aplicarFiltros() {
+      if (!catalogo) {
+        return;
+      }
+
+      const texto = normalizar(elementoBuscar.value);
+      const categoria = filtroCategoria.value;
+      const estado = filtroEstado.value;
+
+      const resultados = catalogo.proveedores.filter((proveedor) => {
+        if (estado !== "todos" && proveedor.estado !== estado) {
+          return false;
+        }
+
+        if (categoria && proveedor.categoria !== categoria) {
+          return false;
+        }
+
+        const servicios = catalogo.servicios.filter(
+          (servicio) => servicio.proveedor_id === proveedor.id
+        );
+
+        const contenido = [
+          proveedor.nombre,
+          proveedor.id,
+          proveedor.categoria,
+          proveedor.contacto_nombre,
+          proveedor.observaciones,
+          ...servicios.flatMap((servicio) => [
+            servicio.nombre,
+            servicio.categoria,
+            servicio.descripcion,
+            servicio.unidad
+          ])
+        ].map(normalizar).join(" ");
+
+        return !texto || contenido.includes(texto);
+      });
+
+      listaProveedores.replaceChildren();
+
+      if (resultados.length === 0) {
+        listaProveedores.appendChild(
+          crearElemento(
+            "div",
+            "sin-resultados",
+            "No se encontraron proveedores con los filtros seleccionados."
+          )
+        );
+      } else {
+        resultados.forEach((proveedor) => {
+          listaProveedores.appendChild(
+            crearTarjetaProveedor(proveedor)
+          );
+        });
+      }
+
+      contadorResultados.textContent =
+        `${resultados.length} de ${catalogo.proveedores.length} proveedores`;
+    }
+
+    async function cargarCatalogo(recargar = false) {
+      btnRecargar.disabled = true;
+      mensaje.className = "estado-mensaje";
+      mensaje.textContent = "Cargando catálogo institucional...";
+
+      try {
+        catalogo = await cargarCatalogoProveedores({
+          recargar
+        });
+
+        cargarIndicadores();
+        cargarCategorias();
+        aplicarFiltros();
+
+        mensaje.className = "estado-mensaje correcto";
+        mensaje.textContent =
+          "Catálogo cargado correctamente. La consulta es de solo lectura.";
+      } catch (error) {
+        catalogo = null;
+        listaProveedores.replaceChildren();
+        contadorResultados.textContent = "Sin resultados";
+
+        mensaje.className = "estado-mensaje error";
+        mensaje.textContent =
+          "No se pudo cargar el catálogo. " +
+          (error instanceof Error ? error.message : String(error));
+      } finally {
+        btnRecargar.disabled = false;
+      }
+    }
+
+    elementoBuscar.addEventListener("input", aplicarFiltros);
+    filtroCategoria.addEventListener("change", aplicarFiltros);
+    filtroEstado.addEventListener("change", aplicarFiltros);
+
+    document.getElementById("btnLimpiar").addEventListener("click", () => {
+      elementoBuscar.value = "";
+      filtroCategoria.value = "";
+      filtroEstado.value = "todos";
+      aplicarFiltros();
+    });
+
+    btnRecargar.addEventListener("click", () => {
+      cargarCatalogo(true);
+    });
+
+    cargarCatalogo();
+  </script>
+</body>
+</html>
